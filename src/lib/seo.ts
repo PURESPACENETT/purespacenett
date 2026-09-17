@@ -9,6 +9,8 @@ export const localBusinessJsonLd = {
   telephone: "+33759483021",
   email: business.email,
   url: "/",
+  hasMap: business.googleBusinessUrl,
+  sameAs: [business.googleBusinessUrl],
   address: {
     "@type": "PostalAddress",
     addressLocality: business.city,

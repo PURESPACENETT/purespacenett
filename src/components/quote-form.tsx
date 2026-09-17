@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { business } from "@/content/business";
+import { trackEvent } from "@/lib/analytics";
 
 export const propertyTypes = [
   "Maison",
@@ -10,12 +11,22 @@ export const propertyTypes = [
 ] as const;
 
 export const serviceTypes = [
-  "Ménage régulier",
-  "Ménage ponctuel",
-  "Fin de chantier",
-  "Déménagement / État des lieux",
-  "Vitres",
-  "Débarras",
+  "Nettoyage de bureaux et locaux professionnels",
+  "Entretien de copropriété et parties communes",
+  "Entretien de local commercial ou boutique",
+  "Ménage régulier (particulier)",
+  "Ménage ponctuel / grand nettoyage",
+  "Nettoyage de vitres et vitrines",
+  "Nettoyage fin de chantier",
+  "Remise en état après sinistre ou dégradation",
+  "Nettoyage avant / après déménagement (état des lieux)",
+  "Nettoyage de canapés, fauteuils et matelas",
+  "Nettoyage de tapis et moquettes",
+  "Nettoyage intérieur de véhicule",
+  "Désinfection et sanitaires",
+  "Nettoyage de parking et local poubelles",
+  "Débarras et évacuation d'encombrants",
+  "Autre besoin (à préciser)",
 ] as const;
 
 export const frequencies = [
@@ -48,6 +59,10 @@ export function QuoteForm() {
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    trackEvent("formulaire_devis_vu");
+  }, []);
 
   const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -82,9 +97,15 @@ export function QuoteForm() {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error(await res.text());
+      trackEvent("devis_envoye", {
+        prestation: form.serviceType,
+        type_de_bien: form.propertyType,
+        frequence: form.frequency,
+      });
       setStatus("sent");
       setForm(emptyForm);
     } catch {
+      trackEvent("devis_echec_envoi", { prestation: form.serviceType });
       setStatus("error");
       setError(null);
       mailtoFallback();

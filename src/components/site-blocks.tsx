@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Mail, Phone } from "lucide-react";
 import { business } from "@/content/business";
+import { trackEvent } from "@/lib/analytics";
 
 export function Section({
   children,
@@ -43,11 +44,11 @@ export function CheckList({ items }: { items: readonly string[] }) {
 }
 
 export function CallButtons({ subject }: { subject: string }) {
-  void subject;
   return (
     <div className="flex flex-wrap gap-3">
       <a
         href={business.phoneHref}
+        onClick={() => trackEvent("appel_telephone", { source: subject })}
         className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
       >
         <Phone className="size-4" />
@@ -55,6 +56,7 @@ export function CallButtons({ subject }: { subject: string }) {
       </a>
       <Link
         to="/devis"
+        onClick={() => trackEvent("clic_devis", { source: subject })}
         className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
       >
         <Mail className="size-4" />
@@ -65,7 +67,6 @@ export function CallButtons({ subject }: { subject: string }) {
 }
 
 export function QuoteBanner({ subject }: { subject: string }) {
-  void subject;
   return (
     <Section>
       <div className="rounded-3xl bg-ink px-6 py-10 text-ink-foreground sm:px-12">
@@ -83,6 +84,7 @@ export function QuoteBanner({ subject }: { subject: string }) {
           <div className="flex flex-col gap-3">
             <Link
               to="/devis"
+              onClick={() => trackEvent("clic_devis", { source: subject })}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground"
             >
               <Mail className="size-4" />
@@ -90,6 +92,7 @@ export function QuoteBanner({ subject }: { subject: string }) {
             </Link>
             <a
               href={business.phoneHref}
+              onClick={() => trackEvent("appel_telephone", { source: subject })}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold"
             >
               <Phone className="size-4" />

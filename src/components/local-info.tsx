@@ -1,14 +1,16 @@
-import { Clock, MapPin, Phone } from "lucide-react";
+import { Clock, MapPin, Phone, Star } from "lucide-react";
 import { business } from "@/content/business";
+import { trackEvent } from "@/lib/analytics";
 
-/** Bloc SEO local : téléphone cliquable, horaires, zone d'intervention. */
+/** Bloc SEO local : téléphone cliquable, horaires, zone d'intervention, fiche Google. */
 export function LocalInfo({ area }: { area?: string }) {
   const zone = area ?? `${business.city}, Seine-Saint-Denis, Paris et Île-de-France`;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <a
         href={business.phoneHref}
+        onClick={() => trackEvent("appel_telephone", { source: "bloc_local" })}
         className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-accent"
       >
         <Phone className="mt-0.5 size-5 shrink-0 text-accent" />
@@ -19,6 +21,7 @@ export function LocalInfo({ area }: { area?: string }) {
           <span className="font-display text-base font-bold">{business.phone}</span>
         </span>
       </a>
+
 
       <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5">
         <Clock className="mt-0.5 size-5 shrink-0 text-accent" />
@@ -39,6 +42,24 @@ export function LocalInfo({ area }: { area?: string }) {
           <span className="text-sm font-medium">{zone}</span>
         </div>
       </div>
+
+      <a
+        href={business.googleBusinessUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackEvent("clic_fiche_google", { source: "bloc_local" })}
+        className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-accent"
+      >
+        <Star className="mt-0.5 size-5 shrink-0 text-accent" />
+        <span>
+          <span className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Fiche Google
+          </span>
+          <span className="text-sm font-medium">
+            Voir nos avis et notre fiche {business.name} sur Google
+          </span>
+        </span>
+      </a>
     </div>
   );
 }
