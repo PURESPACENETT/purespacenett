@@ -96,9 +96,12 @@ export const geoMeta = ({
   postalCode: string;
   department: string;
 }) => [
-  { name: "geo.region", content: postalCode.startsWith("75") ? "FR-75" : "FR-93" },
+  {
+    name: "geo.region",
+    content: postalCode.startsWith("75") ? "FR-75" : postalCode ? "FR-93" : "FR-IDF",
+  },
   { name: "geo.placename", content: city },
-  { name: "ICBM", content: "" },
+  ...(postalCode ? [{ name: "geo.postal-code", content: postalCode }] : []),
   { name: "coverage", content: `${city}${postalCode ? ` ${postalCode}` : ""} — ${department}` },
 ];
 
