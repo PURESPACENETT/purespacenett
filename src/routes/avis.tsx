@@ -3,6 +3,7 @@ import { Quote, Star } from "lucide-react";
 import { business } from "@/content/business";
 import { testimonials } from "@/content/testimonials";
 import { Breadcrumbs, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
+import { ReviewForm } from "@/components/review-form";
 import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { trackEvent } from "@/lib/analytics";
 
@@ -143,6 +144,22 @@ function AvisPage() {
             </a>
           </div>
         )}
+      </Section>
+
+      <Section className="pt-0">
+        <div className="mx-auto max-w-2xl">
+          <Eyebrow>Votre avis</Eyebrow>
+          <h2 className="mt-3 font-display text-2xl font-bold sm:text-3xl">
+            Vous avez fait appel à {business.name} ? Laissez-nous un avis
+          </h2>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Quelques lignes suffisent. Votre avis nous est envoyé directement, et à la fin nous vous
+            proposons de le publier aussi sur notre fiche Google en un clic.
+          </p>
+          <div className="mt-6">
+            <ReviewForm />
+          </div>
+        </div>
       </Section>
 
       <QuoteBanner subject="avis clients" />
