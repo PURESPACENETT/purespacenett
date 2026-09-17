@@ -8,7 +8,7 @@ import {
   QuoteBanner,
   Section,
 } from "@/components/site-blocks";
-import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { breadcrumbJsonLd, cityBusinessJsonLd, geoMeta, pageMeta } from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 
@@ -26,12 +26,25 @@ export const Route = createFileRoute("/zones/$slug")({
     const z = loaderData.zone;
     const path = `/zones/${params.slug}`;
     return {
-      meta: pageMeta({ title: z.title, description: z.description, path }),
+      meta: [
+        ...pageMeta({ title: z.title, description: z.description, path }),
+        ...geoMeta({ city: z.name, postalCode: z.postalCode, department: z.department }),
+      ],
       links: [{ rel: "canonical", href: path }],
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({ ...localBusinessJsonLd, url: path }),
+          children: JSON.stringify(
+            cityBusinessJsonLd({
+              city: z.name,
+              postalCode: z.postalCode,
+              department: z.department,
+              sectors: z.sectors,
+              neighbours: z.neighbours,
+              path,
+              description: z.description,
+            }),
+          ),
         },
         {
           type: "application/ld+json",
@@ -72,7 +85,9 @@ function ZoneDetail() {
             <Eyebrow>Zone desservie</Eyebrow>
             <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold leading-tight">
               Entreprise de nettoyage à {zone.name}
+              {zone.postalCode ? ` (${zone.postalCode})` : ""}
             </h1>
+            <p className="mt-2 text-sm font-medium text-muted-foreground">{zone.department}</p>
             <p className="mt-5 max-w-2xl text-base text-muted-foreground">{zone.intro}</p>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">{zone.context}</p>
             <div className="mt-8">
@@ -85,6 +100,26 @@ function ZoneDetail() {
             className="aspect-[4/3] w-full rounded-2xl border border-border object-cover shadow-card"
           />
         </div>
+      </Section>
+
+      <Section className="pt-0">
+        <h2 className="font-display text-2xl font-bold">
+          Quartiers et secteurs desservis à {zone.name}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Nous intervenons sur l'ensemble de {zone.name}
+          {zone.postalCode ? ` (${zone.postalCode})` : ""}, notamment :
+        </p>
+        <ul className="mt-5 flex flex-wrap gap-2">
+          {zone.sectors.map((sector) => (
+            <li
+              key={sector}
+              className="rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground/90"
+            >
+              {sector}
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section className="pt-0">

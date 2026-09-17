@@ -37,6 +37,11 @@ export function SiteFooter() {
               <MapPin className="size-4 text-accent" />
               {business.city} ({business.postalCode})
             </li>
+            <li>
+              <Link to="/avis" className="hover:underline">
+                Avis clients
+              </Link>
+            </li>
           </ul>
         </div>
 
