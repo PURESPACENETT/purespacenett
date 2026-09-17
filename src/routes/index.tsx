@@ -6,6 +6,7 @@ import { zones } from "@/content/zones";
 import { CallButtons, CheckList, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { siteImages } from "@/lib/site-images";
+import { LocalInfo, LocalMap } from "@/components/local-info";
 
 const title = "Entreprise de nettoyage Île-de-France | PURE SPACE NETT";
 const description =
@@ -183,6 +184,31 @@ function Index() {
               Nettoyage {z.name}
             </Link>
           ))}
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <Eyebrow>Nous joindre</Eyebrow>
+        <h2 className="mt-3 font-display text-3xl font-bold">
+          Une équipe locale, joignable {business.hours.toLowerCase()}
+        </h2>
+        <div className="mt-8">
+          <LocalInfo />
+        </div>
+        <div className="mt-6">
+          <LocalMap
+            query={`${business.city} ${business.postalCode} France`}
+            title={`Zone d'intervention de ${business.name} autour du ${business.city}`}
+          />
+        </div>
+        <div className="mt-6">
+          <Link
+            to="/devis"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
+          >
+            Demander un devis en ligne
+            <ArrowRight className="size-4" />
+          </Link>
         </div>
       </Section>
 
