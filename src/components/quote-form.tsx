@@ -36,6 +36,8 @@ const emptyForm = {
   frequency: "",
   message: "",
   consent: false,
+  // champ piège anti-robots, invisible pour les visiteurs
+  company: "",
 };
 
 const field =
@@ -230,6 +232,16 @@ export function QuoteForm() {
           onChange={(e) => set("message", e.target.value)}
         />
       </label>
+
+      <input
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={form.company}
+        onChange={(e) => set("company", e.target.value)}
+        className="pointer-events-none absolute left-[-9999px] size-0 opacity-0"
+      />
 
       <label className="mt-4 flex items-start gap-3 text-xs text-muted-foreground">
         <input

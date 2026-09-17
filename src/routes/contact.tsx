@@ -10,6 +10,7 @@ const description =
   "Contactez PURE SPACE NETT au 07 59 48 30 21 ou à contact@purespacenett.com pour un devis de nettoyage gratuit en Île-de-France. Réponse sous 24 heures.";
 
 export const Route = createFileRoute("/contact")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/contact" }),
     links: [{ rel: "canonical", href: "/contact" }],

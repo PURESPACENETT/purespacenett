@@ -10,8 +10,10 @@ import {
 } from "@/components/site-blocks";
 import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
+import { LocalInfo, LocalMap } from "@/components/local-info";
 
 export const Route = createFileRoute("/zones/$slug")({
+  staticData: { sitemap: true },
   loader: ({ params }) => {
     const zone = getZone(params.slug);
     if (!zone) throw notFound();
@@ -122,6 +124,29 @@ function ZoneDetail() {
                 Nettoyage {z.name}
               </Link>
             ))}
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <h2 className="font-display text-2xl font-bold">
+          Nous joindre pour une intervention à {zone.name}
+        </h2>
+        <div className="mt-6">
+          <LocalInfo area={`${zone.name} et communes voisines`} />
+        </div>
+        <div className="mt-6">
+          <LocalMap
+            query={`${zone.name} Île-de-France France`}
+            title={`Carte du secteur d'intervention de nettoyage à ${zone.name}`}
+          />
+        </div>
+        <div className="mt-6">
+          <Link
+            to="/devis"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
+          >
+            Demander un devis pour {zone.name}
+          </Link>
         </div>
       </Section>
 

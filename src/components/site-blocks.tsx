@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Mail, Phone } from "lucide-react";
-import { business, quoteMailto } from "@/content/business";
+import { business } from "@/content/business";
 
 export function Section({
   children,
@@ -43,6 +43,7 @@ export function CheckList({ items }: { items: readonly string[] }) {
 }
 
 export function CallButtons({ subject }: { subject: string }) {
+  void subject;
   return (
     <div className="flex flex-wrap gap-3">
       <a
@@ -52,18 +53,19 @@ export function CallButtons({ subject }: { subject: string }) {
         <Phone className="size-4" />
         Appeler le {business.phone}
       </a>
-      <a
-        href={quoteMailto(subject)}
+      <Link
+        to="/devis"
         className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
       >
         <Mail className="size-4" />
         Demander un devis gratuit
-      </a>
+      </Link>
     </div>
   );
 }
 
 export function QuoteBanner({ subject }: { subject: string }) {
+  void subject;
   return (
     <Section>
       <div className="rounded-3xl bg-ink px-6 py-10 text-ink-foreground sm:px-12">
@@ -76,27 +78,28 @@ export function QuoteBanner({ subject }: { subject: string }) {
               Décrivez-nous votre besoin : surface, fréquence souhaitée, contraintes d'horaires.
               Nous vous rappelons pour caler une visite ou vous envoyer un chiffrage directement.
             </p>
+            <p className="mt-3 text-sm text-ink-foreground/75">{business.hours}</p>
           </div>
           <div className="flex flex-col gap-3">
+            <Link
+              to="/devis"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground"
+            >
+              <Mail className="size-4" />
+              Demander un devis en ligne
+            </Link>
             <a
               href={business.phoneHref}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold"
             >
               <Phone className="size-4" />
               {business.phone}
-            </a>
-            <a
-              href={quoteMailto(subject)}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold"
-            >
-              <Mail className="size-4" />
-              {business.email}
             </a>
             <Link
               to="/contact"
               className="text-center text-xs text-ink-foreground/60 underline underline-offset-4"
             >
-              Ou remplir le formulaire de contact
+              Ou nous écrire via la page contact
             </Link>
           </div>
         </div>

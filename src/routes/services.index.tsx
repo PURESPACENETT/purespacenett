@@ -10,6 +10,7 @@ const description =
   "Toutes les prestations de PURE SPACE NETT : nettoyage de bureaux, copropriétés, commerces, vitres, fin de chantier, remise en état, état des lieux, canapés et véhicules en Île-de-France.";
 
 export const Route = createFileRoute("/services/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/services" }),
     links: [{ rel: "canonical", href: "/services" }],

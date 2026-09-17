@@ -59,6 +59,7 @@ const grid = [
 ];
 
 export const Route = createFileRoute("/tarifs")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/tarifs" }),
     links: [{ rel: "canonical", href: "/tarifs" }],
