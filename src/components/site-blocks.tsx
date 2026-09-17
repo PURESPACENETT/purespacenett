@@ -67,7 +67,6 @@ export function CallButtons({ subject }: { subject: string }) {
 }
 
 export function QuoteBanner({ subject }: { subject: string }) {
-  void subject;
   return (
     <Section>
       <div className="rounded-3xl bg-ink px-6 py-10 text-ink-foreground sm:px-12">
