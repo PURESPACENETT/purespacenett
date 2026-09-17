@@ -60,6 +60,10 @@ export function QuoteForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    trackEvent("formulaire_devis_vu");
+  }, []);
+
   const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
