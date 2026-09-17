@@ -89,13 +89,19 @@ function AvisPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((t) => (
               <figure
-                key={`${t.author}-${t.text.slice(0, 20)}`}
+                key={t.author}
                 className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-card"
               >
                 <Quote className="size-6 text-accent" />
-                <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-foreground/90">
-                  “{t.text}”
-                </blockquote>
+                {t.text ? (
+                  <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-foreground/90">
+                    “{t.text}”
+                  </blockquote>
+                ) : (
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                    A laissé un avis {t.rating} étoiles sur notre fiche Google.
+                  </p>
+                )}
                 <div
                   className="mt-4 flex gap-0.5"
                   aria-label={`Note de ${t.rating} sur 5`}
