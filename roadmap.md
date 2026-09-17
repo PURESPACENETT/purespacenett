@@ -11,6 +11,10 @@
 - [x] Espace privé /connexion + /admin
 - [x] Infos locales : téléphone, horaires 7h–22h, zone desservie, carte Google Maps, lien fiche Google (accueil, villes, devis)
 - [x] Suivi Google Analytics : vues de pages (villes incluses), formulaire vu, devis envoyé, clics devis et téléphone
-- [ ] Lien exact de la fiche Google Business (à fournir par l'utilisateur pour remplacer la recherche Maps)
-- [ ] Envoi automatique d'un e-mail de notification — bloqué : configuration du domaine d'envoi purespacenett.com
+- [x] Lien exact de la fiche Google Business branché
+- [x] Envoi d'e-mails PURE SPACE NETT (notify.purespacenett.com) : notification devis + avis
+- [x] Balises H1/H2/H3 et métadonnées des pages de villes optimisées mots-clés locaux
+- [x] Bouton WhatsApp Business aux endroits clés
+- [x] Page FAQ locale (horaires, devis, tarifs, prestations, zones)
+- [x] Open Graph + données locales des pages de villes optimisées pour les résultats locaux
 - [ ] Brancher purespacenett.com (à faire par l'utilisateur dans les réglages du projet)

@@ -6,6 +6,9 @@ export const business = {
   phoneHref: "tel:+33759483021",
   email: "contact@purespacenett.com",
   emailHref: "mailto:contact@purespacenett.com",
+  /** WhatsApp Business (même numéro que la ligne téléphonique). */
+  whatsapp: "+33 7 59 48 30 21",
+  whatsappNumber: "33759483021",
   /** Fiche Google officielle (lien de partage fourni par le client). */
   googleBusinessUrl: "https://share.google/2u1kIaVRrVNB4drT0",
   googleReviewUrl: "https://share.google/2u1kIaVRrVNB4drT0",
@@ -33,6 +36,12 @@ export const business = {
     "Interventions ponctuelles ou contrats réguliers",
   ],
 } as const;
+
+/** Lien WhatsApp Business pré-rempli. */
+export const whatsappHref = (subject: string) =>
+  `https://wa.me/${business.whatsappNumber}?text=${encodeURIComponent(
+    `Bonjour ${business.name}, je souhaite un devis pour : ${subject}.`,
+  )}`;
 
 export const quoteMailto = (subject: string) =>
   `mailto:${business.email}?subject=${encodeURIComponent(`Demande de devis — ${subject}`)}`;

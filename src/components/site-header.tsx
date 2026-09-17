@@ -10,6 +10,7 @@ const nav = [
   { to: "/tarifs", label: "Tarifs" },
   { to: "/devis", label: "Devis gratuit" },
   { to: "/avis", label: "Avis clients" },
+  { to: "/faq", label: "FAQ" },
   { to: "/a-propos", label: "À propos" },
   { to: "/contact", label: "Contact" },
 ] as const;

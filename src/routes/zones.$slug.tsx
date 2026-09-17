@@ -7,8 +7,15 @@ import {
   Eyebrow,
   QuoteBanner,
   Section,
+  WhatsAppButton,
 } from "@/components/site-blocks";
-import { breadcrumbJsonLd, cityBusinessJsonLd, geoMeta, pageMeta } from "@/lib/seo";
+import {
+  breadcrumbJsonLd,
+  cityBusinessJsonLd,
+  geoMeta,
+  localOgMeta,
+  pageMeta,
+} from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 
@@ -27,7 +34,17 @@ export const Route = createFileRoute("/zones/$slug")({
     const path = `/zones/${params.slug}`;
     return {
       meta: [
-        ...pageMeta({ title: z.title, description: z.description, path }),
+        ...pageMeta({
+          title: z.title,
+          description: z.description,
+          path,
+          type: "business.business",
+        }),
+        ...localOgMeta({
+          city: z.name,
+          postalCode: z.postalCode,
+          department: z.department,
+        }),
         ...geoMeta({ city: z.name, postalCode: z.postalCode, department: z.department }),
       ],
       links: [{ rel: "canonical", href: path }],
@@ -43,6 +60,10 @@ export const Route = createFileRoute("/zones/$slug")({
               neighbours: z.neighbours,
               path,
               description: z.description,
+              services: z.serviceSlugs
+                .map((slug) => getService(slug))
+                .filter((s): s is NonNullable<ReturnType<typeof getService>> => Boolean(s))
+                .map((s) => ({ name: s.navName, path: `/services/${s.slug}` })),
             }),
           ),
         },
@@ -82,12 +103,15 @@ function ZoneDetail() {
       <Section className="pb-8">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
           <div>
-            <Eyebrow>Zone desservie</Eyebrow>
+            <Eyebrow>Nettoyage {zone.name}</Eyebrow>
             <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold leading-tight">
-              Entreprise de nettoyage à {zone.name}
-              {zone.postalCode ? ` (${zone.postalCode})` : ""}
+              Nettoyage {zone.name}
+              {zone.postalCode ? ` (${zone.postalCode})` : ""} — entreprise de nettoyage
+              professionnel
             </h1>
-            <p className="mt-2 text-sm font-medium text-muted-foreground">{zone.department}</p>
+            <p className="mt-2 text-sm font-medium text-muted-foreground">
+              {zone.department} · société de nettoyage de proximité · devis gratuit sous 24 h
+            </p>
             <p className="mt-5 max-w-2xl text-base text-muted-foreground">{zone.intro}</p>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">{zone.context}</p>
             <div className="mt-8">
@@ -104,19 +128,21 @@ function ZoneDetail() {
 
       <Section className="pt-0">
         <h2 className="font-display text-2xl font-bold">
-          Quartiers et secteurs desservis à {zone.name}
+          Nettoyage {zone.name} : quartiers et secteurs desservis
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Nous intervenons sur l'ensemble de {zone.name}
-          {zone.postalCode ? ` (${zone.postalCode})` : ""}, notamment :
+          {zone.postalCode ? ` (${zone.postalCode})` : ""}, quartier par quartier :
         </p>
-        <ul className="mt-5 flex flex-wrap gap-2">
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {zone.sectors.map((sector) => (
-            <li
-              key={sector}
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground/90"
-            >
-              {sector}
+            <li key={sector} className="rounded-2xl border border-border bg-card p-4">
+              <h3 className="font-display text-sm font-semibold">
+                Nettoyage {sector} — {zone.name}
+              </h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Bureaux, parties communes, commerces et fin de chantier sur ce secteur.
+              </p>
             </li>
           ))}
         </ul>
@@ -231,6 +257,16 @@ function ZoneDetail() {
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
           >
             Demander un devis de nettoyage à {zone.name}
+          </Link>
+          <WhatsAppButton
+            subject={`nettoyage à ${zone.name}${zone.postalCode ? ` (${zone.postalCode})` : ""}`}
+            label="Écrire sur WhatsApp"
+          />
+          <Link
+            to="/faq"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold transition-colors hover:border-accent"
+          >
+            Questions fréquentes
           </Link>
           <Link
             to="/contact"
