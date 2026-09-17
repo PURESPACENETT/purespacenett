@@ -143,6 +143,37 @@ function ZoneDetail() {
               <p className="mt-1 text-xs text-muted-foreground">
                 Bureaux, parties communes, commerces et fin de chantier sur ce secteur.
               </p>
+              <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/80">
+                Recherches liées : nettoyage bureaux {sector}, entretien copropriété {sector},
+                nettoyage vitres {sector}.
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section className="pt-0">
+        <h2 className="font-display text-2xl font-bold">
+          Recherches fréquentes de nettoyage à {zone.name}
+          {zone.postalCode ? ` (${zone.postalCode})` : ""}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Voici les demandes pour lesquelles nos clients de {zone.name} nous trouvent sur Google, et
+          la page qui y répond.
+        </p>
+        <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+          {queries.map((q) => (
+            <li key={q.query} className="text-sm text-muted-foreground">
+              {q.servicePath ? (
+                <Link
+                  to={q.servicePath}
+                  className="text-primary underline underline-offset-2 hover:no-underline"
+                >
+                  {q.query}
+                </Link>
+              ) : (
+                <span>{q.query}</span>
+              )}
             </li>
           ))}
         </ul>
