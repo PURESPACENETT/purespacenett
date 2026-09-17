@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getZone, zones } from "@/content/zones";
+import { getZone, zoneQueries, zones } from "@/content/zones";
 import { getService } from "@/content/services";
 import {
   Breadcrumbs,
@@ -86,6 +86,7 @@ export const Route = createFileRoute("/zones/$slug")({
 function ZoneDetail() {
   const { zone } = Route.useLoaderData();
   const zoneIndex = Math.max(0, zones.findIndex((item) => item.slug === zone.slug));
+  const queries = zoneQueries(zone);
   const zoneServices = zone.serviceSlugs
     .map((slug) => getService(slug))
     .filter((s): s is NonNullable<ReturnType<typeof getService>> => Boolean(s));
