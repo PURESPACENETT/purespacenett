@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MapPin, Phone } from "lucide-react";
-import { business } from "@/content/business";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { business, whatsappHref } from "@/content/business";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { siteImages } from "@/lib/site-images";
@@ -38,8 +38,24 @@ export function SiteFooter() {
               {business.city} ({business.postalCode})
             </li>
             <li>
+              <a
+                href={whatsappHref("nettoyage en Île-de-France")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 hover:underline"
+              >
+                <MessageCircle className="size-4 text-accent" />
+                WhatsApp : {business.whatsapp}
+              </a>
+            </li>
+            <li>
               <Link to="/avis" className="hover:underline">
                 Avis clients
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" className="hover:underline">
+                Questions fréquentes (FAQ)
               </Link>
             </li>
           </ul>
