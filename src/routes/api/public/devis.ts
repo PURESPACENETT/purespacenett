@@ -35,7 +35,7 @@ export const Route = createFileRoute("/api/public/devis")({
         const data = parsed.data;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { error } = await supabaseAdmin.from("quote_requests").insert({
+        const { data: inserted, error } = await supabaseAdmin.from("quote_requests").insert({
           full_name: data.fullName,
           email: data.email,
           phone: data.phone,
