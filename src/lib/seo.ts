@@ -1,5 +1,13 @@
 import { business } from "@/content/business";
 
+/** Origine publique du site : les URL canoniques doivent être absolues pour Google. */
+export const SITE_URL = "https://purespacenett.com";
+
+/** Transforme un chemin interne en URL absolue auto-référencée. */
+export const canonicalUrl = (path: string) =>
+  path.startsWith("http") ? path : `${SITE_URL}${path === "/" ? "/" : path}`;
+
+
 /** JSON-LD de l'entreprise, réutilisé sur les pages principales. */
 export const localBusinessJsonLd = {
   "@context": "https://schema.org",
