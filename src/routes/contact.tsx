@@ -30,23 +30,6 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    service: services[0]!.name,
-    city: "",
-    message: "",
-  });
-
-  const mailto = `mailto:${business.email}?subject=${encodeURIComponent(
-    `Demande de devis — ${form.service}`,
-  )}&body=${encodeURIComponent(
-    `Nom : ${form.name}\nTéléphone : ${form.phone}\nPrestation : ${form.service}\nVille : ${form.city}\n\n${form.message}`,
-  )}`;
-
-  const field =
-    "mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-ring/40";
-
   return (
     <>
       <Breadcrumbs items={[{ label: "Accueil", to: "/" }, { label: "Contact" }]} />
