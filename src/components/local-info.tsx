@@ -42,6 +42,24 @@ export function LocalInfo({ area }: { area?: string }) {
           <span className="text-sm font-medium">{zone}</span>
         </div>
       </div>
+
+      <a
+        href={business.googleBusinessUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackEvent("clic_fiche_google", { source: "bloc_local" })}
+        className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-accent"
+      >
+        <Star className="mt-0.5 size-5 shrink-0 text-accent" />
+        <span>
+          <span className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Fiche Google
+          </span>
+          <span className="text-sm font-medium">
+            Voir nos avis et notre fiche {business.name} sur Google
+          </span>
+        </span>
+      </a>
     </div>
   );
 }
