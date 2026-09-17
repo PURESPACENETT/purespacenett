@@ -8,7 +8,7 @@ import {
   QuoteBanner,
   Section,
 } from "@/components/site-blocks";
-import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { breadcrumbJsonLd, cityBusinessJsonLd, geoMeta, pageMeta } from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 
