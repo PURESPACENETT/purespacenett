@@ -17,10 +17,21 @@ export type QuoteRequest = {
   created_at: string;
 };
 
+/** Adresse du propriétaire : ce compte reçoit automatiquement le rôle administrateur. */
+const OWNER_EMAIL = "contact@purespacenett.com";
+
 /** Liste des demandes de devis. RLS : réservé au rôle administrateur. */
 export const listQuoteRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const claims = context.claims as { email?: string } | undefined;
+    if (claims?.email?.toLowerCase() === OWNER_EMAIL) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: context.userId, role: "admin" }, { onConflict: "user_id,role" });
+    }
+
     const { data, error } = await context.supabase
       .from("quote_requests")
       .select(
