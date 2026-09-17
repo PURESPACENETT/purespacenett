@@ -61,6 +61,7 @@ export const cityBusinessJsonLd = ({
   neighbours,
   path,
   description,
+  services = [],
 }: {
   city: string;
   postalCode: string;
@@ -69,11 +70,14 @@ export const cityBusinessJsonLd = ({
   neighbours: string[];
   path: string;
   description: string;
+  services?: { name: string; path: string }[];
 }) => ({
   ...localBusinessJsonLd,
+  "@id": path,
   name: `${business.name} — Nettoyage à ${city}`,
   description,
   url: path,
+  slogan: `Nettoyage ${city}${postalCode ? ` ${postalCode}` : ""} — devis gratuit sous 24 h`,
   areaServed: [
     {
       "@type": "City",
@@ -84,7 +88,54 @@ export const cityBusinessJsonLd = ({
     ...sectors.map((s) => ({ "@type": "Place", name: `${s}, ${city}` })),
     ...neighbours.map((n) => ({ "@type": "City", name: n })),
   ],
+  serviceArea: {
+    "@type": "City",
+    name: city,
+    ...(postalCode ? { postalCode } : {}),
+  },
+  ...(services.length
+    ? {
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: `Prestations de nettoyage à ${city}`,
+          itemListElement: services.map((s) => ({
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: `${s.name} à ${city}`,
+              serviceType: s.name,
+              url: s.path,
+              areaServed: {
+                "@type": "City",
+                name: city,
+                ...(postalCode ? { postalCode } : {}),
+              },
+            },
+          })),
+        },
+      }
+    : {}),
 });
+
+/** Balises Open Graph orientées établissement local (résultats locaux Google & partages). */
+export const localOgMeta = ({
+  city,
+  postalCode,
+  department,
+}: {
+  city: string;
+  postalCode: string;
+  department: string;
+}) => [
+  { property: "business:contact_data:locality", content: city },
+  ...(postalCode ? [{ property: "business:contact_data:postal_code", content: postalCode }] : []),
+  { property: "business:contact_data:region", content: department },
+  { property: "business:contact_data:country_name", content: "France" },
+  { property: "business:contact_data:phone_number", content: "+33759483021" },
+  { property: "business:contact_data:email", content: business.email },
+  { property: "business:contact_data:website", content: "https://purespacenett.com" },
+  { property: "place:location:region", content: business.region },
+];
 
 /** Balises géographiques locales pour une ville. */
 export const geoMeta = ({
