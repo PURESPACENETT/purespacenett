@@ -83,7 +83,8 @@ function LoginPage() {
             className={field}
             type="password"
             required
-            autoComplete="current-password"
+            minLength={8}
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -93,9 +94,27 @@ function LoginPage() {
           disabled={loading}
           className="mt-6 w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
         >
-          {loading ? "Connexion…" : "Se connecter"}
+          {loading
+            ? "Patientez…"
+            : mode === "signup"
+              ? "Créer mon compte"
+              : "Se connecter"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setMode(mode === "signup" ? "signin" : "signup");
+            setError(null);
+            setInfo(null);
+          }}
+          className="mt-3 w-full text-xs text-muted-foreground underline underline-offset-4"
+        >
+          {mode === "signup"
+            ? "J'ai déjà un compte — me connecter"
+            : "Première visite ? Créer mon compte"}
         </button>
         {error && <p className="mt-3 text-xs text-destructive">{error}</p>}
+        {info && <p className="mt-3 text-xs text-primary">{info}</p>}
       </form>
     </Section>
   );
