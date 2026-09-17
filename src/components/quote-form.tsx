@@ -97,9 +97,15 @@ export function QuoteForm() {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error(await res.text());
+      trackEvent("devis_envoye", {
+        prestation: form.serviceType,
+        type_de_bien: form.propertyType,
+        frequence: form.frequency,
+      });
       setStatus("sent");
       setForm(emptyForm);
     } catch {
+      trackEvent("devis_echec_envoi", { prestation: form.serviceType });
       setStatus("error");
       setError(null);
       mailtoFallback();
