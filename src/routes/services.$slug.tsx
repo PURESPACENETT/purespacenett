@@ -11,6 +11,7 @@ import {
   Section,
 } from "@/components/site-blocks";
 import { breadcrumbJsonLd, faqJsonLd, pageMeta, serviceJsonLd } from "@/lib/seo";
+import { getServiceImage } from "@/lib/site-images";
 
 export const Route = createFileRoute("/services/$slug")({
   loader: ({ params }) => {
@@ -66,13 +67,22 @@ function ServiceDetail() {
       />
 
       <Section className="pb-8">
-        <Eyebrow>{service.audience}</Eyebrow>
-        <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold leading-tight">
-          {service.h1}
-        </h1>
-        <p className="mt-5 max-w-2xl text-base text-muted-foreground">{service.intro}</p>
-        <div className="mt-8">
-          <CallButtons subject={service.name} />
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          <div>
+            <Eyebrow>{service.audience}</Eyebrow>
+            <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold leading-tight">
+              {service.h1}
+            </h1>
+            <p className="mt-5 max-w-2xl text-base text-muted-foreground">{service.intro}</p>
+            <div className="mt-8">
+              <CallButtons subject={service.name} />
+            </div>
+          </div>
+          <img
+            src={getServiceImage(service.slug)}
+            alt={`Exemple de chantier ${service.name.toLowerCase()} réalisé par PURE SPACE NETT`}
+            className="aspect-[4/3] w-full rounded-2xl border border-border object-cover shadow-card"
+          />
         </div>
       </Section>
 

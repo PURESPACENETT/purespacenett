@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { services } from "@/content/services";
 import { Breadcrumbs, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { breadcrumbJsonLd, pageMeta } from "@/lib/seo";
+import { getServiceImage } from "@/lib/site-images";
 
 const title = "Nos prestations de nettoyage | PURE SPACE NETT";
 const description =
@@ -45,22 +46,30 @@ function ServicesIndex() {
 
       <Section className="pt-0">
         <div className="grid gap-4 md:grid-cols-2">
-          {services.map((s) => (
+          {services.map((s, index) => (
             <Link
               key={s.slug}
               to="/services/$slug"
               params={{ slug: s.slug }}
-              className="group flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card transition-colors hover:border-accent"
+              className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-colors hover:border-accent"
             >
-              <h2 className="font-display text-lg font-semibold">{s.name}</h2>
-              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-accent-foreground/70">
-                {s.audience}
-              </p>
-              <p className="mt-3 text-sm text-muted-foreground">{s.intro}</p>
-              <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                Détail de la prestation
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-              </span>
+              <img
+                src={getServiceImage(s.slug, index)}
+                alt={`Chantier PURE SPACE NETT pour ${s.name.toLowerCase()}`}
+                loading="lazy"
+                className="aspect-[16/8] w-full object-cover"
+              />
+              <div className="flex h-full flex-col p-6">
+                <h2 className="font-display text-lg font-semibold">{s.name}</h2>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-accent-foreground/70">
+                  {s.audience}
+                </p>
+                <p className="mt-3 text-sm text-muted-foreground">{s.intro}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                  Détail de la prestation
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </div>
             </Link>
           ))}
         </div>

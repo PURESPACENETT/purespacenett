@@ -3,13 +3,22 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { business } from "@/content/business";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
+import { siteImages } from "@/lib/site-images";
 
 export function SiteFooter() {
   return (
     <footer className="mt-20 bg-ink text-ink-foreground">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4">
         <div className="md:col-span-1">
-          <p className="font-display text-lg font-bold">{business.name}</p>
+          <div className="flex items-center gap-3">
+            <img
+              src={siteImages.logo}
+              alt="Logo PURE SPACE NETT"
+              loading="lazy"
+              className="size-12 rounded-md object-cover"
+            />
+            <p className="font-display text-lg font-bold">{business.name}</p>
+          </div>
           <p className="mt-2 text-sm text-ink-foreground/70">{business.tagline}</p>
           <ul className="mt-5 space-y-2 text-sm">
             <li>

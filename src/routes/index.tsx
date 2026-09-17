@@ -5,6 +5,7 @@ import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { CallButtons, CheckList, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { siteImages } from "@/lib/site-images";
 
 const title = "Entreprise de nettoyage Île-de-France | PURE SPACE NETT";
 const description =
@@ -77,17 +78,25 @@ function Index() {
             </dl>
           </div>
 
-          <div className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8">
-            <h2 className="font-display text-lg font-bold">Pourquoi nous confier vos locaux</h2>
-            <div className="mt-5">
-              <CheckList items={business.usp} />
-            </div>
-            <div className="mt-6 rounded-2xl bg-sand p-4 text-sm text-sand-foreground">
-              <p className="font-semibold">Besoin urgent&nbsp;?</p>
-              <p className="mt-1">
-                Fin de chantier à livrer ou état des lieux demain : appelez-nous, nous réorganisons
-                nos tournées quand c'est possible.
-              </p>
+          <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-card">
+            <img
+              src={siteImages.avantApres}
+              alt="Hall de copropriété avant et après le nettoyage par PURE SPACE NETT"
+              className="aspect-[16/10] w-full object-cover"
+              fetchPriority="high"
+            />
+            <div className="p-6 sm:p-8">
+              <h2 className="font-display text-lg font-bold">Pourquoi nous confier vos locaux</h2>
+              <div className="mt-5">
+                <CheckList items={business.usp} />
+              </div>
+              <div className="mt-6 rounded-2xl bg-sand p-4 text-sm text-sand-foreground">
+                <p className="font-semibold">Besoin urgent&nbsp;?</p>
+                <p className="mt-1">
+                  Fin de chantier à livrer ou état des lieux demain : appelez-nous, nous réorganisons
+                  nos tournées quand c'est possible.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -117,6 +126,26 @@ function Index() {
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </span>
             </Link>
+          ))}
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <Eyebrow>Réalisations</Eyebrow>
+        <h2 className="mt-3 font-display text-3xl font-bold">Nos chantiers récents</h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          {[
+            [siteImages.couloir, "Sol brillant après nettoyage dans une résidence"],
+            [siteImages.solNettoye, "Entretien d'un sol dans les parties communes"],
+            [siteImages.bureaux, "Bureaux lumineux après une intervention de nettoyage"],
+          ].map(([src, alt]) => (
+            <img
+              key={src}
+              src={src}
+              alt={alt}
+              loading="lazy"
+              className="aspect-[4/5] w-full rounded-2xl border border-border object-cover shadow-card"
+            />
           ))}
         </div>
       </Section>
