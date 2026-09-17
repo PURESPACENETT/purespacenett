@@ -24,14 +24,14 @@ const chantierImages = [
 
 const serviceImageBySlug: Record<string, string> = {
   "nettoyage-bureaux": siteImages.bureaux,
-  "nettoyage-residences-coproprietes": siteImages.avantApres,
+  "nettoyage-copropriete": siteImages.avantApres,
   "entretien-locaux-commerciaux": siteImages.solBrillant,
   "nettoyage-vitres": siteImages.bureaux,
   "nettoyage-fin-de-chantier": siteImages.avantApres,
   "remise-en-etat": siteImages.couloir,
   "menage-etat-des-lieux": siteImages.solNettoye,
   "nettoyage-canapes-tapis": siteImages.solBrillant,
-  "nettoyage-interieur-vehicules": siteImages.solNettoye,
+  "nettoyage-interieur-vehicule": siteImages.solNettoye,
 };
 
 export function getServiceImage(slug: string, index = 0) {
