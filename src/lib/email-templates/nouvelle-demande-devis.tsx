@@ -24,7 +24,7 @@ interface Props {
   message?: string
 }
 
-const Line = ({ label, value }: { label: string; value?: string }) =>
+const Line = ({ label, value }: { label: string; value?: string | undefined }) =>
   value ? (
     <Text style={line}>
       <strong style={strong}>{label} :</strong> {value}
