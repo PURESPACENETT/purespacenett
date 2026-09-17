@@ -50,6 +50,24 @@ export function QuoteForm() {
   const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
+  const mailtoFallback = () => {
+    const body = [
+      `Nom : ${form.fullName}`,
+      `Email : ${form.email}`,
+      `Téléphone : ${form.phone}`,
+      `Adresse : ${form.address}`,
+      `Type de bien : ${form.propertyType}`,
+      `Surface : ${form.surface} m²`,
+      `Prestation : ${form.serviceType}`,
+      `Fréquence : ${form.frequency}`,
+      "",
+      form.message,
+    ].join("\n");
+    window.location.href = `mailto:${business.email}?subject=${encodeURIComponent(
+      `Demande de devis — ${form.serviceType}`,
+    )}&body=${encodeURIComponent(body)}`;
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.consent) return;
@@ -64,9 +82,10 @@ export function QuoteForm() {
       if (!res.ok) throw new Error(await res.text());
       setStatus("sent");
       setForm(emptyForm);
-    } catch (err) {
+    } catch {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Envoi impossible");
+      setError(null);
+      mailtoFallback();
     }
   };
 
