@@ -258,6 +258,16 @@ function ZoneDetail() {
           >
             Demander un devis de nettoyage à {zone.name}
           </Link>
+          <WhatsAppButton
+            subject={`nettoyage à ${zone.name}${zone.postalCode ? ` (${zone.postalCode})` : ""}`}
+            label="Écrire sur WhatsApp"
+          />
+          <Link
+            to="/faq"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold transition-colors hover:border-accent"
+          >
+            Questions fréquentes
+          </Link>
           <Link
             to="/contact"
             className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
