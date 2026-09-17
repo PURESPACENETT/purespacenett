@@ -34,7 +34,17 @@ export const Route = createFileRoute("/zones/$slug")({
     const path = `/zones/${params.slug}`;
     return {
       meta: [
-        ...pageMeta({ title: z.title, description: z.description, path }),
+        ...pageMeta({
+          title: z.title,
+          description: z.description,
+          path,
+          type: "business.business",
+        }),
+        ...localOgMeta({
+          city: z.name,
+          postalCode: z.postalCode,
+          department: z.department,
+        }),
         ...geoMeta({ city: z.name, postalCode: z.postalCode, department: z.department }),
       ],
       links: [{ rel: "canonical", href: path }],
@@ -50,6 +60,10 @@ export const Route = createFileRoute("/zones/$slug")({
               neighbours: z.neighbours,
               path,
               description: z.description,
+              services: z.serviceSlugs
+                .map((slug) => getService(slug))
+                .filter((s): s is NonNullable<ReturnType<typeof getService>> => Boolean(s))
+                .map((s) => ({ name: s.navName, path: `/services/${s.slug}` })),
             }),
           ),
         },
