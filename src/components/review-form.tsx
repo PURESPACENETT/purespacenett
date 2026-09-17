@@ -15,17 +15,17 @@ export function ReviewForm() {
 
   const buildMailto = (values: Record<string, string>) => {
     const body = [
-      `Nom : ${values.authorName}`,
-      `Ville : ${values.city || "—"}`,
-      `Prestation : ${values.serviceType || "—"}`,
+      `Nom : ${values["authorName"]}`,
+      `Ville : ${values["city"] || "—"}`,
+      `Prestation : ${values["serviceType"] || "—"}`,
       `Note : ${rating}/5`,
-      `E-mail : ${values.email || "—"}`,
+      `E-mail : ${values["email"] || "—"}`,
       "",
       "Avis :",
-      values.message,
+      values["message"] ?? "",
     ].join("\n");
     return `mailto:${business.email}?subject=${encodeURIComponent(
-      `Nouvel avis client — ${values.authorName}`,
+      `Nouvel avis client — ${values["authorName"]}`,
     )}&body=${encodeURIComponent(body)}`;
   };
 
