@@ -52,6 +52,56 @@ export const serviceJsonLd = (name: string, description: string, path: string) =
   areaServed: business.areaServed.map((a) => ({ "@type": "Place", name: a })),
 });
 
+/** JSON-LD d'une page de ville : entreprise + zone servie précise. */
+export const cityBusinessJsonLd = ({
+  city,
+  postalCode,
+  department,
+  sectors,
+  neighbours,
+  path,
+  description,
+}: {
+  city: string;
+  postalCode: string;
+  department: string;
+  sectors: string[];
+  neighbours: string[];
+  path: string;
+  description: string;
+}) => ({
+  ...localBusinessJsonLd,
+  name: `${business.name} — Nettoyage à ${city}`,
+  description,
+  url: path,
+  areaServed: [
+    {
+      "@type": "City",
+      name: city,
+      ...(postalCode ? { postalCode } : {}),
+      containedInPlace: { "@type": "AdministrativeArea", name: department },
+    },
+    ...sectors.map((s) => ({ "@type": "Place", name: `${s}, ${city}` })),
+    ...neighbours.map((n) => ({ "@type": "City", name: n })),
+  ],
+});
+
+/** Balises géographiques locales pour une ville. */
+export const geoMeta = ({
+  city,
+  postalCode,
+  department,
+}: {
+  city: string;
+  postalCode: string;
+  department: string;
+}) => [
+  { name: "geo.region", content: postalCode.startsWith("75") ? "FR-75" : "FR-93" },
+  { name: "geo.placename", content: city },
+  { name: "ICBM", content: "" },
+  { name: "coverage", content: `${city}${postalCode ? ` ${postalCode}` : ""} — ${department}` },
+];
+
 export const breadcrumbJsonLd = (items: { name: string; item: string }[]) => ({
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
