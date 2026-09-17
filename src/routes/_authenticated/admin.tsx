@@ -178,6 +178,39 @@ function AdminPage() {
           </article>
         ))}
       </div>
+
+      <div className="mt-14">
+        <h2 className="font-display text-2xl font-bold">Avis reçus depuis le site</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {reviewsQuery.isLoading ? "Chargement…" : `${reviews.length} avis enregistré(s)`}
+        </p>
+
+        {reviews.length === 0 && !reviewsQuery.isLoading && (
+          <p className="mt-6 text-sm text-muted-foreground">Aucun avis pour le moment.</p>
+        )}
+
+        <div className="mt-6 space-y-4">
+          {reviews.map((r) => (
+            <article key={r.id} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="font-display text-lg font-bold">
+                  {r.author_name}
+                  {r.city ? ` · ${r.city}` : ""}
+                </h3>
+                <span className="text-sm font-semibold text-accent">{r.rating}/5</span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {dateFmt.format(new Date(r.created_at))}
+                {r.service_type ? ` · ${r.service_type}` : ""}
+                {r.email ? ` · ${r.email}` : ""}
+              </p>
+              <p className="mt-4 whitespace-pre-line rounded-xl bg-secondary/60 p-4 text-sm">
+                {r.message}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
     </Section>
   );
 }
