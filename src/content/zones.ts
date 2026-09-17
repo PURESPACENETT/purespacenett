@@ -230,3 +230,34 @@ export const zones: Zone[] = [
 ];
 
 export const getZone = (slug: string) => zones.find((z) => z.slug === slug);
+
+/**
+ * Requêtes locales réellement tapées sur Google pour une ville et ses quartiers.
+ * Utilisées dans le contenu des pages de villes (maillage interne + mots-clés locaux).
+ */
+export const zoneQueries = (zone: Zone): { query: string; servicePath?: string }[] => {
+  const area = zone.postalCode ? `${zone.name} ${zone.postalCode}` : zone.name;
+  const base: { query: string; servicePath?: string }[] = [
+    { query: `entreprise de nettoyage ${zone.name}` },
+    { query: `société de nettoyage ${area}` },
+    { query: `nettoyage de bureaux ${zone.name}`, servicePath: "/services/nettoyage-bureaux" },
+    {
+      query: `nettoyage parties communes copropriété ${zone.name}`,
+      servicePath: "/services/nettoyage-copropriete",
+    },
+    {
+      query: `nettoyage fin de chantier ${zone.name}`,
+      servicePath: "/services/nettoyage-fin-de-chantier",
+    },
+    { query: `nettoyage de vitres ${zone.name}`, servicePath: "/services/nettoyage-vitres" },
+    {
+      query: `ménage état des lieux ${zone.name}`,
+      servicePath: "/services/menage-etat-des-lieux",
+    },
+    { query: `remise en état après travaux ${zone.name}`, servicePath: "/services/remise-en-etat" },
+  ];
+  const bySector = zone.sectors.map((sector) => ({
+    query: `nettoyage ${sector.split(" / ")[0]!.replace(/ — .*$/, "")} ${zone.name}`,
+  }));
+  return [...base, ...bySector];
+};
