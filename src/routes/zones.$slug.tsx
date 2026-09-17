@@ -85,7 +85,9 @@ function ZoneDetail() {
             <Eyebrow>Zone desservie</Eyebrow>
             <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold leading-tight">
               Entreprise de nettoyage à {zone.name}
+              {zone.postalCode ? ` (${zone.postalCode})` : ""}
             </h1>
+            <p className="mt-2 text-sm font-medium text-muted-foreground">{zone.department}</p>
             <p className="mt-5 max-w-2xl text-base text-muted-foreground">{zone.intro}</p>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">{zone.context}</p>
             <div className="mt-8">
