@@ -1,12 +1,11 @@
 # PURE SPACE NETT — site SEO
 
 - [x] Coordonnées : PURE SPACE NETT, 07 59 48 30 21, contact@purespacenett.com
-- [ ] Données centralisées (entreprise, services, zones)
-- [ ] Design system (couleurs, typo) + en-tête / pied de page
-- [ ] Accueil
-- [ ] Pages services (9)
-- [ ] Pages zones (9)
-- [ ] Contact / devis, À propos, Tarifs
-- [ ] SEO : head par page, JSON-LD LocalBusiness, robots.txt
-- [ ] Sitemap : à installer après mise en ligne du domaine public (bloqué : pas d'URL publique)
-- [ ] Domaine purespacenett.com à brancher par l'utilisateur
+- [x] Données centralisées (entreprise, 9 services, 9 zones)
+- [x] Design system (bleu pétrole + menthe, Sora/Manrope) + en-tête / pied de page
+- [x] Accueil, Services (liste + 9 pages), Zones (liste + 9 pages), Contact, Tarifs, À propos
+- [x] SEO : titre/description/og/canonique par page, JSON-LD entreprise + service + fil d'ariane + FAQ, robots.txt
+- [ ] Sitemap.xml — bloqué : nécessite l'adresse publique du site (après publication / branchement du domaine)
+- [ ] Logo et photos de chantiers — en attente d'envoi par l'utilisateur
+- [ ] Brancher purespacenett.com (à faire par l'utilisateur dans les réglages du projet)
+- [ ] Fiche Google Business Profile à relier au nouveau site
