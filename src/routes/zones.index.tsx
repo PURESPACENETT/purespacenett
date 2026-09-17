@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 import { zones } from "@/content/zones";
 import { Breadcrumbs, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { breadcrumbJsonLd, pageMeta } from "@/lib/seo";
+import { getZoneImage } from "@/lib/site-images";
 
 const title = "Zones desservies en Île-de-France | PURE SPACE NETT";
 const description =
@@ -44,16 +45,24 @@ function ZonesIndex() {
 
       <Section className="pt-0">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {zones.map((z) => (
+          {zones.map((z, index) => (
             <Link
               key={z.slug}
               to="/zones/$slug"
               params={{ slug: z.slug }}
-              className="rounded-2xl border border-border bg-card p-6 shadow-card transition-colors hover:border-accent"
+              className="overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-colors hover:border-accent"
             >
-              <MapPin className="size-5 text-accent" />
-              <h2 className="mt-3 font-display text-lg font-semibold">{z.name}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{z.intro}</p>
+              <img
+                src={getZoneImage(index)}
+                alt={`Intervention de nettoyage près de ${z.name}`}
+                loading="lazy"
+                className="aspect-[16/9] w-full object-cover"
+              />
+              <div className="p-6">
+                <MapPin className="size-5 text-accent" />
+                <h2 className="mt-3 font-display text-lg font-semibold">{z.name}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{z.intro}</p>
+              </div>
             </Link>
           ))}
         </div>

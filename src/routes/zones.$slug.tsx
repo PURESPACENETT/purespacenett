@@ -9,6 +9,7 @@ import {
   Section,
 } from "@/components/site-blocks";
 import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { getZoneImage } from "@/lib/site-images";
 
 export const Route = createFileRoute("/zones/$slug")({
   loader: ({ params }) => {
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/zones/$slug")({
 
 function ZoneDetail() {
   const { zone } = Route.useLoaderData();
+  const zoneIndex = Math.max(0, zones.findIndex((item) => item.slug === zone.slug));
   const zoneServices = zone.serviceSlugs
     .map((slug) => getService(slug))
     .filter((s): s is NonNullable<ReturnType<typeof getService>> => Boolean(s));
@@ -63,14 +65,23 @@ function ZoneDetail() {
       />
 
       <Section className="pb-8">
-        <Eyebrow>Zone desservie</Eyebrow>
-        <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold leading-tight">
-          Entreprise de nettoyage à {zone.name}
-        </h1>
-        <p className="mt-5 max-w-2xl text-base text-muted-foreground">{zone.intro}</p>
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">{zone.context}</p>
-        <div className="mt-8">
-          <CallButtons subject={`nettoyage ${zone.name}`} />
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          <div>
+            <Eyebrow>Zone desservie</Eyebrow>
+            <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold leading-tight">
+              Entreprise de nettoyage à {zone.name}
+            </h1>
+            <p className="mt-5 max-w-2xl text-base text-muted-foreground">{zone.intro}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">{zone.context}</p>
+            <div className="mt-8">
+              <CallButtons subject={`nettoyage ${zone.name}`} />
+            </div>
+          </div>
+          <img
+            src={getZoneImage(zoneIndex)}
+            alt={`Chantier de nettoyage réalisé dans le secteur de ${zone.name}`}
+            className="aspect-[4/3] w-full rounded-2xl border border-border object-cover shadow-card"
+          />
         </div>
       </Section>
 

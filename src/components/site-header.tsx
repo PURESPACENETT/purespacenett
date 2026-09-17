@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import { business } from "@/content/business";
+import { siteImages } from "@/lib/site-images";
 
 const nav = [
   { to: "/services", label: "Services" },
@@ -18,9 +19,11 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
         <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground font-display text-sm font-bold">
-            PS
-          </span>
+          <img
+            src={siteImages.logo}
+            alt="Logo PURE SPACE NETT"
+            className="size-11 rounded-md object-cover"
+          />
           <span className="leading-tight">
             <span className="block font-display text-sm font-bold tracking-tight">
               {business.name}
