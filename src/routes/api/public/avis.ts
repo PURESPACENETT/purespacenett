@@ -31,18 +31,40 @@ export const Route = createFileRoute("/api/public/avis")({
         const data = parsed.data;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { error } = await supabaseAdmin.from("review_submissions").insert({
-          author_name: data.authorName,
-          city: data.city || null,
-          service_type: data.serviceType || null,
-          rating: data.rating,
-          message: data.message,
-          email: data.email || null,
-        });
+        const { data: inserted, error } = await supabaseAdmin
+          .from("review_submissions")
+          .insert({
+            author_name: data.authorName,
+            city: data.city || null,
+            service_type: data.serviceType || null,
+            rating: data.rating,
+            message: data.message,
+            email: data.email || null,
+          })
+          .select("id")
+          .single();
 
         if (error) {
           console.error("Enregistrement de l'avis impossible", error.message);
           return Response.json({ error: "Enregistrement impossible" }, { status: 500 });
+        }
+
+        try {
+          const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+          await sendTemplateEmail("nouvel-avis-client", "contact@purespacenett.com", {
+            templateData: {
+              authorName: data.authorName,
+              city: data.city,
+              serviceType: data.serviceType,
+              rating: data.rating,
+              message: data.message,
+              email: data.email,
+            },
+            idempotencyKey: `nouvel-avis-client-${inserted?.id ?? data.authorName}`,
+            ...(data.email ? { replyTo: data.email } : {}),
+          });
+        } catch (mailError) {
+          console.error("Notification e-mail de l'avis impossible", mailError);
         }
 
         return Response.json({ ok: true });

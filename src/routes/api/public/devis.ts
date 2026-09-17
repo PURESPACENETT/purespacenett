@@ -35,21 +35,46 @@ export const Route = createFileRoute("/api/public/devis")({
         const data = parsed.data;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { error } = await supabaseAdmin.from("quote_requests").insert({
-          full_name: data.fullName,
-          email: data.email,
-          phone: data.phone,
-          address: data.address || null,
-          property_type: data.propertyType || null,
-          surface: data.surface || null,
-          service_type: data.serviceType,
-          frequency: data.frequency || null,
-          message: data.message || null,
-        });
+        const { data: inserted, error } = await supabaseAdmin
+          .from("quote_requests")
+          .insert({
+            full_name: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            address: data.address || null,
+            property_type: data.propertyType || null,
+            surface: data.surface || null,
+            service_type: data.serviceType,
+            frequency: data.frequency || null,
+            message: data.message || null,
+          })
+          .select("id")
+          .single();
 
         if (error) {
           console.error("Enregistrement du devis impossible", error.message);
           return Response.json({ error: "Enregistrement impossible" }, { status: 500 });
+        }
+
+        try {
+          const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+          await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
+            templateData: {
+              fullName: data.fullName,
+              email: data.email,
+              phone: data.phone,
+              address: data.address,
+              propertyType: data.propertyType,
+              surface: data.surface,
+              serviceType: data.serviceType,
+              frequency: data.frequency,
+              message: data.message,
+            },
+            idempotencyKey: `nouvelle-demande-devis-${inserted?.id ?? data.email}`,
+            replyTo: data.email,
+          });
+        } catch (mailError) {
+          console.error("Notification e-mail du devis impossible", mailError);
         }
 
         return Response.json({ ok: true });
