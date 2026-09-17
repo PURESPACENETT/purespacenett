@@ -31,12 +31,20 @@ function AdminPage() {
   const queryClient = useQueryClient();
   const fetchQuotes = useServerFn(listQuoteRequests);
   const updateStatus = useServerFn(setQuoteStatus);
+  const fetchReviews = useServerFn(listReviewSubmissions);
   const [search, setSearch] = useState("");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["quote-requests"],
     queryFn: () => fetchQuotes(),
   });
+
+  const reviewsQuery = useQuery({
+    queryKey: ["review-submissions"],
+    queryFn: () => fetchReviews(),
+  });
+  const reviews: ReviewSubmission[] = reviewsQuery.data ?? [];
+
 
   const mutation = useMutation({
     mutationFn: (input: { id: string; status: "nouveau" | "traité" }) =>
