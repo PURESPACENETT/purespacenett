@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { business } from "@/content/business";
+import { trackEvent } from "@/lib/analytics";
 
 export const propertyTypes = [
   "Maison",
