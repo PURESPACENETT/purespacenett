@@ -10,6 +10,7 @@ import {
   WhatsAppButton,
 } from "@/components/site-blocks";
 import {
+  canonicalUrl,
   breadcrumbJsonLd,
   cityBusinessJsonLd,
   geoMeta,
