@@ -84,6 +84,7 @@ export function QuoteBanner({ subject }: { subject: string }) {
           <div className="flex flex-col gap-3">
             <Link
               to="/devis"
+              onClick={() => trackEvent("clic_devis", { source: subject })}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground"
             >
               <Mail className="size-4" />
@@ -91,6 +92,7 @@ export function QuoteBanner({ subject }: { subject: string }) {
             </Link>
             <a
               href={business.phoneHref}
+              onClick={() => trackEvent("appel_telephone", { source: subject })}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold"
             >
               <Phone className="size-4" />
