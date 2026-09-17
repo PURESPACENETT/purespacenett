@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Mail, Phone } from "lucide-react";
 import { business } from "@/content/business";
+import { trackEvent } from "@/lib/analytics";
 
 export function Section({
   children,
