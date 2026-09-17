@@ -61,7 +61,11 @@ function ZonesIndex() {
               />
               <div className="p-6">
                 <MapPin className="size-5 text-accent" />
-                <h2 className="mt-3 font-display text-lg font-semibold">{z.name}</h2>
+                <h2 className="mt-3 font-display text-lg font-semibold">
+                  Nettoyage à {z.name}
+                  {z.postalCode ? ` (${z.postalCode})` : ""}
+                </h2>
+                <p className="mt-1 text-xs font-medium text-muted-foreground">{z.department}</p>
                 <p className="mt-2 text-sm text-muted-foreground">{z.intro}</p>
               </div>
             </Link>

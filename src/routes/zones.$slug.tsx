@@ -124,8 +124,12 @@ function ZoneDetail() {
 
       <Section className="pt-0">
         <h2 className="font-display text-2xl font-bold">
-          Nos prestations disponibles à {zone.name}
+          Nos prestations de nettoyage à {zone.name}
         </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Société de nettoyage de proximité, nous couvrons {zone.name} pour les entreprises, les
+          syndics et les particuliers. Cliquez sur une prestation pour en voir le détail.
+        </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {zoneServices.map((s) => (
             <Link
@@ -134,7 +138,9 @@ function ZoneDetail() {
               params={{ slug: s.slug }}
               className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-accent"
             >
-              <span className="font-display text-base font-semibold">{s.navName}</span>
+              <h3 className="font-display text-base font-semibold">
+                {s.navName} à {zone.name}
+              </h3>
               <p className="mt-1 text-sm text-muted-foreground">{s.audience}</p>
             </Link>
           ))}
@@ -142,9 +148,51 @@ function ZoneDetail() {
       </Section>
 
       <Section className="pt-0">
-        <h2 className="font-display text-2xl font-bold">Communes voisines</h2>
+        <h2 className="font-display text-2xl font-bold">
+          Pourquoi choisir PURE SPACE NETT à {zone.name} ?
+        </h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+            <h3 className="font-display text-base font-semibold">Une entreprise du secteur</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Basés au Pré-Saint-Gervais, nous connaissons {zone.name} et {zone.department} : accès,
+              stationnement, horaires de livraison. En savoir plus{" "}
+              <Link to="/a-propos" className="text-primary underline underline-offset-2">
+                sur notre entreprise
+              </Link>
+              .
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+            <h3 className="font-display text-base font-semibold">Des tarifs clairs</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Chiffrage détaillé, sans frais cachés, pour un entretien régulier ou une intervention
+              ponctuelle à {zone.name}. Voir{" "}
+              <Link to="/tarifs" className="text-primary underline underline-offset-2">
+                nos tarifs de nettoyage
+              </Link>
+              .
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+            <h3 className="font-display text-base font-semibold">Des clients qui recommandent</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Équipes formées et assurées, résultat contrôlé après chaque passage. Lisez{" "}
+              <Link to="/avis" className="text-primary underline underline-offset-2">
+                les avis de nos clients
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <h2 className="font-display text-2xl font-bold">
+          Nettoyage dans les communes proches de {zone.name}
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Également desservies : {zone.neighbours.join(", ")}.
+          Également desservies depuis {zone.name} : {zone.neighbours.join(", ")}.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           {zones
@@ -156,7 +204,8 @@ function ZoneDetail() {
                 params={{ slug: z.slug }}
                 className="rounded-full border border-border bg-card px-4 py-2 text-sm transition-colors hover:border-accent hover:text-primary"
               >
-                Nettoyage {z.name}
+                Nettoyage à {z.name}
+                {z.postalCode ? ` (${z.postalCode})` : ""}
               </Link>
             ))}
         </div>
@@ -164,7 +213,8 @@ function ZoneDetail() {
 
       <Section className="pt-0">
         <h2 className="font-display text-2xl font-bold">
-          Nous joindre pour une intervention à {zone.name}
+          Contacter votre entreprise de nettoyage à {zone.name}
+          {zone.postalCode ? ` (${zone.postalCode})` : ""}
         </h2>
         <div className="mt-6">
           <LocalInfo area={`${zone.name} et communes voisines`} />
@@ -175,12 +225,24 @@ function ZoneDetail() {
             title={`Carte du secteur d'intervention de nettoyage à ${zone.name}`}
           />
         </div>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap gap-3">
           <Link
             to="/devis"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
           >
-            Demander un devis pour {zone.name}
+            Demander un devis de nettoyage à {zone.name}
+          </Link>
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
+          >
+            Nous écrire
+          </Link>
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold transition-colors hover:border-accent"
+          >
+            Toutes nos prestations
           </Link>
         </div>
       </Section>
