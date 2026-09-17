@@ -26,12 +26,25 @@ export const Route = createFileRoute("/zones/$slug")({
     const z = loaderData.zone;
     const path = `/zones/${params.slug}`;
     return {
-      meta: pageMeta({ title: z.title, description: z.description, path }),
+      meta: [
+        ...pageMeta({ title: z.title, description: z.description, path }),
+        ...geoMeta({ city: z.name, postalCode: z.postalCode, department: z.department }),
+      ],
       links: [{ rel: "canonical", href: path }],
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({ ...localBusinessJsonLd, url: path }),
+          children: JSON.stringify(
+            cityBusinessJsonLd({
+              city: z.name,
+              postalCode: z.postalCode,
+              department: z.department,
+              sectors: z.sectors,
+              neighbours: z.neighbours,
+              path,
+              description: z.description,
+            }),
+          ),
         },
         {
           type: "application/ld+json",
