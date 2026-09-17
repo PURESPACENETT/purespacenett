@@ -21,7 +21,8 @@ export const business = {
     "Paris",
     "Île-de-France",
   ],
-  hours: "Lundi au samedi, 7h – 20h — interventions en soirée et week-end sur demande",
+  hours: "Du lundi au samedi, 7h – 22h — dimanche et jours fériés sur demande",
+  openingHours: "Mo-Sa 07:00-22:00",
   usp: [
     "Devis gratuit sous 24 h",
     "Équipes formées et assurées",

@@ -17,7 +17,15 @@ export const localBusinessJsonLd = {
     addressCountry: business.country,
   },
   areaServed: business.areaServed.map((a) => ({ "@type": "Place", name: a })),
-  openingHours: "Mo-Sa 07:00-20:00",
+  openingHours: business.openingHours,
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      opens: "07:00",
+      closes: "22:00",
+    },
+  ],
   priceRange: "€€",
 };
 
