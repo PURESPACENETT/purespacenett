@@ -10,7 +10,7 @@ import {
   QuoteBanner,
   Section,
 } from "@/components/site-blocks";
-import { breadcrumbJsonLd, faqJsonLd, pageMeta, serviceJsonLd } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, faqJsonLd, pageMeta, serviceJsonLd } from "@/lib/seo";
 import { getServiceImage } from "@/lib/site-images";
 
 export const Route = createFileRoute("/services/$slug")({
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/services/$slug")({
     const path = `/services/${params.slug}`;
     return {
       meta: pageMeta({ title: s.title, description: s.description, path }),
-      links: [{ rel: "canonical", href: path }],
+      links: [{ rel: "canonical", href: canonicalUrl(path) }],
       scripts: [
         {
           type: "application/ld+json",

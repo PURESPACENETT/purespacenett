@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { zones } from "@/content/zones";
 import { Breadcrumbs, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
-import { breadcrumbJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, pageMeta } from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
 
 const title = "Zones desservies en Île-de-France | PURE SPACE NETT";
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/zones/")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/zones" }),
-    links: [{ rel: "canonical", href: "/zones" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/zones") }],
     scripts: [
       {
         type: "application/ld+json",

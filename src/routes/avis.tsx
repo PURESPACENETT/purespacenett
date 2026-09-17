@@ -4,7 +4,7 @@ import { business } from "@/content/business";
 import { testimonials } from "@/content/testimonials";
 import { Breadcrumbs, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { ReviewForm } from "@/components/review-form";
-import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { trackEvent } from "@/lib/analytics";
 
 const title = "Avis clients — Témoignages PURE SPACE NETT (nettoyage 93 / IDF)";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/avis")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/avis" }),
-    links: [{ rel: "canonical", href: "/avis" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/avis") }],
     scripts: [
       {
         type: "application/ld+json",

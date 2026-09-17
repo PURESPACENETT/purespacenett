@@ -1,5 +1,13 @@
 import { business } from "@/content/business";
 
+/** Origine publique du site : les URL canoniques doivent être absolues pour Google. */
+export const SITE_URL = "https://purespacenett.com";
+
+/** Transforme un chemin interne en URL absolue auto-référencée. */
+export const canonicalUrl = (path: string) =>
+  path.startsWith("http") ? path : `${SITE_URL}${path === "/" ? "/" : path}`;
+
+
 /** JSON-LD de l'entreprise, réutilisé sur les pages principales. */
 export const localBusinessJsonLd = {
   "@context": "https://schema.org",
@@ -8,7 +16,7 @@ export const localBusinessJsonLd = {
   description: business.tagline,
   telephone: "+33759483021",
   email: business.email,
-  url: "/",
+  url: SITE_URL,
   hasMap: business.googleBusinessUrl,
   sameAs: [business.googleBusinessUrl],
   address: {
@@ -37,7 +45,7 @@ export const serviceJsonLd = (name: string, description: string, path: string) =
   name,
   description,
   serviceType: name,
-  url: path,
+  url: canonicalUrl(path),
   provider: {
     "@type": "CleaningService",
     name: business.name,
@@ -73,10 +81,10 @@ export const cityBusinessJsonLd = ({
   services?: { name: string; path: string }[];
 }) => ({
   ...localBusinessJsonLd,
-  "@id": path,
+  "@id": canonicalUrl(path),
   name: `${business.name} — Nettoyage à ${city}`,
   description,
-  url: path,
+  url: canonicalUrl(path),
   slogan: `Nettoyage ${city}${postalCode ? ` ${postalCode}` : ""} — devis gratuit sous 24 h`,
   areaServed: [
     {
@@ -104,7 +112,7 @@ export const cityBusinessJsonLd = ({
               "@type": "Service",
               name: `${s.name} à ${city}`,
               serviceType: s.name,
-              url: s.path,
+              url: canonicalUrl(s.path),
               areaServed: {
                 "@type": "City",
                 name: city,
@@ -163,7 +171,7 @@ export const breadcrumbJsonLd = (items: { name: string; item: string }[]) => ({
     "@type": "ListItem",
     position: i + 1,
     name: it.name,
-    item: it.item,
+    item: canonicalUrl(it.item),
   })),
 });
 
@@ -194,7 +202,7 @@ export const pageMeta = ({
   { property: "og:title", content: title },
   { property: "og:description", content: description },
   { property: "og:type", content: type },
-  { property: "og:url", content: path },
+  { property: "og:url", content: canonicalUrl(path) },
   { property: "og:site_name", content: business.name },
   { property: "og:locale", content: "fr_FR" },
   { name: "twitter:card", content: "summary_large_image" },
