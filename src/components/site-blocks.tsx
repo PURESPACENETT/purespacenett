@@ -44,11 +44,11 @@ export function CheckList({ items }: { items: readonly string[] }) {
 }
 
 export function CallButtons({ subject }: { subject: string }) {
-  void subject;
   return (
     <div className="flex flex-wrap gap-3">
       <a
         href={business.phoneHref}
+        onClick={() => trackEvent("appel_telephone", { source: subject })}
         className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
       >
         <Phone className="size-4" />
@@ -56,6 +56,7 @@ export function CallButtons({ subject }: { subject: string }) {
       </a>
       <Link
         to="/devis"
+        onClick={() => trackEvent("clic_devis", { source: subject })}
         className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
       >
         <Mail className="size-4" />
