@@ -7,8 +7,15 @@ import {
   Eyebrow,
   QuoteBanner,
   Section,
+  WhatsAppButton,
 } from "@/components/site-blocks";
-import { breadcrumbJsonLd, cityBusinessJsonLd, geoMeta, pageMeta } from "@/lib/seo";
+import {
+  breadcrumbJsonLd,
+  cityBusinessJsonLd,
+  geoMeta,
+  localOgMeta,
+  pageMeta,
+} from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 
