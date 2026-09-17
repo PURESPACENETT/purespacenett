@@ -16,6 +16,7 @@ import { Route as AvisRouteImport } from './routes/avis'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DevisRouteImport } from './routes/devis'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -59,6 +60,11 @@ const ContactRoute = ContactRouteImport.update({
 const DevisRoute = DevisRouteImport.update({
   id: '/devis',
   path: '/devis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
   '/devis': typeof DevisRoute
+  '/faq': typeof FaqRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
   '/devis': typeof DevisRoute
+  '/faq': typeof FaqRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
   '/devis': typeof DevisRoute
+  '/faq': typeof FaqRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/contact'
     | '/devis'
+    | '/faq'
     | '/sitemap.xml'
     | '/tarifs'
     | '/admin'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/contact'
     | '/devis'
+    | '/faq'
     | '/sitemap.xml'
     | '/tarifs'
     | '/admin'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/connexion'
     | '/contact'
     | '/devis'
+    | '/faq'
     | '/sitemap.xml'
     | '/tarifs'
     | '/_authenticated/admin'
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   ConnexionRoute: typeof ConnexionRoute
   ContactRoute: typeof ContactRoute
   DevisRoute: typeof DevisRoute
+  FaqRoute: typeof FaqRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TarifsRoute: typeof TarifsRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
@@ -295,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/devis'
       fullPath: '/devis'
       preLoaderRoute: typeof DevisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -389,6 +409,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConnexionRoute: ConnexionRoute,
   ContactRoute: ContactRoute,
   DevisRoute: DevisRoute,
+  FaqRoute: FaqRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TarifsRoute: TarifsRoute,
   ServicesSlugRoute: ServicesSlugRoute,
