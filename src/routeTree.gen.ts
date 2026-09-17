@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as ZonesIndexRouteImport } from './routes/zones.index'
 import { Route as ZonesSlugRouteImport } from './routes/zones.$slug'
+import { Route as ApiPublicDevisRouteImport } from './routes/api/public/devis'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,6 +33,11 @@ const AProposRoute = AProposRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TarifsRoute = TarifsRouteImport.update({
@@ -58,37 +65,48 @@ const ZonesSlugRoute = ZonesSlugRouteImport.update({
   path: '/zones/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicDevisRoute = ApiPublicDevisRouteImport.update({
+  id: '/api/public/devis',
+  path: '/api/public/devis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
   '/contact': typeof ContactRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
   '/services/': typeof ServicesIndexRoute
   '/zones/': typeof ZonesIndexRoute
+  '/api/public/devis': typeof ApiPublicDevisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
   '/contact': typeof ContactRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
   '/services': typeof ServicesIndexRoute
   '/zones': typeof ZonesIndexRoute
+  '/api/public/devis': typeof ApiPublicDevisRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
   '/contact': typeof ContactRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
   '/services/': typeof ServicesIndexRoute
   '/zones/': typeof ZonesIndexRoute
+  '/api/public/devis': typeof ApiPublicDevisRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,42 +114,50 @@ export interface FileRouteTypes {
     | '/'
     | '/a-propos'
     | '/contact'
+    | '/sitemap.xml'
     | '/tarifs'
     | '/services/$slug'
     | '/zones/$slug'
     | '/services/'
     | '/zones/'
+    | '/api/public/devis'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/a-propos'
     | '/contact'
+    | '/sitemap.xml'
     | '/tarifs'
     | '/services/$slug'
     | '/zones/$slug'
     | '/services'
     | '/zones'
+    | '/api/public/devis'
   id:
     | '__root__'
     | '/'
     | '/a-propos'
     | '/contact'
+    | '/sitemap.xml'
     | '/tarifs'
     | '/services/$slug'
     | '/zones/$slug'
     | '/services/'
     | '/zones/'
+    | '/api/public/devis'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AProposRoute: typeof AProposRoute
   ContactRoute: typeof ContactRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TarifsRoute: typeof TarifsRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ZonesSlugRoute: typeof ZonesSlugRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   ZonesIndexRoute: typeof ZonesIndexRoute
+  ApiPublicDevisRoute: typeof ApiPublicDevisRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -155,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tarifs': {
@@ -192,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ZonesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/devis': {
+      id: '/api/public/devis'
+      path: '/api/public/devis'
+      fullPath: '/api/public/devis'
+      preLoaderRoute: typeof ApiPublicDevisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -199,11 +239,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AProposRoute: AProposRoute,
   ContactRoute: ContactRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TarifsRoute: TarifsRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ZonesSlugRoute: ZonesSlugRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   ZonesIndexRoute: ZonesIndexRoute,
+  ApiPublicDevisRoute: ApiPublicDevisRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

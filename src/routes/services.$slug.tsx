@@ -14,6 +14,7 @@ import { breadcrumbJsonLd, faqJsonLd, pageMeta, serviceJsonLd } from "@/lib/seo"
 import { getServiceImage } from "@/lib/site-images";
 
 export const Route = createFileRoute("/services/$slug")({
+  staticData: { sitemap: true },
   loader: ({ params }) => {
     const service = getService(params.slug);
     if (!service) throw notFound();

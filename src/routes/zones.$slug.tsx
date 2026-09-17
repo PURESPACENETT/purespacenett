@@ -12,6 +12,7 @@ import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
 
 export const Route = createFileRoute("/zones/$slug")({
+  staticData: { sitemap: true },
   loader: ({ params }) => {
     const zone = getZone(params.slug);
     if (!zone) throw notFound();

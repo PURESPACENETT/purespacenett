@@ -12,6 +12,7 @@ const description =
   "PURE SPACE NETT, entreprise de nettoyage au Pré-Saint-Gervais : bureaux, copropriétés, fin de chantier, vitres, remise en état dans le 93, Paris et toute l'Île-de-France. Devis gratuit sous 24 h.";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/" }),
     links: [{ rel: "canonical", href: "/" }],

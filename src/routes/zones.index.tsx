@@ -10,6 +10,7 @@ const description =
   "PURE SPACE NETT intervient au Pré-Saint-Gervais, Pantin, Les Lilas, Aubervilliers, Montreuil, Bagnolet, Saint-Denis, Paris et dans toute l'Île-de-France.";
 
 export const Route = createFileRoute("/zones/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/zones" }),
     links: [{ rel: "canonical", href: "/zones" }],

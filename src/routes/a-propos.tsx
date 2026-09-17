@@ -8,6 +8,7 @@ const description =
   "PURE SPACE NETT est une entreprise de nettoyage basée au Pré-Saint-Gervais, au service des entreprises, syndics et particuliers du 93, de Paris et de l'Île-de-France.";
 
 export const Route = createFileRoute("/a-propos")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/a-propos" }),
     links: [{ rel: "canonical", href: "/a-propos" }],
