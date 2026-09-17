@@ -23,6 +23,7 @@ import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as ZonesIndexRouteImport } from './routes/zones.index'
 import { Route as ZonesSlugRouteImport } from './routes/zones.$slug'
+import { Route as ApiPublicAvisRouteImport } from './routes/api/public/avis'
 import { Route as ApiPublicDevisRouteImport } from './routes/api/public/devis'
 
 const IndexRoute = IndexRouteImport.update({
@@ -94,6 +95,11 @@ const ZonesSlugRoute = ZonesSlugRouteImport.update({
   path: '/zones/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAvisRoute = ApiPublicAvisRouteImport.update({
+  id: '/api/public/avis',
+  path: '/api/public/avis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDevisRoute = ApiPublicDevisRouteImport.update({
   id: '/api/public/devis',
   path: '/api/public/devis',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/zones/$slug': typeof ZonesSlugRoute
   '/services/': typeof ServicesIndexRoute
   '/zones/': typeof ZonesIndexRoute
+  '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
 }
 export interface FileRoutesByTo {
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/zones/$slug': typeof ZonesSlugRoute
   '/services': typeof ServicesIndexRoute
   '/zones': typeof ZonesIndexRoute
+  '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
 }
 export interface FileRoutesById {
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/zones/$slug': typeof ZonesSlugRoute
   '/services/': typeof ServicesIndexRoute
   '/zones/': typeof ZonesIndexRoute
+  '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
 }
 export interface FileRouteTypes {
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/zones/$slug'
     | '/services/'
     | '/zones/'
+    | '/api/public/avis'
     | '/api/public/devis'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/zones/$slug'
     | '/services'
     | '/zones'
+    | '/api/public/avis'
     | '/api/public/devis'
   id:
     | '__root__'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/zones/$slug'
     | '/services/'
     | '/zones/'
+    | '/api/public/avis'
     | '/api/public/devis'
   fileRoutesById: FileRoutesById
 }
@@ -216,6 +228,7 @@ export interface RootRouteChildren {
   ZonesSlugRoute: typeof ZonesSlugRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   ZonesIndexRoute: typeof ZonesIndexRoute
+  ApiPublicAvisRoute: typeof ApiPublicAvisRoute
   ApiPublicDevisRoute: typeof ApiPublicDevisRoute
 }
 
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ZonesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/avis': {
+      id: '/api/public/avis'
+      path: '/api/public/avis'
+      fullPath: '/api/public/avis'
+      preLoaderRoute: typeof ApiPublicAvisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/devis': {
       id: '/api/public/devis'
       path: '/api/public/devis'
@@ -354,6 +374,7 @@ const rootRouteChildren: RootRouteChildren = {
   ZonesSlugRoute: ZonesSlugRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   ZonesIndexRoute: ZonesIndexRoute,
+  ApiPublicAvisRoute: ApiPublicAvisRoute,
   ApiPublicDevisRoute: ApiPublicDevisRoute,
 }
 export const routeTree = rootRouteImport

@@ -59,6 +59,42 @@ export type Database = {
         }
         Relationships: []
       }
+      review_submissions: {
+        Row: {
+          author_name: string
+          city: string | null
+          created_at: string
+          email: string | null
+          id: string
+          message: string
+          rating: number
+          service_type: string | null
+          status: string
+        }
+        Insert: {
+          author_name: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          message: string
+          rating: number
+          service_type?: string | null
+          status?: string
+        }
+        Update: {
+          author_name?: string
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string
+          rating?: number
+          service_type?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
