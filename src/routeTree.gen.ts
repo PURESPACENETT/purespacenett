@@ -10,6 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AProposRouteImport } from './routes/a-propos'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as ZonesIndexRouteImport } from './routes/zones.index'
@@ -18,6 +21,21 @@ import { Route as ZonesSlugRouteImport } from './routes/zones.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AProposRoute = AProposRouteImport.update({
+  id: '/a-propos',
+  path: '/a-propos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TarifsRoute = TarifsRouteImport.update({
+  id: '/tarifs',
+  path: '/tarifs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
@@ -43,6 +61,9 @@ const ZonesSlugRoute = ZonesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/tarifs': typeof TarifsRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
   '/services/': typeof ServicesIndexRoute
@@ -50,6 +71,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/tarifs': typeof TarifsRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
   '/services': typeof ServicesIndexRoute
@@ -58,6 +82,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/a-propos': typeof AProposRoute
+  '/contact': typeof ContactRoute
+  '/tarifs': typeof TarifsRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
   '/services/': typeof ServicesIndexRoute
@@ -65,12 +92,31 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/services/$slug' | '/zones/$slug' | '/services/' | '/zones/'
+  fullPaths:
+    | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/tarifs'
+    | '/services/$slug'
+    | '/zones/$slug'
+    | '/services/'
+    | '/zones/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/services/$slug' | '/zones/$slug' | '/services' | '/zones'
+  to:
+    | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/tarifs'
+    | '/services/$slug'
+    | '/zones/$slug'
+    | '/services'
+    | '/zones'
   id:
     | '__root__'
     | '/'
+    | '/a-propos'
+    | '/contact'
+    | '/tarifs'
     | '/services/$slug'
     | '/zones/$slug'
     | '/services/'
@@ -79,6 +125,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AProposRoute: typeof AProposRoute
+  ContactRoute: typeof ContactRoute
+  TarifsRoute: typeof TarifsRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ZonesSlugRoute: typeof ZonesSlugRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
@@ -92,6 +141,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/a-propos': {
+      id: '/a-propos'
+      path: '/a-propos'
+      fullPath: '/a-propos'
+      preLoaderRoute: typeof AProposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarifs': {
+      id: '/tarifs'
+      path: '/tarifs'
+      fullPath: '/tarifs'
+      preLoaderRoute: typeof TarifsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/': {
@@ -127,6 +197,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AProposRoute: AProposRoute,
+  ContactRoute: ContactRoute,
+  TarifsRoute: TarifsRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ZonesSlugRoute: ZonesSlugRoute,
   ServicesIndexRoute: ServicesIndexRoute,
