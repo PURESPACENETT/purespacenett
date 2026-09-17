@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Check, Mail, Phone } from "lucide-react";
-import { business } from "@/content/business";
+import { Check, Mail, MessageCircle, Phone } from "lucide-react";
+import { business, whatsappHref } from "@/content/business";
 import { trackEvent } from "@/lib/analytics";
 
 export function Section({
@@ -43,6 +43,39 @@ export function CheckList({ items }: { items: readonly string[] }) {
   );
 }
 
+/** Bouton WhatsApp Business, message pré-rempli avec le contexte de la page. */
+export function WhatsAppButton({
+  subject,
+  label = "Écrire sur WhatsApp",
+  variant = "solid",
+  className = "",
+}: {
+  subject: string;
+  label?: string;
+  variant?: "solid" | "outline" | "dark";
+  className?: string;
+}) {
+  const styles =
+    variant === "solid"
+      ? "bg-[#25D366] text-[#0b3d24] hover:opacity-90"
+      : variant === "dark"
+        ? "border border-white/25 text-current hover:bg-white/10"
+        : "border border-border bg-card text-foreground hover:border-accent";
+
+  return (
+    <a
+      href={whatsappHref(subject)}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => trackEvent("clic_whatsapp", { source: subject })}
+      className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors ${styles} ${className}`}
+    >
+      <MessageCircle className="size-4" />
+      {label}
+    </a>
+  );
+}
+
 export function CallButtons({ subject }: { subject: string }) {
   return (
     <div className="flex flex-wrap gap-3">
@@ -54,6 +87,7 @@ export function CallButtons({ subject }: { subject: string }) {
         <Phone className="size-4" />
         Appeler le {business.phone}
       </a>
+      <WhatsAppButton subject={subject} />
       <Link
         to="/devis"
         onClick={() => trackEvent("clic_devis", { source: subject })}
@@ -98,6 +132,12 @@ export function QuoteBanner({ subject }: { subject: string }) {
               <Phone className="size-4" />
               {business.phone}
             </a>
+            <WhatsAppButton
+              subject={subject}
+              variant="dark"
+              label="Écrire sur WhatsApp"
+              className="justify-center"
+            />
             <Link
               to="/contact"
               className="text-center text-xs text-ink-foreground/60 underline underline-offset-4"
