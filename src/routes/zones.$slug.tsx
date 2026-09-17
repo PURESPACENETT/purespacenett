@@ -225,12 +225,24 @@ function ZoneDetail() {
             title={`Carte du secteur d'intervention de nettoyage à ${zone.name}`}
           />
         </div>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap gap-3">
           <Link
             to="/devis"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
           >
-            Demander un devis pour {zone.name}
+            Demander un devis de nettoyage à {zone.name}
+          </Link>
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
+          >
+            Nous écrire
+          </Link>
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold transition-colors hover:border-accent"
+          >
+            Toutes nos prestations
           </Link>
         </div>
       </Section>
