@@ -92,6 +92,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "PURE SPACE NETT" },
       { property: "og:locale", content: "fr_FR" },
       { name: "twitter:card", content: "summary_large_image" },
+      // Vérification de propriété du site pour Google Search Console
+      {
+        name: "google-site-verification",
+        content: "BhtapHSdl44wwo1hIEPokJfB-wRViXoIsDOlJloVN2M",
+      },
     ],
     links: [
       {
