@@ -47,7 +47,7 @@ export const Route = createFileRoute("/zones/$slug")({
         }),
         ...geoMeta({ city: z.name, postalCode: z.postalCode, department: z.department }),
       ],
-      links: [{ rel: "canonical", href: path }],
+      links: [{ rel: "canonical", href: canonicalUrl(path) }],
       scripts: [
         {
           type: "application/ld+json",

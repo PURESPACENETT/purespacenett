@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { services } from "@/content/services";
 import { Breadcrumbs, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
-import { breadcrumbJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, pageMeta } from "@/lib/seo";
 import { getServiceImage } from "@/lib/site-images";
 
 const title = "Nos prestations de nettoyage | PURE SPACE NETT";
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/services/")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/services" }),
-    links: [{ rel: "canonical", href: "/services" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/services") }],
     scripts: [
       {
         type: "application/ld+json",

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { business } from "@/content/business";
 import { Breadcrumbs, CheckList, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
-import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 
 const title = "À propos de PURE SPACE NETT | Entreprise de nettoyage 93";
 const description =
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/a-propos")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/a-propos" }),
-    links: [{ rel: "canonical", href: "/a-propos" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/a-propos") }],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) },
       {

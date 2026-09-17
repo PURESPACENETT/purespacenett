@@ -5,7 +5,7 @@ import { zones } from "@/content/zones";
 import { QuoteForm } from "@/components/quote-form";
 import { Breadcrumbs, CheckList, Eyebrow, Section } from "@/components/site-blocks";
 import { LocalInfo } from "@/components/local-info";
-import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 
 const title = "Devis nettoyage gratuit en 24 h | PURE SPACE NETT";
 const description =
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/devis")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path }),
-    links: [{ rel: "canonical", href: path }],
+    links: [{ rel: "canonical", href: canonicalUrl(path) }],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify({ ...localBusinessJsonLd, url: path }) },
       {

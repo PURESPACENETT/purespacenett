@@ -10,7 +10,7 @@ import {
   Section,
 } from "@/components/site-blocks";
 import { LocalInfo } from "@/components/local-info";
-import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 
 const title = "FAQ nettoyage — horaires, devis, tarifs, zones | PURE SPACE NETT";
 const description =
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/faq")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/faq" }),
-    links: [{ rel: "canonical", href: "/faq" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/faq") }],
     scripts: [
       {
         type: "application/ld+json",

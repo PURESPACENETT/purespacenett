@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Breadcrumbs, Eyebrow, FaqList, QuoteBanner, Section } from "@/components/site-blocks";
-import { breadcrumbJsonLd, faqJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, faqJsonLd, pageMeta } from "@/lib/seo";
 
 const title = "Tarifs de nettoyage et devis | PURE SPACE NETT";
 const description =
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/tarifs")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/tarifs" }),
-    links: [{ rel: "canonical", href: "/tarifs" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/tarifs") }],
     scripts: [
       {
         type: "application/ld+json",

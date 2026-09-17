@@ -3,7 +3,7 @@ import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { business } from "@/content/business";
 import { Breadcrumbs, Eyebrow, Section } from "@/components/site-blocks";
 import { QuoteForm } from "@/components/quote-form";
-import { breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 
 const title = "Contact et devis gratuit | PURE SPACE NETT";
 const description =
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/contact")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/contact" }),
-    links: [{ rel: "canonical", href: "/contact" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/contact") }],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) },
       {

@@ -4,7 +4,7 @@ import { business } from "@/content/business";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { CallButtons, CheckList, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
-import { localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { siteImages } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/" }),
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: canonicalUrl("/") }],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) },
     ],
