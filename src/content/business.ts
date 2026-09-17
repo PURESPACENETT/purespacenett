@@ -37,5 +37,11 @@ export const business = {
   ],
 } as const;
 
+/** Lien WhatsApp Business pré-rempli. */
+export const whatsappHref = (subject: string) =>
+  `https://wa.me/${business.whatsappNumber}?text=${encodeURIComponent(
+    `Bonjour ${business.name}, je souhaite un devis pour : ${subject}.`,
+  )}`;
+
 export const quoteMailto = (subject: string) =>
   `mailto:${business.email}?subject=${encodeURIComponent(`Demande de devis — ${subject}`)}`;
