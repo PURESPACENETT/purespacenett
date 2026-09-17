@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Clock, MapPin, Phone, Star } from "lucide-react";
 import { business } from "@/content/business";
 import { trackEvent } from "@/lib/analytics";
@@ -64,17 +65,48 @@ export function LocalInfo({ area }: { area?: string }) {
   );
 }
 
-/** Carte Google Maps, chargée seulement à l'approche du bloc. */
+/**
+ * Carte Google Maps chargée uniquement au clic du visiteur.
+ * L'iframe n'est jamais demandée aux robots : aucune ressource Google bloquée
+ * lors de l'exploration de la page.
+ */
 export function LocalMap({ query, title }: { query: string; title: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
-      <iframe
-        title={title}
-        src={`https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=fr&z=13&output=embed`}
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-        className="h-72 w-full border-0 sm:h-80"
-      />
+      {loaded ? (
+        <iframe
+          title={title}
+          src={`https://www.google.com/maps?q=${encodeURIComponent(query)}&hl=fr&z=13&output=embed`}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="h-72 w-full border-0 sm:h-80"
+        />
+      ) : (
+        <div className="flex h-72 w-full flex-col items-center justify-center gap-4 bg-secondary/60 p-6 text-center sm:h-80">
+          <MapPin className="size-8 text-accent" />
+          <p className="max-w-sm text-sm text-muted-foreground">{title}</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setLoaded(true)}
+              className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+              Afficher la carte
+            </button>
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold transition-colors hover:border-accent"
+            >
+              Ouvrir dans Google Maps
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

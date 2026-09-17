@@ -17,4 +17,6 @@
 - [x] Bouton WhatsApp Business aux endroits clés
 - [x] Page FAQ locale (horaires, devis, tarifs, prestations, zones)
 - [x] Open Graph + données locales des pages de villes optimisées pour les résultats locaux
+- [x] Carte Google chargée au clic (plus de ressource bloquée pour Googlebot)
+- [x] Suivi Google par ville dans /admin (page, vérification, recherches)
 - [ ] Brancher purespacenett.com (à faire par l'utilisateur dans les réglages du projet)

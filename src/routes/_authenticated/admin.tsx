@@ -6,6 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { listQuoteRequests, setQuoteStatus, type QuoteRequest } from "@/lib/quotes.functions";
 import { listReviewSubmissions, type ReviewSubmission } from "@/lib/reviews.functions";
 import { Section } from "@/components/site-blocks";
+import { zones } from "@/content/zones";
+
+const SITE_URL = "https://purespacenett.com";
+const GSC_RESOURCE = encodeURIComponent("sc-domain:purespacenett.com");
 
 export const Route = createFileRoute("/_authenticated/admin")({
   staticData: { sitemap: false },
@@ -209,6 +213,65 @@ function AdminPage() {
               </p>
             </article>
           ))}
+        </div>
+      </div>
+
+      <div className="mt-14">
+        <h2 className="font-display text-2xl font-bold">Suivi Google par ville</h2>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          Pour chaque ville : la page publique, la vérification Google (est-elle bien indexée ?) et
+          les recherches qui l'ont fait apparaître.
+        </p>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          {zones.map((z) => {
+            const pageUrl = `${SITE_URL}/zones/${z.slug}`;
+            return (
+              <article
+                key={z.slug}
+                className="rounded-2xl border border-border bg-card p-5 shadow-card"
+              >
+                <h3 className="font-display text-base font-bold">
+                  {z.name}
+                  {z.postalCode ? ` (${z.postalCode})` : ""}
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+                  <a
+                    href={pageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-border px-3 py-1.5 transition-colors hover:border-accent"
+                  >
+                    Voir la page
+                  </a>
+                  <a
+                    href={`https://search.google.com/search-console/inspect?resource_id=${GSC_RESOURCE}&id=${encodeURIComponent(pageUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
+                  >
+                    Vérifier dans Google
+                  </a>
+                  <a
+                    href={`https://search.google.com/search-console/performance/search-analytics?resource_id=${GSC_RESOURCE}&page=${encodeURIComponent(`!${pageUrl}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-border px-3 py-1.5 transition-colors hover:border-accent"
+                  >
+                    Recherches Google
+                  </a>
+                  <a
+                    href={`https://www.google.com/search?q=${encodeURIComponent(`nettoyage ${z.name}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-border px-3 py-1.5 transition-colors hover:border-accent"
+                  >
+                    Tester « nettoyage {z.name} »
+                  </a>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </Section>
