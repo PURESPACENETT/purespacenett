@@ -27,7 +27,7 @@ export const Route = createFileRoute("/avis")({
                   "@type": "Review",
                   author: { "@type": "Person", name: t.author },
                   reviewRating: { "@type": "Rating", ratingValue: t.rating, bestRating: 5 },
-                  reviewBody: t.text,
+                  ...(t.text ? { reviewBody: t.text } : {}),
                   ...(t.date ? { datePublished: t.date } : {}),
                 })),
               }
