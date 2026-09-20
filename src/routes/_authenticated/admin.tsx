@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { listQuoteRequests, setQuoteStatus, type QuoteRequest } from "@/lib/quotes.functions";
 import { listReviewSubmissions, type ReviewSubmission } from "@/lib/reviews.functions";
 import { Section } from "@/components/site-blocks";
+import { SeoAudit } from "@/components/seo-audit";
 import { zones } from "@/content/zones";
 
 const SITE_URL = "https://purespacenett.com";
@@ -274,6 +275,8 @@ function AdminPage() {
           })}
         </div>
       </div>
+
+      <SeoAudit />
     </Section>
   );
 }
