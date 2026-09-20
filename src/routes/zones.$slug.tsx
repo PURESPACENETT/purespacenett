@@ -19,6 +19,7 @@ import {
 } from "@/lib/seo";
 import { getZoneImage } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
+import { ReviewRequestBlock } from "@/components/review-request";
 
 export const Route = createFileRoute("/zones/$slug")({
   staticData: { sitemap: true },
@@ -302,6 +303,9 @@ function ZoneDetail() {
         </h2>
         <div className="mt-6">
           <LocalInfo area={`${zone.name} et communes voisines`} />
+        </div>
+        <div className="mt-6">
+          <ReviewRequestBlock city={zone.name} />
         </div>
         <div className="mt-6">
           <LocalMap
