@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getZone, zoneQueries, zones } from "@/content/zones";
+import { getZone, zoneLocalAnswers, zoneQueries, zones } from "@/content/zones";
 import { getService } from "@/content/services";
 import {
   Breadcrumbs,
@@ -88,6 +88,7 @@ function ZoneDetail() {
   const { zone } = Route.useLoaderData();
   const zoneIndex = Math.max(0, zones.findIndex((item) => item.slug === zone.slug));
   const queries = zoneQueries(zone);
+  const answers = zoneLocalAnswers(zone);
   const zoneServices = zone.serviceSlugs
     .map((slug) => getService(slug))
     .filter((s): s is NonNullable<ReturnType<typeof getService>> => Boolean(s));
