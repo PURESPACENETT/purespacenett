@@ -20,6 +20,12 @@ export const Route = createFileRoute("/api/public/devis")({
   staticData: { sitemap: false },
   server: {
     handlers: {
+      // Google ne doit pas indexer ce point d'entrée : réponse explicite 405 + noindex.
+      GET: async () =>
+        new Response("Method Not Allowed", {
+          status: 405,
+          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow" },
+        }),
       POST: async ({ request }) => {
         let payload: unknown;
         try {
