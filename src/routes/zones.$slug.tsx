@@ -156,12 +156,36 @@ function ZoneDetail() {
 
       <Section className="pt-0">
         <h2 className="font-display text-2xl font-bold">
+          Entreprise nettoyage {zone.name}
+          {zone.postalCode ? ` (${zone.postalCode})` : ""} : vos questions les plus fréquentes
+        </h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {answers.map((a) => (
+            <div key={a.question} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+              <h3 className="font-display text-base font-semibold">{a.question}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{a.answer}</p>
+              {a.servicePath ? (
+                <Link
+                  to={a.servicePath}
+                  className="mt-3 inline-block text-sm text-primary underline underline-offset-2"
+                >
+                  Voir le détail
+                </Link>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <h2 className="font-display text-2xl font-bold">
           Recherches fréquentes de nettoyage à {zone.name}
           {zone.postalCode ? ` (${zone.postalCode})` : ""}
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Voici les demandes pour lesquelles nos clients de {zone.name} nous trouvent sur Google, et
-          la page qui y répond.
+          Voici les demandes pour lesquelles nos clients de {zone.name}
+          {zone.postalCode ? ` et du ${zone.postalCode}` : ""} nous trouvent sur Google, et la page
+          qui y répond.
         </p>
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {queries.map((q) => (
