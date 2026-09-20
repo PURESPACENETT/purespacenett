@@ -89,7 +89,7 @@ async function resolveProperty(chosen?: string) {
     return found.siteUrl;
   }
   const exact = matches.find((e) => e.siteUrl === `${SITE_URL}/`);
-  return (exact ?? matches[0]).siteUrl;
+  return (exact ?? matches[0]!).siteUrl;
 }
 
 async function query(property: string, body: Record<string, unknown>) {
