@@ -7,6 +7,7 @@ import { listQuoteRequests, setQuoteStatus, type QuoteRequest } from "@/lib/quot
 import { listReviewSubmissions, type ReviewSubmission } from "@/lib/reviews.functions";
 import { Section } from "@/components/site-blocks";
 import { SeoAudit } from "@/components/seo-audit";
+import { SearchConsoleStats } from "@/components/search-console-stats";
 import { zones } from "@/content/zones";
 
 const SITE_URL = "https://purespacenett.com";
@@ -216,6 +217,8 @@ function AdminPage() {
           ))}
         </div>
       </div>
+
+      <SearchConsoleStats />
 
       <div className="mt-14">
         <h2 className="font-display text-2xl font-bold">Suivi Google par ville</h2>
