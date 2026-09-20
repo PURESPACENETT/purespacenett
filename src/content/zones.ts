@@ -237,10 +237,15 @@ export const getZone = (slug: string) => zones.find((z) => z.slug === slug);
  */
 export const zoneQueries = (zone: Zone): { query: string; servicePath?: string }[] => {
   const area = zone.postalCode ? `${zone.name} ${zone.postalCode}` : zone.name;
+  const cp = zone.postalCode;
   const base: { query: string; servicePath?: string }[] = [
+    // Formulations exactes relevées dans Search Console (sans « de »).
+    { query: `entreprise nettoyage ${zone.name}` },
     { query: `entreprise de nettoyage ${zone.name}` },
     { query: `société de nettoyage ${area}` },
+    { query: `nettoyage ${zone.name}` },
     { query: `nettoyage de bureaux ${zone.name}`, servicePath: "/services/nettoyage-bureaux" },
+    { query: `nettoyage bureaux ${zone.name}`, servicePath: "/services/nettoyage-bureaux" },
     {
       query: `nettoyage parties communes copropriété ${zone.name}`,
       servicePath: "/services/nettoyage-copropriete",
@@ -256,8 +261,63 @@ export const zoneQueries = (zone: Zone): { query: string; servicePath?: string }
     },
     { query: `remise en état après travaux ${zone.name}`, servicePath: "/services/remise-en-etat" },
   ];
+  // Variantes avec le code postal seul : « nettoyage bureaux 93500 », « entreprise nettoyage 93500 ».
+  const byPostalCode: { query: string; servicePath?: string }[] = cp
+    ? [
+        { query: `nettoyage bureaux ${cp}`, servicePath: "/services/nettoyage-bureaux" },
+        { query: `entreprise nettoyage ${cp}` },
+        { query: `société de nettoyage ${cp}` },
+        {
+          query: `nettoyage copropriété ${cp}`,
+          servicePath: "/services/nettoyage-copropriete",
+        },
+        { query: `nettoyage vitres ${cp}`, servicePath: "/services/nettoyage-vitres" },
+        {
+          query: `nettoyage fin de chantier ${cp}`,
+          servicePath: "/services/nettoyage-fin-de-chantier",
+        },
+      ]
+    : [];
   const bySector = zone.sectors.map((sector) => ({
     query: `nettoyage ${sector.split(" / ")[0]!.replace(/ — .*$/, "")} ${zone.name}`,
   }));
-  return [...base, ...bySector];
+  return [...base, ...byPostalCode, ...bySector];
+};
+
+/**
+ * Questions locales rédigées avec les requêtes exactes en intitulé.
+ * Affichées en H3 sur la page de ville (pas de balisage FAQPage).
+ */
+export const zoneLocalAnswers = (
+  zone: Zone,
+): { question: string; answer: string; servicePath?: string }[] => {
+  const cp = zone.postalCode;
+  const area = cp ? `${zone.name} (${cp})` : zone.name;
+  return [
+    {
+      question: `Entreprise nettoyage ${zone.name} : que faisons-nous exactement ?`,
+      answer: `PURE SPACE NETT est une entreprise de nettoyage basée au Pré-Saint-Gervais qui intervient à ${area} pour l'entretien de bureaux, les parties communes de copropriété, les commerces, les vitres, la fin de chantier et la remise en état. Contrat régulier ou intervention ponctuelle, devis gratuit sous 24 h.`,
+    },
+    {
+      question: cp
+        ? `Nettoyage bureaux ${cp} : à quelle fréquence intervenez-vous ?`
+        : `Nettoyage de bureaux en ${zone.name} : à quelle fréquence intervenez-vous ?`,
+      answer: `Pour le nettoyage de bureaux ${cp ? `sur le ${cp}` : `en ${zone.name}`}, nous proposons un passage quotidien, plusieurs fois par semaine ou hebdomadaire, tôt le matin ou en soirée pour ne pas gêner vos équipes. Sanitaires, sols, postes de travail, cuisine et sortie des déchets sont inclus.`,
+      servicePath: "/services/nettoyage-bureaux",
+    },
+    {
+      question: `Nettoyage copropriété ${area} : quelles prestations pour un syndic ?`,
+      answer: `Halls, escaliers, ascenseurs, locaux poubelles, sortie et rentrée des bacs, vitrages des parties communes : nous mettons en place un planning affiché dans l'immeuble et un référent joignable directement pour les résidences de ${zone.name}.`,
+      servicePath: "/services/nettoyage-copropriete",
+    },
+    {
+      question: `Combien coûte un nettoyage à ${zone.name} ?`,
+      answer: `Le tarif dépend de la surface, de la fréquence et du type de local. Nous nous déplaçons gratuitement à ${area} pour mesurer et chiffrer, puis nous remettons un devis détaillé sous 24 h, sans frais cachés.`,
+      servicePath: "/tarifs",
+    },
+    {
+      question: `Intervenez-vous en urgence à ${zone.name} ?`,
+      answer: `Oui. Depuis notre base du Pré-Saint-Gervais, nous sommes rapidement sur place à ${zone.name} pour un dégât des eaux, un dépôt sauvage, une remise en état avant visite ou un nettoyage de dernière minute. Appelez-nous ou écrivez-nous sur WhatsApp.`,
+    },
+  ];
 };
