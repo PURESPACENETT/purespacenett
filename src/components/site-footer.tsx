@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Linkedin, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { business, whatsappHref } from "@/content/business";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
@@ -46,6 +46,17 @@ export function SiteFooter() {
               >
                 <MessageCircle className="size-4 text-accent" />
                 WhatsApp : {business.whatsapp}
+              </a>
+            </li>
+            <li>
+              <a
+                href={business.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="inline-flex items-center gap-2 hover:underline"
+              >
+                <Linkedin className="size-4 text-accent" />
+                LinkedIn
               </a>
             </li>
             <li>
