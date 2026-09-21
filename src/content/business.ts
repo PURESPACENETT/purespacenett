@@ -12,6 +12,8 @@ export const business = {
   /** Fiche Google officielle (lien de partage fourni par le client). */
   googleBusinessUrl: "https://share.google/2u1kIaVRrVNB4drT0",
   googleReviewUrl: "https://share.google/2u1kIaVRrVNB4drT0",
+  /** Profil LinkedIn du dirigeant (lien nettoyé, sans paramètres de partage). */
+  linkedinUrl: "https://www.linkedin.com/in/amazigh-benseghir-449828420",
   city: "Le Pré-Saint-Gervais",
   postalCode: "93310",
   region: "Île-de-France",
