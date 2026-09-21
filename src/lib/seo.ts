@@ -18,7 +18,7 @@ export const localBusinessJsonLd = {
   email: business.email,
   url: SITE_URL,
   hasMap: business.googleBusinessUrl,
-  sameAs: [business.googleBusinessUrl],
+  sameAs: [business.googleBusinessUrl, business.linkedinUrl],
   address: {
     "@type": "PostalAddress",
     addressLocality: business.city,
