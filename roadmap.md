@@ -19,4 +19,5 @@
 - [x] Open Graph + données locales des pages de villes optimisées pour les résultats locaux
 - [x] Carte Google chargée au clic (plus de ressource bloquée pour Googlebot)
 - [x] Suivi Google par ville dans /admin (page, vérification, recherches)
-- [ ] Brancher purespacenett.com (à faire par l'utilisateur dans les réglages du projet)
+- [x] Brancher purespacenett.com (à faire par l'utilisateur dans les réglages du projet)
+- [x] Campagne Google Search : structure test prête (15 €/jour, 9 groupes par ville) — connexion Google Ads abandonnée, création manuelle possible via le document remis
