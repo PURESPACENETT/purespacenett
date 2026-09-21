@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Linkedin, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { business, whatsappHref } from "@/content/business";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
