@@ -14,6 +14,10 @@ export const business = {
   googleReviewUrl: "https://share.google/2u1kIaVRrVNB4drT0",
   /** Profil LinkedIn du dirigeant (lien nettoyé, sans paramètres de partage). */
   linkedinUrl: "https://www.linkedin.com/in/amazigh-benseghir-449828420",
+  /** Page Facebook officielle (lien de partage fourni par le client). */
+  facebookUrl: "https://www.facebook.com/share/1BuEaVDznf/",
+  /** Compte Instagram officiel (lien nettoyé, sans paramètres de suivi). */
+  instagramUrl: "https://www.instagram.com/purespacenett",
   city: "Le Pré-Saint-Gervais",
   postalCode: "93310",
   region: "Île-de-France",
