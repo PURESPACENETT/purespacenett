@@ -49,6 +49,17 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
+              <a
+                href={business.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="inline-flex items-center gap-2 hover:underline"
+              >
+                <Linkedin className="size-4 text-accent" />
+                LinkedIn
+              </a>
+            </li>
+            <li>
               <Link to="/avis" className="hover:underline">
                 Avis clients
               </Link>
