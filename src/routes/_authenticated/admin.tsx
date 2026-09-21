@@ -39,6 +39,7 @@ function AdminPage() {
   const updateStatus = useServerFn(setQuoteStatus);
   const fetchReviews = useServerFn(listReviewSubmissions);
   const [search, setSearch] = useState("");
+  const [inspectedSlug, setInspectedSlug] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["quote-requests"],
@@ -224,7 +225,9 @@ function AdminPage() {
         <h2 className="font-display text-2xl font-bold">Suivi Google par ville</h2>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
           Pour chaque ville : la page publique, la vérification Google (est-elle bien indexée ?) et
-          les recherches qui l'ont fait apparaître.
+          les recherches qui l'ont fait apparaître. « Vérifier dans Google » ouvre Search Console et
+          copie l'adresse de la page : collez-la dans la barre « Inspecter une URL » en haut, puis
+          appuyez sur Entrée.
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -248,14 +251,21 @@ function AdminPage() {
                   >
                     Voir la page
                   </a>
-                  <a
-                    href={`https://search.google.com/search-console/inspect?resource_id=${GSC_RESOURCE}&id=${encodeURIComponent(pageUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(pageUrl).catch(() => {});
+                      window.open(
+                        `https://search.google.com/search-console?resource_id=${GSC_RESOURCE}`,
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                      setInspectedSlug(z.slug);
+                    }}
                     className="rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
                   >
-                    Vérifier dans Google
-                  </a>
+                    {inspectedSlug === z.slug ? "Adresse copiée ✓" : "Vérifier dans Google"}
+                  </button>
                   <a
                     href={`https://search.google.com/search-console/performance/search-analytics?resource_id=${GSC_RESOURCE}&page=${encodeURIComponent(`!${pageUrl}`)}`}
                     target="_blank"
