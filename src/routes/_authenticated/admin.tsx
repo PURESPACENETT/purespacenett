@@ -52,13 +52,19 @@ type AdminTab = "tableau-de-bord" | "demandes" | "avis" | "seo" | "outils";
 type QuoteFilter = "tous" | "nouveau" | "traité";
 type ReviewFilter = ReviewStatus | "tous";
 
-const ADMIN_TABS: { value: AdminTab; label: string; shortLabel: string; icon: typeof BarChart3 }[] = [
-  { value: "tableau-de-bord", label: "Tableau de bord", shortLabel: "Tableau de bord", icon: BarChart3 },
-  { value: "demandes", label: "Demandes", shortLabel: "Demandes", icon: ClipboardList },
-  { value: "avis", label: "Avis", shortLabel: "Avis", icon: MessageSquareQuote },
-  { value: "seo", label: "SEO / Search Console", shortLabel: "SEO", icon: Search },
-  { value: "outils", label: "Outils", shortLabel: "Outils", icon: Settings2 },
-];
+const ADMIN_TABS: { value: AdminTab; label: string; shortLabel: string; icon: typeof BarChart3 }[] =
+  [
+    {
+      value: "tableau-de-bord",
+      label: "Tableau de bord",
+      shortLabel: "Tableau de bord",
+      icon: BarChart3,
+    },
+    { value: "demandes", label: "Demandes", shortLabel: "Demandes", icon: ClipboardList },
+    { value: "avis", label: "Avis", shortLabel: "Avis", icon: MessageSquareQuote },
+    { value: "seo", label: "SEO / Search Console", shortLabel: "SEO", icon: Search },
+    { value: "outils", label: "Outils", shortLabel: "Outils", icon: Settings2 },
+  ];
 
 const QUOTE_FILTERS: { value: QuoteFilter; label: string }[] = [
   { value: "tous", label: "Toutes" },
@@ -99,7 +105,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { title: "Espace administrateur — PURE SPACE NETT" },
       {
         name: "description",
-        content: "Espace privé de gestion des demandes, avis clients et performances SEO de PURE SPACE NETT.",
+        content:
+          "Espace privé de gestion des demandes, avis clients et performances SEO de PURE SPACE NETT.",
       },
       { property: "og:title", content: "Espace administrateur — PURE SPACE NETT" },
       {
@@ -289,9 +296,7 @@ function AdminPage() {
           />
         )}
 
-        {onglet === "seo" && (
-          <SeoTab inspectedSlug={inspectedSlug} onInspect={setInspectedSlug} />
-        )}
+        {onglet === "seo" && <SeoTab inspectedSlug={inspectedSlug} onInspect={setInspectedSlug} />}
 
         {onglet === "outils" && (
           <div className="[&>div]:mt-0">
@@ -302,11 +307,16 @@ function AdminPage() {
         )}
       </main>
 
-      <AlertDialog open={quoteToChange !== null} onOpenChange={(open) => !open && setQuoteToChange(null)}>
+      <AlertDialog
+        open={quoteToChange !== null}
+        onOpenChange={(open) => !open && setQuoteToChange(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {quoteToChange?.status === "traité" ? "Rouvrir cette demande ?" : "Marquer comme traitée ?"}
+              {quoteToChange?.status === "traité"
+                ? "Rouvrir cette demande ?"
+                : "Marquer comme traitée ?"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {quoteToChange?.status === "traité"
@@ -332,7 +342,10 @@ function AdminPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={reviewToChange !== null} onOpenChange={(open) => !open && setReviewToChange(null)}>
+      <AlertDialog
+        open={reviewToChange !== null}
+        onOpenChange={(open) => !open && setReviewToChange(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -348,10 +361,17 @@ function AdminPage() {
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               disabled={reviewMutation.isPending}
-              className={reviewToChange?.status === "refusé" ? "bg-destructive text-destructive-foreground" : undefined}
+              className={
+                reviewToChange?.status === "refusé"
+                  ? "bg-destructive text-destructive-foreground"
+                  : undefined
+              }
               onClick={() => {
                 if (!reviewToChange) return;
-                reviewMutation.mutate({ id: reviewToChange.review.id, status: reviewToChange.status });
+                reviewMutation.mutate({
+                  id: reviewToChange.review.id,
+                  status: reviewToChange.status,
+                });
               }}
             >
               {reviewMutation.isPending ? "Enregistrement…" : "Confirmer"}
@@ -363,7 +383,13 @@ function AdminPage() {
   );
 }
 
-function AdminNavigation({ activeTab, onChange }: { activeTab: AdminTab; onChange: (tab: AdminTab) => void }) {
+function AdminNavigation({
+  activeTab,
+  onChange,
+}: {
+  activeTab: AdminTab;
+  onChange: (tab: AdminTab) => void;
+}) {
   return (
     <nav className="mt-7" aria-label="Sections de l’administration">
       <div className="sm:hidden">
@@ -373,7 +399,9 @@ function AdminNavigation({ activeTab, onChange }: { activeTab: AdminTab; onChang
           </SelectTrigger>
           <SelectContent>
             {ADMIN_TABS.map((tab) => (
-              <SelectItem key={tab.value} value={tab.value}>{tab.label}</SelectItem>
+              <SelectItem key={tab.value} value={tab.value}>
+                {tab.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -392,7 +420,9 @@ function AdminNavigation({ activeTab, onChange }: { activeTab: AdminTab; onChang
               onClick={() => onChange(tab.value)}
               className={cn(
                 "h-11 shrink-0 rounded-none border-b-2 px-4",
-                selected ? "border-primary bg-secondary text-foreground" : "border-transparent text-muted-foreground",
+                selected
+                  ? "border-primary bg-secondary text-foreground"
+                  : "border-transparent text-muted-foreground",
               )}
             >
               <Icon aria-hidden="true" />
@@ -422,25 +452,33 @@ function DashboardTab({
   const stats = [
     {
       label: "Demandes à traiter",
-      value: quotesLoading ? "…" : String(quotes.filter((quote) => quote.status !== "traité").length),
+      value: quotesLoading
+        ? "…"
+        : String(quotes.filter((quote) => quote.status !== "traité").length),
       tab: "demandes" as const,
       icon: ClipboardList,
     },
     {
       label: "Demandes traitées",
-      value: quotesLoading ? "…" : String(quotes.filter((quote) => quote.status === "traité").length),
+      value: quotesLoading
+        ? "…"
+        : String(quotes.filter((quote) => quote.status === "traité").length),
       tab: "demandes" as const,
       icon: CheckCircle2,
     },
     {
       label: "Avis à modérer",
-      value: reviewsLoading ? "…" : String(reviews.filter((review) => review.status === "nouveau").length),
+      value: reviewsLoading
+        ? "…"
+        : String(reviews.filter((review) => review.status === "nouveau").length),
       tab: "avis" as const,
       icon: MessageSquareQuote,
     },
     {
       label: "Avis publiés",
-      value: reviewsLoading ? "…" : String(reviews.filter((review) => review.status === "publié").length),
+      value: reviewsLoading
+        ? "…"
+        : String(reviews.filter((review) => review.status === "publié").length),
       tab: "avis" as const,
       icon: BarChart3,
     },
@@ -449,8 +487,12 @@ function DashboardTab({
   return (
     <section aria-labelledby="dashboard-title">
       <div>
-        <h2 id="dashboard-title" className="font-display text-2xl font-bold">Tableau de bord</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Les éléments qui demandent votre attention.</p>
+        <h2 id="dashboard-title" className="font-display text-2xl font-bold">
+          Tableau de bord
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Les éléments qui demandent votre attention.
+        </p>
       </div>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
@@ -467,15 +509,23 @@ function DashboardTab({
                 <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
                 <Icon className="size-4 text-accent" aria-hidden="true" />
               </div>
-              <span className="mt-3 block font-display text-3xl font-bold tabular-nums">{stat.value}</span>
+              <span className="mt-3 block font-display text-3xl font-bold tabular-nums">
+                {stat.value}
+              </span>
             </Button>
           );
         })}
       </div>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button type="button" onClick={() => onNavigate("demandes")}>Voir les demandes</Button>
-        <Button type="button" variant="outline" onClick={() => onNavigate("avis")}>Modérer les avis</Button>
-        <Button type="button" variant="outline" onClick={() => onNavigate("seo")}>Voir les résultats Google</Button>
+        <Button type="button" onClick={() => onNavigate("demandes")}>
+          Voir les demandes
+        </Button>
+        <Button type="button" variant="outline" onClick={() => onNavigate("avis")}>
+          Modérer les avis
+        </Button>
+        <Button type="button" variant="outline" onClick={() => onNavigate("seo")}>
+          Voir les résultats Google
+        </Button>
       </div>
     </section>
   );
@@ -514,9 +564,13 @@ function RequestsTab({
     <section aria-labelledby="requests-title">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 id="requests-title" className="font-display text-2xl font-bold">Demandes de devis</h2>
+          <h2 id="requests-title" className="font-display text-2xl font-bold">
+            Demandes de devis
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isLoading ? "Chargement…" : `${quotes.length} demande(s) · ${quotes.filter((quote) => quote.status !== "traité").length} à traiter`}
+            {isLoading
+              ? "Chargement…"
+              : `${quotes.length} demande(s) · ${quotes.filter((quote) => quote.status !== "traité").length} à traiter`}
           </p>
         </div>
       </div>
@@ -538,40 +592,100 @@ function RequestsTab({
               variant={filter === item.value ? "default" : "outline"}
               onClick={() => onFilter(item.value)}
             >
-              {item.label} ({item.value === "tous" ? quotes.length : quotes.filter((quote) => quote.status === item.value).length})
+              {item.label} (
+              {item.value === "tous"
+                ? quotes.length
+                : quotes.filter((quote) => quote.status === item.value).length}
+              )
             </Button>
           ))}
         </div>
       </div>
 
-      {notice && <p role="status" className="mt-4 rounded-lg bg-secondary px-4 py-3 text-sm font-medium">{notice}</p>}
+      {notice && (
+        <p role="status" className="mt-4 rounded-lg bg-secondary px-4 py-3 text-sm font-medium">
+          {notice}
+        </p>
+      )}
       {isLoading && <LoadingMessage>Chargement des demandes…</LoadingMessage>}
-      {error && <p role="alert" className="mt-6 text-sm text-destructive">Impossible d’afficher les demandes. Vérifiez vos droits d’accès.</p>}
-      {!isLoading && !error && filteredQuotes.length === 0 && <p className="mt-6 text-sm text-muted-foreground">Aucune demande ne correspond à ces critères.</p>}
+      {error && (
+        <p role="alert" className="mt-6 text-sm text-destructive">
+          Impossible d’afficher les demandes. Vérifiez vos droits d’accès.
+        </p>
+      )}
+      {!isLoading && !error && filteredQuotes.length === 0 && (
+        <p className="mt-6 text-sm text-muted-foreground">
+          Aucune demande ne correspond à ces critères.
+        </p>
+      )}
 
       <div className="mt-6 space-y-3">
         {filteredQuotes.map((quote) => {
           const expanded = expandedQuoteId === quote.id;
           const pending = pendingId === quote.id;
           return (
-            <article key={quote.id} className="rounded-lg border border-border bg-card p-4 shadow-card sm:p-5">
+            <article
+              key={quote.id}
+              className="rounded-lg border border-border bg-card p-4 shadow-card sm:p-5"
+            >
               <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-display text-lg font-bold">{quote.full_name}</h3>
-                    <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", quote.status === "traité" ? "bg-secondary text-foreground" : "bg-accent text-accent-foreground")}>{quote.status === "traité" ? "Traitée" : "À traiter"}</span>
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-1 text-xs font-semibold",
+                        quote.status === "traité"
+                          ? "bg-secondary text-foreground"
+                          : "bg-accent text-accent-foreground",
+                      )}
+                    >
+                      {quote.status === "traité" ? "Traitée" : "À traiter"}
+                    </span>
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">{dateFmt.format(new Date(quote.created_at))}{quote.service_type ? ` · ${quote.service_type}` : ""}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {dateFmt.format(new Date(quote.created_at))}
+                    {quote.service_type ? ` · ${quote.service_type}` : ""}
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button asChild size="sm" variant="outline"><a href={`tel:${quote.phone.replace(/\s/g, "")}`}><Phone aria-hidden="true" />Appeler</a></Button>
-                  <Button asChild size="sm" variant="outline"><a href={`mailto:${quote.email}`}><Mail aria-hidden="true" />Écrire</a></Button>
-                  <Button type="button" size="sm" variant="outline" onClick={() => onToggleDetails(quote.id)} aria-expanded={expanded}>
-                    {expanded ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
+                  <Button asChild size="sm" variant="outline">
+                    <a href={`tel:${quote.phone.replace(/\s/g, "")}`}>
+                      <Phone aria-hidden="true" />
+                      Appeler
+                    </a>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <a href={`mailto:${quote.email}`}>
+                      <Mail aria-hidden="true" />
+                      Écrire
+                    </a>
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onToggleDetails(quote.id)}
+                    aria-expanded={expanded}
+                  >
+                    {expanded ? (
+                      <ChevronUp aria-hidden="true" />
+                    ) : (
+                      <ChevronDown aria-hidden="true" />
+                    )}
                     {expanded ? "Masquer" : "Détails"}
                   </Button>
-                  <Button type="button" size="sm" disabled={pending} onClick={() => onRequestStatusChange(quote)}>
-                    {pending ? "Enregistrement…" : quote.status === "traité" ? "Rouvrir" : "Marquer traitée"}
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => onRequestStatusChange(quote)}
+                  >
+                    {pending
+                      ? "Enregistrement…"
+                      : quote.status === "traité"
+                        ? "Rouvrir"
+                        : "Marquer traitée"}
                   </Button>
                 </div>
               </div>
@@ -584,9 +698,16 @@ function RequestsTab({
                     <QuoteField label="Adresse" value={quote.address} />
                     <QuoteField label="Prestation" value={quote.service_type} />
                     <QuoteField label="Fréquence" value={quote.frequency} />
-                    <QuoteField label="Type de bien / surface" value={`${quote.property_type ?? "—"}${quote.surface ? ` · ${quote.surface} m²` : ""}`} />
+                    <QuoteField
+                      label="Type de bien / surface"
+                      value={`${quote.property_type ?? "—"}${quote.surface ? ` · ${quote.surface} m²` : ""}`}
+                    />
                   </dl>
-                  {quote.message && <p className="mt-4 whitespace-pre-line rounded-lg bg-secondary/60 p-4 text-sm">{quote.message}</p>}
+                  {quote.message && (
+                    <p className="mt-4 whitespace-pre-line rounded-lg bg-secondary/60 p-4 text-sm">
+                      {quote.message}
+                    </p>
+                  )}
                 </div>
               )}
             </article>
@@ -598,7 +719,12 @@ function RequestsTab({
 }
 
 function QuoteField({ label, value }: { label: string; value: string | null }) {
-  return <div><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 break-words font-medium">{value || "—"}</dd></div>;
+  return (
+    <div>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="mt-1 break-words font-medium">{value || "—"}</dd>
+    </div>
+  );
 }
 
 function ReviewsTab({
@@ -624,33 +750,119 @@ function ReviewsTab({
 }) {
   return (
     <section aria-labelledby="reviews-title">
-      <h2 id="reviews-title" className="font-display text-2xl font-bold">Avis reçus depuis le site</h2>
-      <p className="mt-1 text-sm text-muted-foreground">{isLoading ? "Chargement…" : `${reviews.length} avis · ${reviews.filter((review) => review.status === "nouveau").length} en attente · ${reviews.filter((review) => review.status === "publié").length} publié(s)`}</p>
+      <h2 id="reviews-title" className="font-display text-2xl font-bold">
+        Avis reçus depuis le site
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {isLoading
+          ? "Chargement…"
+          : `${reviews.length} avis · ${reviews.filter((review) => review.status === "nouveau").length} en attente · ${reviews.filter((review) => review.status === "publié").length} publié(s)`}
+      </p>
       <div className="mt-4 flex flex-wrap gap-2">
         {REVIEW_FILTERS.map((item) => (
-          <Button key={item.value} type="button" size="sm" variant={filter === item.value ? "default" : "outline"} onClick={() => onFilter(item.value)}>
-            {item.label} ({item.value === "tous" ? reviews.length : reviews.filter((review) => review.status === item.value).length})
+          <Button
+            key={item.value}
+            type="button"
+            size="sm"
+            variant={filter === item.value ? "default" : "outline"}
+            onClick={() => onFilter(item.value)}
+          >
+            {item.label} (
+            {item.value === "tous"
+              ? reviews.length
+              : reviews.filter((review) => review.status === item.value).length}
+            )
           </Button>
         ))}
       </div>
-      {notice && <p role="status" className="mt-4 rounded-lg bg-secondary px-4 py-3 text-sm font-medium">{notice}</p>}
-      {error && <p role="alert" className="mt-4 text-sm text-destructive">Impossible d’afficher les avis.</p>}
-      {!isLoading && filteredReviews.length === 0 && <p className="mt-6 text-sm text-muted-foreground">Aucun avis dans cette catégorie.</p>}
+      {notice && (
+        <p role="status" className="mt-4 rounded-lg bg-secondary px-4 py-3 text-sm font-medium">
+          {notice}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-destructive">
+          Impossible d’afficher les avis.
+        </p>
+      )}
+      {!isLoading && filteredReviews.length === 0 && (
+        <p className="mt-6 text-sm text-muted-foreground">Aucun avis dans cette catégorie.</p>
+      )}
       <div className="mt-6 space-y-4">
         {filteredReviews.map((review) => {
           const pending = pendingId === review.id;
           return (
-            <article key={review.id} className="rounded-lg border border-border bg-card p-5 shadow-card">
+            <article
+              key={review.id}
+              className="rounded-lg border border-border bg-card p-5 shadow-card"
+            >
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="font-display text-lg font-bold">{review.author_name}{review.city ? ` · ${review.city}` : ""}</h3>
-                <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", review.status === "publié" ? "bg-accent text-accent-foreground" : review.status === "refusé" ? "bg-destructive/15 text-destructive" : "bg-secondary text-foreground")}>{review.status === "publié" ? "Publié" : review.status === "refusé" ? "Refusé" : "En attente"}</span>
+                <h3 className="font-display text-lg font-bold">
+                  {review.author_name}
+                  {review.city ? ` · ${review.city}` : ""}
+                </h3>
+                <span
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-semibold",
+                    review.status === "publié"
+                      ? "bg-accent text-accent-foreground"
+                      : review.status === "refusé"
+                        ? "bg-destructive/15 text-destructive"
+                        : "bg-secondary text-foreground",
+                  )}
+                >
+                  {review.status === "publié"
+                    ? "Publié"
+                    : review.status === "refusé"
+                      ? "Refusé"
+                      : "En attente"}
+                </span>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3"><Stars rating={review.rating} /><span className="text-xs text-muted-foreground">{dateFmt.format(new Date(review.created_at))}{review.service_type ? ` · ${review.service_type}` : ""}{review.email ? ` · ${review.email}` : ""}</span></div>
-              <p className="mt-4 whitespace-pre-line rounded-lg bg-secondary/60 p-4 text-sm">{review.message}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <Stars rating={review.rating} />
+                <span className="text-xs text-muted-foreground">
+                  {dateFmt.format(new Date(review.created_at))}
+                  {review.service_type ? ` · ${review.service_type}` : ""}
+                  {review.email ? ` · ${review.email}` : ""}
+                </span>
+              </div>
+              <p className="mt-4 whitespace-pre-line rounded-lg bg-secondary/60 p-4 text-sm">
+                {review.message}
+              </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                {review.status !== "publié" && <Button type="button" size="sm" disabled={pending} onClick={() => onRequestStatusChange(review, "publié")}>{pending ? "Enregistrement…" : "Publier"}</Button>}
-                {review.status === "publié" && <Button type="button" size="sm" variant="outline" disabled={pending} onClick={() => onRequestStatusChange(review, "nouveau")}>Dépublier</Button>}
-                {review.status !== "refusé" && <Button type="button" size="sm" variant="outline" className="border-destructive/40 text-destructive hover:text-destructive" disabled={pending} onClick={() => onRequestStatusChange(review, "refusé")}>Refuser</Button>}
+                {review.status !== "publié" && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => onRequestStatusChange(review, "publié")}
+                  >
+                    {pending ? "Enregistrement…" : "Publier"}
+                  </Button>
+                )}
+                {review.status === "publié" && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={pending}
+                    onClick={() => onRequestStatusChange(review, "nouveau")}
+                  >
+                    Dépublier
+                  </Button>
+                )}
+                {review.status !== "refusé" && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="border-destructive/40 text-destructive hover:text-destructive"
+                    disabled={pending}
+                    onClick={() => onRequestStatusChange(review, "refusé")}
+                  >
+                    Refuser
+                  </Button>
+                )}
               </div>
             </article>
           );
@@ -660,31 +872,81 @@ function ReviewsTab({
   );
 }
 
-function SeoTab({ inspectedSlug, onInspect }: { inspectedSlug: string | null; onInspect: (slug: string) => void }) {
+function SeoTab({
+  inspectedSlug,
+  onInspect,
+}: {
+  inspectedSlug: string | null;
+  onInspect: (slug: string) => void;
+}) {
   return (
     <section aria-labelledby="seo-title">
-      <h2 id="seo-title" className="sr-only">SEO et Search Console</h2>
+      <h2 id="seo-title" className="sr-only">
+        SEO et Search Console
+      </h2>
       <div className="[&>div]:mt-0">
-        <Suspense fallback={<LoadingMessage>Chargement des outils Google…</LoadingMessage>}><SearchConsoleStats /></Suspense>
+        <Suspense fallback={<LoadingMessage>Chargement des outils Google…</LoadingMessage>}>
+          <SearchConsoleStats />
+        </Suspense>
       </div>
       <div className="mt-12">
         <h2 className="font-display text-2xl font-bold">Suivi Google par ville</h2>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">Ouvrez la page publique, contrôlez son indexation et consultez les recherches qui l’ont affichée.</p>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          Ouvrez la page publique, contrôlez son indexation et consultez les recherches qui l’ont
+          affichée.
+        </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {zones.map((zone) => {
             const pageUrl = `${SITE_URL}/zones/${zone.slug}`;
             return (
-              <article key={zone.slug} className="rounded-lg border border-border bg-card p-5 shadow-card">
-                <h3 className="font-display text-base font-bold">{zone.name}{zone.postalCode ? ` (${zone.postalCode})` : ""}</h3>
+              <article
+                key={zone.slug}
+                className="rounded-lg border border-border bg-card p-5 shadow-card"
+              >
+                <h3 className="font-display text-base font-bold">
+                  {zone.name}
+                  {zone.postalCode ? ` (${zone.postalCode})` : ""}
+                </h3>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button asChild size="sm" variant="outline"><a href={pageUrl} target="_blank" rel="noopener noreferrer">Voir la page<ExternalLink aria-hidden="true" /></a></Button>
-                  <Button size="sm" type="button" onClick={() => {
-                    navigator.clipboard?.writeText(pageUrl).catch(() => undefined);
-                    window.open(`https://search.google.com/search-console?resource_id=${GSC_RESOURCE}`, "_blank", "noopener,noreferrer");
-                    onInspect(zone.slug);
-                  }}>{inspectedSlug === zone.slug ? "Adresse copiée" : "Vérifier dans Google"}</Button>
-                  <Button asChild size="sm" variant="outline"><a href={`https://search.google.com/search-console/performance/search-analytics?resource_id=${GSC_RESOURCE}&page=${encodeURIComponent(`!${pageUrl}`)}`} target="_blank" rel="noopener noreferrer">Recherches Google</a></Button>
-                  <Button asChild size="sm" variant="outline"><a href={`https://www.google.com/search?q=${encodeURIComponent(`nettoyage ${zone.name}`)}`} target="_blank" rel="noopener noreferrer">Tester la recherche</a></Button>
+                  <Button asChild size="sm" variant="outline">
+                    <a href={pageUrl} target="_blank" rel="noopener noreferrer">
+                      Voir la page
+                      <ExternalLink aria-hidden="true" />
+                    </a>
+                  </Button>
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(pageUrl).catch(() => undefined);
+                      window.open(
+                        `https://search.google.com/search-console?resource_id=${GSC_RESOURCE}`,
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
+                      onInspect(zone.slug);
+                    }}
+                  >
+                    {inspectedSlug === zone.slug ? "Adresse copiée" : "Vérifier dans Google"}
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <a
+                      href={`https://search.google.com/search-console/performance/search-analytics?resource_id=${GSC_RESOURCE}&page=${encodeURIComponent(`!${pageUrl}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Recherches Google
+                    </a>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <a
+                      href={`https://www.google.com/search?q=${encodeURIComponent(`nettoyage ${zone.name}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Tester la recherche
+                    </a>
+                  </Button>
                 </div>
               </article>
             );

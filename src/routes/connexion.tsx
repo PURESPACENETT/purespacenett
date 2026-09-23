@@ -68,9 +68,7 @@ function LoginPage() {
         return;
       }
 
-      const { error } = await withTimeout(
-        supabase.auth.signInWithPassword({ email, password }),
-      );
+      const { error } = await withTimeout(supabase.auth.signInWithPassword({ email, password }));
 
       if (error) {
         setError(
@@ -84,7 +82,8 @@ function LoginPage() {
       await navigate({ to: "/admin", search: { onglet: "tableau-de-bord" } });
     } catch (error) {
       console.error("[Connexion] Erreur d'authentification", error);
-      const message = error instanceof Error ? error.message : "Erreur inattendue lors de la connexion.";
+      const message =
+        error instanceof Error ? error.message : "Erreur inattendue lors de la connexion.";
       setError(
         message.includes("Missing Supabase environment")
           ? "La connexion Supabase n'est pas correctement configurée sur le site."
@@ -104,7 +103,10 @@ function LoginPage() {
       <p className="mt-2 text-sm text-muted-foreground">
         Connectez-vous pour consulter les demandes de devis reçues.
       </p>
-      <form onSubmit={submit} className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
+      <form
+        onSubmit={submit}
+        className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card"
+      >
         <label className="block text-sm font-medium">
           E-mail
           <input
@@ -133,11 +135,7 @@ function LoginPage() {
           disabled={loading}
           className="mt-6 w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
         >
-          {loading
-            ? "Patientez…"
-            : mode === "signup"
-              ? "Créer mon compte"
-              : "Se connecter"}
+          {loading ? "Patientez…" : mode === "signup" ? "Créer mon compte" : "Se connecter"}
         </button>
         <button
           type="button"
