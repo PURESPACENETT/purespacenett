@@ -20,7 +20,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as PolitiqueConfidentialiteRouteImport } from './routes/politique-confidentialite'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as EntreprisesRouteImport } from './routes/entreprises'
+import { Route as SousTraitanceRouteImport } from './routes/entreprises'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
@@ -87,9 +87,9 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EntreprisesRoute = EntreprisesRouteImport.update({
-  id: '/entreprises',
-  path: '/entreprises',
+const SousTraitanceRoute = SousTraitanceRouteImport.update({
+  id: '/sous-traitance',
+  path: '/sous-traitance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TarifsRoute = TarifsRouteImport.update({
@@ -156,9 +156,9 @@ export interface FileRoutesByFullPath {
   '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
-  '/entreprises': typeof EntreprisesRoute
-  '/entreprises': typeof EntreprisesRoute
-  '/entreprises': typeof EntreprisesRoute
+  '/sous-traitance': typeof SousTraitanceRoute
+  '/sous-traitance': typeof SousTraitanceRoute
+  '/sous-traitance': typeof SousTraitanceRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
@@ -293,7 +293,7 @@ export interface RootRouteChildren {
   PolitiqueConfidentialiteRoute: typeof PolitiqueConfidentialiteRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TarifsRoute: typeof TarifsRoute
-  EntreprisesRoute: typeof EntreprisesRoute
+  SousTraitanceRoute: typeof SousTraitanceRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ZonesSlugRoute: typeof ZonesSlugRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
@@ -382,11 +382,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/entreprises': {
-      id: '/entreprises'
-      path: '/entreprises'
-      fullPath: '/entreprises'
-      preLoaderRoute: typeof EntreprisesRouteImport
+    '/sous-traitance': {
+      id: '/sous-traitance'
+      path: '/sous-traitance'
+      fullPath: '/sous-traitance'
+      preLoaderRoute: typeof SousTraitanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tarifs': {
@@ -480,7 +480,7 @@ const rootRouteChildren: RootRouteChildren = {
   PolitiqueConfidentialiteRoute: PolitiqueConfidentialiteRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TarifsRoute: TarifsRoute,
-  EntreprisesRoute: EntreprisesRoute,
+  SousTraitanceRoute: SousTraitanceRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ZonesSlugRoute: ZonesSlugRoute,
   ServicesIndexRoute: ServicesIndexRoute,
