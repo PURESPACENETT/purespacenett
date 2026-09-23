@@ -139,7 +139,11 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {business.name} — Entreprise de nettoyage en{" "}
             {business.region}.
           </p>
-          <p>{business.hours}</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <Link to="/mentions-legales" className="hover:text-ink-foreground hover:underline">Mentions légales</Link>
+            <Link to="/politique-confidentialite" className="hover:text-ink-foreground hover:underline">Confidentialité</Link>
+            <p>{business.hours}</p>
+          </div>
         </div>
       </div>
     </footer>
