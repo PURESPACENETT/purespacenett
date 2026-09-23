@@ -133,7 +133,11 @@ export function QuoteForm() {
         <p className="mt-3 text-sm text-muted-foreground">
           Merci ! Nous avons reçu votre demande et vous répondons sous 24 heures. Pour une urgence,
           appelez-nous au{" "}
-          <a className="font-semibold text-foreground" href={business.phoneHref}>
+          <a
+            className="font-semibold text-foreground"
+            href={business.phoneHref}
+            onClick={() => trackEvent("appel_telephone", { source: "confirmation_devis" })}
+          >
             {business.phone}
           </a>
           .
@@ -374,7 +378,10 @@ export function QuoteForm() {
             </a>
             <button
               type="button"
-              onClick={mailtoFallback}
+              onClick={() => {
+                trackEvent("clic_email", { source: "erreur_formulaire_devis" });
+                mailtoFallback();
+              }}
               className="rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold"
             >
               Préparer un e-mail
