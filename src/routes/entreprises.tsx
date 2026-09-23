@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Building2, CheckCircle2, FileText, Phone, Target } from "lucide-react";
+import { B2BLeadForm } from "@/components/b2b-lead-form";
 import { business } from "@/content/business";
 import { Breadcrumbs, CallButtons, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
@@ -139,7 +140,7 @@ function BusinessesPage() {
         </div>
       </Section>
 
-      <QuoteBanner subject="demande de nettoyage B2B" />
+      <Section className="pt-0"><Eyebrow>Parlons de votre besoin</Eyebrow><h2 className="mt-3 font-display text-3xl font-bold">Décrivez le chantier à nous confier</h2><p className="mt-3 max-w-2xl text-sm text-muted-foreground">Votre demande est transmise directement à notre espace commercial pour qualification et suivi.</p><div className="mt-6 max-w-3xl"><B2BLeadForm /></div></Section>
     </>
   );
 }
