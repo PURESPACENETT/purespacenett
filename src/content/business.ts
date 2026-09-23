@@ -37,9 +37,9 @@ export const business = {
   openingHours: "Mo-Sa 07:00-22:00",
   usp: [
     "Devis gratuit sous 24 h",
-    "Équipes formées et assurées",
-    "Produits professionnels et éco-responsables",
     "Interventions ponctuelles ou contrats réguliers",
+    "Prestations pour particuliers et professionnels",
+    "Photos possibles avec la demande de devis",
   ],
 } as const;
 
