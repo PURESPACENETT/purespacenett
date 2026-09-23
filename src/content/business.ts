@@ -1,27 +1,27 @@
 export const business = {
   name: "PURE SPACE NETT",
-  legalName: "PURE SPACE NETT",
+  legalName: "BENSEGHIR AMAZIGH",
   tagline: "Entreprise de nettoyage professionnel en Île-de-France",
   phone: "07 59 48 30 21",
   phoneHref: "tel:+33759483021",
   email: "contact@purespacenett.com",
   emailHref: "mailto:contact@purespacenett.com",
-  /** WhatsApp Business (même numéro que la ligne téléphonique). */
   whatsapp: "+33 7 59 48 30 21",
   whatsappNumber: "33759483021",
-  /** Fiche Google officielle (lien de partage fourni par le client). */
   googleBusinessUrl: "https://share.google/2u1kIaVRrVNB4drT0",
   googleReviewUrl: "https://share.google/2u1kIaVRrVNB4drT0",
-  /** Profil LinkedIn du dirigeant (lien nettoyé, sans paramètres de partage). */
   linkedinUrl: "https://www.linkedin.com/in/amazigh-benseghir-449828420",
-  /** Page Facebook officielle (lien de partage fourni par le client). */
   facebookUrl: "https://www.facebook.com/share/1BuEaVDznf/",
-  /** Compte Instagram officiel (lien nettoyé, sans paramètres de suivi). */
   instagramUrl: "https://www.instagram.com/purespacenett",
+  address: "2 rue Chevreul, BP 67",
   city: "Le Pré-Saint-Gervais",
   postalCode: "93310",
   region: "Île-de-France",
   country: "FR",
+  siren: "885 370 767",
+  siret: "885 370 767 00034",
+  vatNumber: "FR16 885370767",
+  apeCode: "81.21Z",
   areaServed: [
     "Le Pré-Saint-Gervais",
     "Pantin",
@@ -43,7 +43,6 @@ export const business = {
   ],
 } as const;
 
-/** Lien WhatsApp Business pré-rempli. */
 export const whatsappHref = (subject: string) =>
   `https://wa.me/${business.whatsappNumber}?text=${encodeURIComponent(
     `Bonjour ${business.name}, je souhaite un devis pour : ${subject}.`,
