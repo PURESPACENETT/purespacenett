@@ -95,6 +95,7 @@ const Email = ({
 
 export const template = {
   component: Email,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subject: (data: Record<string, any>) =>
     `Nouvelle demande de devis${data['fullName'] ? ` — ${data['fullName']}` : ''}`,
   displayName: 'Nouvelle demande de devis',
