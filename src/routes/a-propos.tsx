@@ -2,10 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { business } from "@/content/business";
 import { Breadcrumbs, CheckList, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { siteImages } from "@/lib/site-images";
 
 const title = "À propos de PURE SPACE NETT | Entreprise de nettoyage 93";
 const description =
-  "PURE SPACE NETT est une entreprise de nettoyage basée au Pré-Saint-Gervais, au service des entreprises, syndics et particuliers du 93, de Paris et de l'Île-de-France.";
+  "Découvrez PURE SPACE NETT, entreprise de nettoyage indépendante basée au Pré-Saint-Gervais. Méthode de travail, engagements et zones d'intervention dans le 93, à Paris et en Île-de-France.";
 
 export const Route = createFileRoute("/a-propos")({
   staticData: { sitemap: true },
@@ -29,10 +30,10 @@ export const Route = createFileRoute("/a-propos")({
 });
 
 const values = [
-  "Un référent unique, joignable directement au téléphone",
-  "Les mêmes agents sur votre site, mois après mois",
-  "Un cahier des charges écrit et des points de contrôle",
-  "Des produits professionnels dosés, sans excès de chimie",
+  "Un interlocuteur direct pour organiser vos interventions",
+  "Un cahier des charges adapté à votre site et à vos besoins",
+  "Des points de contrôle pour suivre la qualité des prestations",
+  "Des produits et matériels professionnels utilisés selon la prestation",
 ];
 
 function AboutPage() {
@@ -48,40 +49,83 @@ function AboutPage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.3fr_1fr]">
           <div className="space-y-4 text-sm leading-relaxed text-foreground/90">
             <p>
-              {business.name} est une entreprise de nettoyage installée au Pré-Saint-Gervais, en
-              Seine-Saint-Denis. Nous travaillons pour des entreprises, des syndics, des artisans et
-              des particuliers, sur des contrats réguliers comme sur des interventions ponctuelles.
+              {business.name} est une entreprise de nettoyage indépendante installée au Pré-Saint-Gervais,
+              en Seine-Saint-Denis. Nous accompagnons les entreprises, syndics, artisans et particuliers
+              pour des interventions ponctuelles comme pour des besoins réguliers.
             </p>
             <p>
-              Notre parti pris est simple : rester une structure à taille humaine, où le client parle
-              directement à la personne qui organise les interventions. Pas de plateau téléphonique,
-              pas de sous-traitance en chaîne. Vous appelez, on décroche, et on connaît votre site.
+              Notre approche repose sur une organisation simple : comprendre le besoin, définir précisément
+              la prestation, organiser l'intervention et rester disponible pour le suivi. Le client dispose
+              d'un interlocuteur direct pour les questions liées au chantier ou au contrat.
             </p>
             <p>
-              Nous couvrons en priorité le 93 et l'est parisien, où nous sommes réactifs en quelques
-              minutes, et nous nous déplaçons dans toute l'Île-de-France pour les chantiers et les
-              contrats plus importants.
+              Nous intervenons en priorité dans le 93 et l'est parisien. Pour les chantiers et contrats
+              adaptés à notre organisation, nous nous déplaçons également à Paris et dans les autres secteurs
+              d'Île-de-France.
             </p>
             <p>
-              Nos équipes sont formées aux protocoles d'hygiène, aux règles de sécurité et à
-              l'utilisation du matériel professionnel : monobrosse, injection-extraction, perche à
-              eau pure, nettoyage haute pression.
+              Selon la prestation, nous utilisons du matériel professionnel adapté au support et au niveau
+              de salissure : monobrosse, injection-extraction, perche à eau pure ou matériel de nettoyage
+              haute pression lorsque les conditions du site le permettent.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
-            <h2 className="font-display text-lg font-semibold">Nos engagements</h2>
-            <div className="mt-4">
-              <CheckList items={values} />
-            </div>
-            <div className="mt-6 rounded-xl bg-secondary p-4 text-sm text-secondary-foreground">
-              <p className="font-semibold">Coordonnées</p>
-              <p className="mt-1">
-                {business.city} ({business.postalCode}) · {business.phone} · {business.email}
-              </p>
-              <p className="mt-2 text-xs">{business.hours}</p>
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+            <img
+              src={siteImages.bureaux}
+              alt="Bureaux après une intervention de nettoyage par PURE SPACE NETT"
+              className="aspect-[4/3] w-full object-cover"
+              loading="lazy"
+            />
+            <div className="p-6">
+              <h2 className="font-display text-lg font-semibold">Nos engagements</h2>
+              <div className="mt-4">
+                <CheckList items={values} />
+              </div>
+              <div className="mt-6 rounded-xl bg-secondary p-4 text-sm text-secondary-foreground">
+                <p className="font-semibold">Coordonnées</p>
+                <p className="mt-1">
+                  {business.city} ({business.postalCode}) · {business.phone} · {business.email}
+                </p>
+                <p className="mt-2 text-xs">{business.hours}</p>
+              </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-display text-lg font-semibold">Notre méthode</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Échange initial, définition du besoin, estimation ou visite lorsque nécessaire, puis
+              intervention selon le cahier des charges convenu.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-display text-lg font-semibold">Nos clients</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Bureaux, commerces, copropriétés, artisans, propriétaires et particuliers selon la nature
+              de la prestation demandée.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="font-display text-lg font-semibold">Notre secteur</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Base au Pré-Saint-Gervais, interventions dans le 93, à Paris et plus largement en
+              Île-de-France selon le chantier et son organisation.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div className="rounded-2xl border border-border bg-secondary p-6 sm:p-8">
+          <Eyebrow>Parlons de votre besoin</Eyebrow>
+          <h2 className="mt-3 font-display text-2xl font-bold">Un besoin ponctuel ou un contrat régulier ?</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Décrivez votre site, la prestation recherchée et, si utile, ajoutez des photos dans votre demande.
+            Nous pourrons ainsi mieux comprendre le chantier avant de vous répondre.
+          </p>
         </div>
       </Section>
 
