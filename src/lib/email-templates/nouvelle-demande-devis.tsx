@@ -22,6 +22,7 @@ interface Props {
   serviceType?: string
   frequency?: string
   message?: string
+  photoUrls?: string[]
 }
 
 const Line = ({ label, value }: { label: string; value?: string | undefined }) =>
@@ -41,6 +42,7 @@ const Email = ({
   serviceType,
   frequency,
   message,
+  photoUrls = [],
 }: Props) => (
   <Html lang="fr" dir="ltr">
     <Head />
@@ -64,6 +66,17 @@ const Email = ({
           <Line label="Prestation" value={serviceType} />
           <Line label="Fréquence" value={frequency} />
         </Section>
+        {photoUrls.length > 0 ? (
+          <>
+            <Hr style={hr} />
+            <Text style={strong}>Photos jointes</Text>
+            {photoUrls.map((url, index) => (
+              <Text key={url} style={line}>
+                <a href={url}>Photo {index + 1}</a>
+              </Text>
+            ))}
+          </>
+        ) : null}
         {message ? (
           <>
             <Hr style={hr} />
