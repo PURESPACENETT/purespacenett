@@ -232,14 +232,14 @@ export const zones: Zone[] = [
 export const getZone = (slug: string) => zones.find((z) => z.slug === slug);
 
 /**
- * Requêtes locales réellement tapées sur Google pour une ville et ses quartiers.
- * Utilisées dans le contenu des pages de villes (maillage interne + mots-clés locaux).
+ * Recherches locales associées aux prestations pour une ville et ses quartiers.
+ * Utilisées pour le maillage interne et comme variantes sémantiques, sans les présenter comme des données Search Console.
  */
 export const zoneQueries = (zone: Zone): { query: string; servicePath?: string }[] => {
   const area = zone.postalCode ? `${zone.name} ${zone.postalCode}` : zone.name;
   const cp = zone.postalCode;
   const base: { query: string; servicePath?: string }[] = [
-    // Formulations exactes relevées dans Search Console (sans « de »).
+    // Variantes sémantiques locales, sans prétendre à des volumes ou données Search Console.
     { query: `entreprise nettoyage ${zone.name}` },
     { query: `entreprise de nettoyage ${zone.name}` },
     { query: `société de nettoyage ${area}` },
