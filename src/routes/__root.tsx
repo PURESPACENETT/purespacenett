@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CookieConsent } from "@/components/cookie-consent";
+import { MobileActionBar } from "@/components/mobile-action-bar";
 import { initAnalytics, trackPageView } from "@/lib/analytics";
 
 function NotFoundComponent() {
@@ -158,6 +159,7 @@ function RootComponent() {
         </main>
         <SiteFooter />
         <CookieConsent />
+        <MobileActionBar />
       </div>
     </QueryClientProvider>
   );
