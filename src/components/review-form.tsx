@@ -158,6 +158,20 @@ export function ReviewForm() {
         className="hidden"
       />
 
+      <label className="mt-5 flex items-start gap-3 text-xs text-muted-foreground">
+        <input
+          name="consent"
+          type="checkbox"
+          value="true"
+          required
+          className="mt-0.5 size-4 shrink-0 rounded border-input"
+        />
+        <span>
+          J'accepte que PURE SPACE NETT traite cet avis et les données que je transmets pour le
+          gérer. Je peux demander sa modification ou sa suppression à {business.email}.
+        </span>
+      </label>
+
       <button
         type="submit"
         disabled={status === "sending"}
