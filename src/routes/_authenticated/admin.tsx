@@ -286,13 +286,7 @@ function AdminPage() {
             pendingId={reviewMutation.isPending ? reviewMutation.variables?.id : undefined}
             notice={reviewNotice}
             onFilter={setReviewFilter}
-            onRequestStatusChange={(review, status) => {
-              if (status === "publié") {
-                reviewMutation.mutate({ id: review.id, status });
-                return;
-              }
-              setReviewToChange({ review, status });
-            }}
+            onRequestStatusChange={(review, status) => setReviewToChange({ review, status })}
           />
         )}
 
@@ -349,12 +343,18 @@ function AdminPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {reviewToChange?.status === "refusé" ? "Refuser cet avis ?" : "Dépublier cet avis ?"}
+              {reviewToChange?.status === "publié"
+                ? "Publier cet avis ?"
+                : reviewToChange?.status === "refusé"
+                  ? "Refuser cet avis ?"
+                  : "Dépublier cet avis ?"}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {reviewToChange?.status === "refusé"
-                ? "L’avis restera enregistré, mais ne sera pas visible sur le site."
-                : "L’avis disparaîtra du site et reviendra dans la liste En attente."}
+              {reviewToChange?.status === "publié"
+                ? `L’avis de ${reviewToChange.review.author_name} sera visible publiquement sur le site (page Avis, accueil, page de ville) et compté dans la note moyenne.`
+                : reviewToChange?.status === "refusé"
+                  ? "L’avis restera enregistré, mais ne sera pas visible sur le site."
+                  : "L’avis disparaîtra du site et reviendra dans la liste En attente."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -830,7 +830,7 @@ function ReviewsTab({
                 {review.message}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                {review.status !== "publié" && (
+                {review.status !== "publié" && !isTestReview(review) && (
                   <Button
                     type="button"
                     size="sm"
@@ -839,6 +839,11 @@ function ReviewsTab({
                   >
                     {pending ? "Enregistrement…" : "Publier"}
                   </Button>
+                )}
+                {isTestReview(review) && (
+                  <span className="self-center text-xs text-muted-foreground">
+                    Avis de test : publication bloquée
+                  </span>
                 )}
                 {review.status === "publié" && (
                   <Button
