@@ -27,6 +27,10 @@ export function SiteHeader() {
           <img
             src={siteImages.logo}
             alt="Logo PURE SPACE NETT"
+            width={44}
+            height={44}
+            loading="eager"
+            decoding="async"
             className="size-11 rounded-md object-cover"
           />
           <span className="leading-tight">
