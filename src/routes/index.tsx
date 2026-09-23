@@ -7,6 +7,7 @@ import { CallButtons, CheckList, Eyebrow, QuoteBanner, Section } from "@/compone
 import { canonicalUrl, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { siteImages } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
+import { SocialProof } from "@/components/published-reviews";
 
 const title = "Entreprise de nettoyage Île-de-France | PURE SPACE NETT";
 const description =
@@ -218,6 +219,14 @@ function Index() {
             Demander un devis en ligne
             <ArrowRight className="size-4" />
           </Link>
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <Eyebrow>Avis clients</Eyebrow>
+        <h2 className="mt-3 font-display text-3xl font-bold">Ils nous ont confié leur nettoyage</h2>
+        <div className="mt-6">
+          <SocialProof />
         </div>
       </Section>
 
