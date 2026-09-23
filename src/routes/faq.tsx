@@ -35,6 +35,10 @@ export const Route = createFileRoute("/faq")({
           ]),
         ),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(faqJsonLd(faqGroups.flatMap((group) => group.items))),
+      },
     ],
   }),
   component: FaqPage,
