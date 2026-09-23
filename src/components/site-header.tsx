@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import { business } from "@/content/business";
 import { siteImages } from "@/lib/site-images";
+import { trackEvent } from "@/lib/analytics";
 
 const nav = [
   { to: "/services", label: "Services" },
@@ -54,12 +55,14 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             to="/devis"
+            onClick={() => trackEvent("clic_devis", { source: "header" })}
             className="hidden items-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
           >
             Devis gratuit
           </Link>
           <a
             href={business.phoneHref}
+            onClick={() => trackEvent("appel_telephone", { source: "header" })}
             className="hidden items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 md:inline-flex"
           >
             <Phone className="size-4" />
@@ -91,6 +94,7 @@ export function SiteHeader() {
           ))}
           <a
             href={business.phoneHref}
+            onClick={() => trackEvent("appel_telephone", { source: "menu_mobile" })}
             className="mt-4 flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground"
           >
             <Phone className="size-4" />
