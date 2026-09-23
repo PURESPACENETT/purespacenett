@@ -1,4 +1,4 @@
-import js from "eslint/js";
+import js from "@eslint/js";
 import prettier from "eslint-plugin-prettier";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
