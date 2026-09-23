@@ -10,7 +10,7 @@ import {
   Section,
 } from "@/components/site-blocks";
 import { LocalInfo } from "@/components/local-info";
-import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, breadcrumbJsonLd, faqJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 
 const title = "FAQ nettoyage — horaires, devis, tarifs, zones | PURE SPACE NETT";
 const description =
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/faq")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify({ ...localBusinessJsonLd, url: "/faq" }),
+        children: JSON.stringify({ ...localBusinessJsonLd, url: canonicalUrl("/faq") }),
       },
       {
         type: "application/ld+json",
