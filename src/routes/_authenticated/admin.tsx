@@ -4,7 +4,21 @@ import { useServerFn } from "@tanstack/react-start";
 import { lazy, Suspense, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listQuoteRequests, setQuoteStatus, type QuoteRequest } from "@/lib/quotes.functions";
-import { listReviewSubmissions, type ReviewSubmission } from "@/lib/reviews.functions";
+import {
+  listReviewSubmissions,
+  setReviewStatus,
+  type ReviewStatus,
+  type ReviewSubmission,
+} from "@/lib/reviews.functions";
+import { Stars } from "@/components/published-reviews";
+
+type ReviewFilter = ReviewStatus | "tous";
+const REVIEW_FILTERS: { value: ReviewFilter; label: string }[] = [
+  { value: "nouveau", label: "En attente" },
+  { value: "publié", label: "Publiés" },
+  { value: "refusé", label: "Refusés" },
+  { value: "tous", label: "Tous" },
+];
 import { Section } from "@/components/site-blocks";
 import { zones } from "@/content/zones";
 
@@ -43,6 +57,7 @@ function AdminPage() {
   const fetchQuotes = useServerFn(listQuoteRequests);
   const updateStatus = useServerFn(setQuoteStatus);
   const fetchReviews = useServerFn(listReviewSubmissions);
+  const changeReviewStatus = useServerFn(setReviewStatus);
   const [search, setSearch] = useState("");
   const [inspectedSlug, setInspectedSlug] = useState<string | null>(null);
 
@@ -56,6 +71,27 @@ function AdminPage() {
     queryFn: () => fetchReviews(),
   });
   const reviews: ReviewSubmission[] = reviewsQuery.data ?? [];
+  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>("nouveau");
+  const [reviewNotice, setReviewNotice] = useState<string | null>(null);
+  const filteredReviews =
+    reviewFilter === "tous" ? reviews : reviews.filter((r) => r.status === reviewFilter);
+
+  const reviewMutation = useMutation({
+    mutationFn: (input: { id: string; status: ReviewStatus }) => changeReviewStatus({ data: input }),
+    onSuccess: (_res, v) => {
+      setReviewNotice(
+        v.status === "publié"
+          ? "Avis publié : il est maintenant visible sur le site."
+          : v.status === "refusé"
+            ? "Avis refusé : il ne sera pas affiché."
+            : "Avis retiré de la publication (remis en attente).",
+      );
+      queryClient.invalidateQueries({ queryKey: ["review-submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["published-reviews"] });
+    },
+    onError: (e) => setReviewNotice(`Échec : ${e instanceof Error ? e.message : "action impossible"}`),
+  });
+
 
 
   const mutation = useMutation({
@@ -194,33 +230,109 @@ function AdminPage() {
       <div className="mt-14">
         <h2 className="font-display text-2xl font-bold">Avis reçus depuis le site</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          {reviewsQuery.isLoading ? "Chargement…" : `${reviews.length} avis enregistré(s)`}
+          {reviewsQuery.isLoading
+            ? "Chargement…"
+            : `${reviews.length} avis · ${reviews.filter((r) => r.status === "nouveau").length} en attente · ${reviews.filter((r) => r.status === "publié").length} publié(s)`}
         </p>
 
-        {reviews.length === 0 && !reviewsQuery.isLoading && (
-          <p className="mt-6 text-sm text-muted-foreground">Aucun avis pour le moment.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {REVIEW_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => setReviewFilter(f.value)}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold ${
+                reviewFilter === f.value
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-border bg-card"
+              }`}
+            >
+              {f.label} ({f.value === "tous" ? reviews.length : reviews.filter((r) => r.status === f.value).length})
+            </button>
+          ))}
+        </div>
+
+        {reviewNotice && (
+          <p role="status" className="mt-4 rounded-xl bg-secondary/60 px-4 py-2 text-sm font-medium">
+            {reviewNotice}
+          </p>
+        )}
+        {reviewsQuery.error && (
+          <p className="mt-4 text-sm text-destructive">Impossible d'afficher les avis.</p>
+        )}
+
+        {filteredReviews.length === 0 && !reviewsQuery.isLoading && (
+          <p className="mt-6 text-sm text-muted-foreground">Aucun avis dans cette catégorie.</p>
         )}
 
         <div className="mt-6 space-y-4">
-          {reviews.map((r) => (
-            <article key={r.id} className="rounded-2xl border border-border bg-card p-5 shadow-card">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="font-display text-lg font-bold">
-                  {r.author_name}
-                  {r.city ? ` · ${r.city}` : ""}
-                </h3>
-                <span className="text-sm font-semibold text-accent">{r.rating}/5</span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {dateFmt.format(new Date(r.created_at))}
-                {r.service_type ? ` · ${r.service_type}` : ""}
-                {r.email ? ` · ${r.email}` : ""}
-              </p>
-              <p className="mt-4 whitespace-pre-line rounded-xl bg-secondary/60 p-4 text-sm">
-                {r.message}
-              </p>
-            </article>
-          ))}
+          {filteredReviews.map((r) => {
+            const pending = reviewMutation.isPending && reviewMutation.variables?.id === r.id;
+            return (
+              <article key={r.id} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className="font-display text-lg font-bold">
+                    {r.author_name}
+                    {r.city ? ` · ${r.city}` : ""}
+                  </h3>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      r.status === "publié"
+                        ? "bg-accent text-accent-foreground"
+                        : r.status === "refusé"
+                          ? "bg-destructive/15 text-destructive"
+                          : "bg-secondary text-foreground"
+                    }`}
+                  >
+                    {r.status === "publié" ? "Publié" : r.status === "refusé" ? "Refusé" : "En attente"}
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  <Stars rating={r.rating} />
+                  <span className="text-xs text-muted-foreground">
+                    {dateFmt.format(new Date(r.created_at))}
+                    {r.service_type ? ` · ${r.service_type}` : ""}
+                    {r.email ? ` · ${r.email}` : ""}
+                  </span>
+                </div>
+                <p className="mt-4 whitespace-pre-line rounded-xl bg-secondary/60 p-4 text-sm">
+                  {r.message}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {r.status !== "publié" && (
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => reviewMutation.mutate({ id: r.id, status: "publié" })}
+                      className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+                    >
+                      Publier
+                    </button>
+                  )}
+                  {r.status === "publié" && (
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => reviewMutation.mutate({ id: r.id, status: "nouveau" })}
+                      className="rounded-full border border-border px-4 py-1.5 text-xs font-semibold disabled:opacity-50"
+                    >
+                      Retirer de la publication
+                    </button>
+                  )}
+                  {r.status !== "refusé" && (
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => reviewMutation.mutate({ id: r.id, status: "refusé" })}
+                      className="rounded-full border border-destructive/40 px-4 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
+                    >
+                      Refuser
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
 
