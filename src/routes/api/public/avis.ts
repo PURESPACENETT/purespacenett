@@ -8,6 +8,7 @@ const schema = z.object({
   serviceType: z.string().trim().max(80).optional().default(""),
   rating: z.coerce.number().int().min(1).max(5),
   message: z.string().trim().min(10).max(2000),
+  consent: z.literal(true),
   email: z.string().trim().email().max(255).optional().or(z.literal("")).default(""),
   // champ piège anti-robots : doit rester vide
   company: z.string().max(0).optional().default(""),
