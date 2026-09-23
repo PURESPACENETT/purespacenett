@@ -1,14 +1,18 @@
-# Welcome to your Lovable project
+# SEO Booster Pro
+
+Je voudrais organiser et automatiser un SEO complet et fonctionnel pour ma micro entreprise de nettoyage, es-tu capable de faire ça ?
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://purespacenett.lovable.app
+
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/8bf96a43-3de9-43df-afd6-ecb75b34138a).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +24,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
