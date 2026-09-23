@@ -15,6 +15,8 @@ import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as AvisRouteImport } from './routes/avis'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as PolitiqueConfidentialiteRouteImport } from './routes/politique-confidentialite'
 import { Route as DevisRouteImport } from './routes/devis'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -55,6 +57,16 @@ const ConnexionRoute = ConnexionRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PolitiqueConfidentialiteRoute = PolitiqueConfidentialiteRouteImport.update({
+  id: '/politique-confidentialite',
+  path: '/politique-confidentialite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevisRoute = DevisRouteImport.update({
@@ -125,6 +137,10 @@ export interface FileRoutesByFullPath {
   '/avis': typeof AvisRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/devis': typeof DevisRoute
   '/faq': typeof FaqRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -144,6 +160,8 @@ export interface FileRoutesByTo {
   '/avis': typeof AvisRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/devis': typeof DevisRoute
   '/faq': typeof FaqRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -186,6 +204,8 @@ export interface FileRouteTypes {
     | '/avis'
     | '/connexion'
     | '/contact'
+    | '/mentions-legales'
+    | '/politique-confidentialite'
     | '/devis'
     | '/faq'
     | '/sitemap.xml'
@@ -205,6 +225,8 @@ export interface FileRouteTypes {
     | '/avis'
     | '/connexion'
     | '/contact'
+    | '/mentions-legales'
+    | '/politique-confidentialite'
     | '/devis'
     | '/faq'
     | '/sitemap.xml'
@@ -225,6 +247,8 @@ export interface FileRouteTypes {
     | '/avis'
     | '/connexion'
     | '/contact'
+    | '/mentions-legales'
+    | '/politique-confidentialite'
     | '/devis'
     | '/faq'
     | '/sitemap.xml'
@@ -246,6 +270,8 @@ export interface RootRouteChildren {
   AvisRoute: typeof AvisRoute
   ConnexionRoute: typeof ConnexionRoute
   ContactRoute: typeof ContactRoute
+  MentionsLegalesRoute: typeof MentionsLegalesRoute
+  PolitiqueConfidentialiteRoute: typeof PolitiqueConfidentialiteRoute
   DevisRoute: typeof DevisRoute
   FaqRoute: typeof FaqRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -408,6 +434,8 @@ const rootRouteChildren: RootRouteChildren = {
   AvisRoute: AvisRoute,
   ConnexionRoute: ConnexionRoute,
   ContactRoute: ContactRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
+  PolitiqueConfidentialiteRoute: PolitiqueConfidentialiteRoute,
   DevisRoute: DevisRoute,
   FaqRoute: FaqRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
