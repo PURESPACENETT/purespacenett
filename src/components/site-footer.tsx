@@ -5,6 +5,7 @@ import { reopenCookieConsent } from "@/components/cookie-consent";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { siteImages } from "@/lib/site-images";
+import { trackEvent } from "@/lib/analytics";
 
 export function SiteFooter() {
   return (
@@ -23,7 +24,7 @@ export function SiteFooter() {
           <p className="mt-2 text-sm text-ink-foreground/70">{business.tagline}</p>
           <ul className="mt-5 space-y-2 text-sm">
             <li>
-              <a href={business.phoneHref} className="inline-flex items-center gap-2 hover:underline">
+              <a href={business.phoneHref} onClick={() => trackEvent("appel_telephone", { source: "footer" })} className="inline-flex items-center gap-2 hover:underline">
                 <Phone className="size-4 text-accent" />
                 {business.phone}
               </a>
@@ -41,6 +42,7 @@ export function SiteFooter() {
             <li>
               <a
                 href={whatsappHref("nettoyage en Île-de-France")}
+                onClick={() => trackEvent("clic_whatsapp", { source: "footer" })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 hover:underline"
