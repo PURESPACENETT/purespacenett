@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { business } from "@/content/business";
+import { business, whatsappHref } from "@/content/business";
 import { trackEvent } from "@/lib/analytics";
 
 export const propertyTypes = [
@@ -61,6 +61,7 @@ export function QuoteForm() {
   const [error, setError] = useState<string | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const startedRef = useRef(false);
 
   useEffect(() => {
     trackEvent("formulaire_devis_vu");
@@ -87,6 +88,12 @@ export function QuoteForm() {
     )}&body=${encodeURIComponent(body)}`;
   };
 
+  const handleFormFocus = () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    trackEvent("formulaire_devis_commence", { source: "page_devis" });
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.consent) return;
@@ -107,6 +114,7 @@ export function QuoteForm() {
         type_de_bien: form.propertyType,
         frequence: form.frequency,
       });
+      trackEvent("devis_confirmation_affichee", { source: "page_devis" });
       setStatus("sent");
       setForm(emptyForm);
       setPhotos([]);
@@ -114,8 +122,7 @@ export function QuoteForm() {
     } catch {
       trackEvent("devis_echec_envoi", { prestation: form.serviceType });
       setStatus("error");
-      setError(null);
-      mailtoFallback();
+      setError("Vous pouvez réessayer ou nous contacter directement.");
     }
   };
 
@@ -143,7 +150,19 @@ export function QuoteForm() {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+    <form
+      onSubmit={submit}
+      onFocus={handleFormFocus}
+      className="rounded-2xl border border-border bg-card p-6 shadow-card"
+    >
+      <div className="mb-6 rounded-xl border border-primary/10 bg-primary/5 p-4">
+        <p className="text-sm font-semibold">Votre demande en 3 étapes</p>
+        <ol className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+          <li><span className="font-semibold text-foreground">1.</span> Vos coordonnées</li>
+          <li><span className="font-semibold text-foreground">2.</span> Le besoin à chiffrer</li>
+          <li><span className="font-semibold text-foreground">3.</span> Envoi de la demande</li>
+        </ol>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={labelCls}>
           Nom complet *
@@ -264,6 +283,9 @@ export function QuoteForm() {
               const selected = Array.from(e.target.files ?? []);
               const valid = selected.filter((file) => file.size <= 5 * 1024 * 1024);
               setPhotos(valid.slice(0, 5));
+              if (valid.length > 0) {
+                trackEvent("devis_photo_ajoutee", { nombre: Math.min(valid.length, 5) });
+              }
               if (selected.some((file) => file.size > 5 * 1024 * 1024) || selected.length > 5) {
                 setError("Vous pouvez joindre jusqu'à 5 photos de 5 Mo maximum chacune.");
               } else {
@@ -326,10 +348,39 @@ export function QuoteForm() {
       </button>
 
       {status === "error" ? (
-        <p className="mt-3 text-xs text-destructive">
-          L'envoi a échoué. Merci de nous appeler au {business.phone} ou d'écrire à {business.email}.
-          {error ? ` (${error})` : ""}
-        </p>
+        <div className="mt-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+          <p className="text-xs text-destructive">
+            {error ?? "L'envoi a échoué. Vous pouvez réessayer ou nous contacter directement."}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="submit" className="rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold">
+              Réessayer
+            </button>
+            <a
+              href={business.phoneHref}
+              onClick={() => trackEvent("appel_telephone", { source: "erreur_formulaire_devis" })}
+              className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+            >
+              Appeler
+            </a>
+            <a
+              href={whatsappHref("demande de devis")}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent("clic_whatsapp", { source: "erreur_formulaire_devis" })}
+              className="rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold"
+            >
+              WhatsApp
+            </a>
+            <button
+              type="button"
+              onClick={mailtoFallback}
+              className="rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold"
+            >
+              Préparer un e-mail
+            </button>
+          </div>
+        </div>
       ) : (
         <p className="mt-3 text-xs text-muted-foreground">
           Votre demande arrive directement dans la boîte {business.email}. Réponse sous 24 heures.
