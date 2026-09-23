@@ -63,7 +63,10 @@ function Index() {
               en priorité, et partout en Île-de-France.
             </p>
             <div className="mt-8">
-              <CallButtons subject="site web" />
+              <CallButtons subject="page d'accueil" />
+              <p className="mt-3 text-xs text-muted-foreground">
+                Devis gratuit • Sans engagement • Réponse sous 24 h
+              </p>
             </div>
             <dl className="mt-10 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
               {[
@@ -92,7 +95,13 @@ function Index() {
               <div className="mt-5">
                 <CheckList items={business.usp} />
               </div>
-              <div className="mt-6 rounded-2xl bg-sand p-4 text-sm text-sand-foreground">
+              <div className="mt-6 rounded-2xl border border-primary/10 bg-primary/5 p-4 text-sm">
+                <p className="font-semibold">Votre demande en quelques minutes</p>
+                <p className="mt-1 text-muted-foreground">
+                  Décrivez le besoin, indiquez la surface et ajoutez vos photos si vous le souhaitez.
+                </p>
+              </div>
+              <div className="mt-3 rounded-2xl bg-sand p-4 text-sm text-sand-foreground">
                 <p className="font-semibold">Besoin urgent&nbsp;?</p>
                 <p className="mt-1">
                   Fin de chantier à livrer ou état des lieux demain : appelez-nous, nous réorganisons
