@@ -40,7 +40,7 @@ export function ReviewForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // la case de consentement arrive en chaîne "true"/absente via FormData : on la convertit en booléen
-        body: JSON.stringify({ ...raw, rating, consent: raw.consent === "true" }),
+        body: JSON.stringify({ ...raw, rating, consent: raw["consent"] === "true" }),
       });
       if (!response.ok) throw new Error("api");
       trackEvent("avis_envoye", { note: rating });
