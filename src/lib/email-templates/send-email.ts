@@ -19,6 +19,7 @@ export type SendTemplateEmailResult =
   | { sent: false; reason: 'recipient_suppressed' }
 
 export interface SendTemplateEmailOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   templateData?: Record<string, any>
   /** Dedupes retries of the same logical send; defaults to a random UUID (no dedupe). */
   idempotencyKey?: string
