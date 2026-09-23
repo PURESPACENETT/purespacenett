@@ -1,14 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listQuoteRequests, setQuoteStatus, type QuoteRequest } from "@/lib/quotes.functions";
 import { listReviewSubmissions, type ReviewSubmission } from "@/lib/reviews.functions";
 import { Section } from "@/components/site-blocks";
-import { SeoAudit } from "@/components/seo-audit";
-import { SearchConsoleStats } from "@/components/search-console-stats";
 import { zones } from "@/content/zones";
+
+const SearchConsoleStats = lazy(() =>
+  import("@/components/search-console-stats").then((module) => ({ default: module.SearchConsoleStats })),
+);
+const SeoAudit = lazy(() =>
+  import("@/components/seo-audit").then((module) => ({ default: module.SeoAudit })),
+);
 
 const SITE_URL = "https://purespacenett.com";
 const GSC_RESOURCE = encodeURIComponent("sc-domain:purespacenett.com");
@@ -219,7 +224,13 @@ function AdminPage() {
         </div>
       </div>
 
-      <SearchConsoleStats />
+      <Suspense
+        fallback={
+          <p className="mt-14 text-sm text-muted-foreground">Chargement des outils Google…</p>
+        }
+      >
+        <SearchConsoleStats />
+      </Suspense>
 
       <div className="mt-14">
         <h2 className="font-display text-2xl font-bold">Suivi Google par ville</h2>
@@ -289,7 +300,13 @@ function AdminPage() {
         </div>
       </div>
 
-      <SeoAudit />
+      <Suspense
+        fallback={
+          <p className="mt-14 text-sm text-muted-foreground">Chargement de l’analyse SEO…</p>
+        }
+      >
+        <SeoAudit />
+      </Suspense>
     </Section>
   );
 }
