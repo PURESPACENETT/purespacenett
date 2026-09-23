@@ -28,8 +28,8 @@ import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as ZonesIndexRouteImport } from './routes/zones.index'
 import { Route as ZonesSlugRouteImport } from './routes/zones.$slug'
 import { Route as ApiPublicAvisRouteImport } from './routes/api/public/avis'
-import { Route as ApiPublicDevisRouteImport } from './routes/api/public/devis'
 import { Route as ApiPublicB2bLeadRouteImport } from './routes/api/public/b2b-lead'
+import { Route as ApiPublicDevisRouteImport } from './routes/api/public/devis'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
@@ -155,10 +155,8 @@ export interface FileRoutesByFullPath {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sous-traitance': typeof SousTraitanceRoute
   '/tarifs': typeof TarifsRoute
-  '/sous-traitance': typeof SousTraitanceRoute
-  '/sous-traitance': typeof SousTraitanceRoute
-  '/sous-traitance': typeof SousTraitanceRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
@@ -180,6 +178,7 @@ export interface FileRoutesByTo {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sous-traitance': typeof SousTraitanceRoute
   '/tarifs': typeof TarifsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -187,6 +186,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesIndexRoute
   '/zones': typeof ZonesIndexRoute
   '/api/public/avis': typeof ApiPublicAvisRoute
+  '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -203,6 +203,7 @@ export interface FileRoutesById {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sous-traitance': typeof SousTraitanceRoute
   '/tarifs': typeof TarifsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -210,6 +211,7 @@ export interface FileRoutesById {
   '/services/': typeof ServicesIndexRoute
   '/zones/': typeof ZonesIndexRoute
   '/api/public/avis': typeof ApiPublicAvisRoute
+  '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -226,6 +228,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/politique-confidentialite'
     | '/sitemap.xml'
+    | '/sous-traitance'
     | '/tarifs'
     | '/admin'
     | '/services/$slug'
@@ -233,6 +236,7 @@ export interface FileRouteTypes {
     | '/services/'
     | '/zones/'
     | '/api/public/avis'
+    | '/api/public/b2b-lead'
     | '/api/public/devis'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -247,6 +251,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/politique-confidentialite'
     | '/sitemap.xml'
+    | '/sous-traitance'
     | '/tarifs'
     | '/admin'
     | '/services/$slug'
@@ -254,6 +259,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/zones'
     | '/api/public/avis'
+    | '/api/public/b2b-lead'
     | '/api/public/devis'
     | '/lovable/email/transactional/preview'
   id:
@@ -269,6 +275,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/politique-confidentialite'
     | '/sitemap.xml'
+    | '/sous-traitance'
     | '/tarifs'
     | '/_authenticated/admin'
     | '/services/$slug'
@@ -276,6 +283,7 @@ export interface FileRouteTypes {
     | '/services/'
     | '/zones/'
     | '/api/public/avis'
+    | '/api/public/b2b-lead'
     | '/api/public/devis'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -292,13 +300,14 @@ export interface RootRouteChildren {
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   PolitiqueConfidentialiteRoute: typeof PolitiqueConfidentialiteRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  TarifsRoute: typeof TarifsRoute
   SousTraitanceRoute: typeof SousTraitanceRoute
+  TarifsRoute: typeof TarifsRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ZonesSlugRoute: typeof ZonesSlugRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   ZonesIndexRoute: typeof ZonesIndexRoute
   ApiPublicAvisRoute: typeof ApiPublicAvisRoute
+  ApiPublicB2bLeadRoute: typeof ApiPublicB2bLeadRoute
   ApiPublicDevisRoute: typeof ApiPublicDevisRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -438,7 +447,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAvisRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/b2b-lead': ApiPublicB2bLeadRoute,
+    '/api/public/b2b-lead': {
+      id: '/api/public/b2b-lead'
+      path: '/api/public/b2b-lead'
+      fullPath: '/api/public/b2b-lead'
+      preLoaderRoute: typeof ApiPublicB2bLeadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/devis': {
       id: '/api/public/devis'
       path: '/api/public/devis'
@@ -479,13 +494,14 @@ const rootRouteChildren: RootRouteChildren = {
   MentionsLegalesRoute: MentionsLegalesRoute,
   PolitiqueConfidentialiteRoute: PolitiqueConfidentialiteRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TarifsRoute: TarifsRoute,
   SousTraitanceRoute: SousTraitanceRoute,
+  TarifsRoute: TarifsRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ZonesSlugRoute: ZonesSlugRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   ZonesIndexRoute: ZonesIndexRoute,
   ApiPublicAvisRoute: ApiPublicAvisRoute,
+  ApiPublicB2bLeadRoute: ApiPublicB2bLeadRoute,
   ApiPublicDevisRoute: ApiPublicDevisRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
