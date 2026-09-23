@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { business } from "@/content/business";
+import { business, whatsappHref } from "@/content/business";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { QuoteForm } from "@/components/quote-form";
 import { Breadcrumbs, CheckList, Eyebrow, Section } from "@/components/site-blocks";
 import { LocalInfo } from "@/components/local-info";
 import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { trackEvent } from "@/lib/analytics";
 
 const title = "Devis nettoyage gratuit en 24 h | PURE SPACE NETT";
 const description =
@@ -69,11 +70,26 @@ function DevisPage() {
               <p className="font-semibold">Vous préférez échanger directement ?</p>
               <p className="mt-2">
                 Appelez-nous au{" "}
-                <a className="font-semibold underline" href={business.phoneHref}>
+                <a
+                  className="font-semibold underline"
+                  href={business.phoneHref}
+                  onClick={() => trackEvent("appel_telephone", { source: "page_devis" })}
+                >
                   {business.phone}
                 </a>
                 {" "}— {business.hours}.
               </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a
+                  href={whatsappHref("demande de devis")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("clic_whatsapp", { source: "page_devis" })}
+                  className="rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold"
+                >
+                  Écrire sur WhatsApp
+                </a>
+              </div>
             </div>
           </div>
         </div>
