@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { checkRateLimit, requestKey } from "@/lib/rate-limit";
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
@@ -27,6 +28,11 @@ export const Route = createFileRoute("/api/public/devis")({
           headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow" },
         }),
       POST: async ({ request }) => {
+        const limit = checkRateLimit(requestKey(request, "devis"), { limit: 5, windowMs: 60 * 60 * 1000 });
+        if (!limit.allowed) {
+          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
+        }
+
         let payload: unknown;
         try {
           payload = await request.json();
