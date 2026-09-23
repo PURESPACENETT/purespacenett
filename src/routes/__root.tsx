@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { CookieConsent } from "@/components/cookie-consent";
 import { initAnalytics, trackPageView } from "@/lib/analytics";
 
 function NotFoundComponent() {
@@ -138,6 +139,9 @@ function RootComponent() {
 
   useEffect(() => {
     initAnalytics();
+    const onConsentChange = () => initAnalytics();
+    window.addEventListener("psn-consent-change", onConsentChange);
+    return () => window.removeEventListener("psn-consent-change", onConsentChange);
   }, []);
 
   useEffect(() => {
@@ -153,6 +157,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <SiteFooter />
+        <CookieConsent />
       </div>
     </QueryClientProvider>
   );
