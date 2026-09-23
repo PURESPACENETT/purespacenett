@@ -64,6 +64,7 @@ const Email = ({ authorName, city, serviceType, rating, message, email }: Props)
 
 export const template = {
   component: Email,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subject: (data: Record<string, any>) =>
     `Nouvel avis client${data['rating'] ? ` (${data['rating']}/5)` : ''}${data['authorName'] ? ` — ${data['authorName']}` : ''}`,
   displayName: 'Nouvel avis client',
