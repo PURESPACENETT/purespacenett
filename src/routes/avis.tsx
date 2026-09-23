@@ -21,7 +21,7 @@ export const Route = createFileRoute("/avis")({
         type: "application/ld+json",
         children: JSON.stringify({
           ...localBusinessJsonLd,
-          url: "/avis",
+          url: canonicalUrl("/avis"),
           ...(testimonials.length
             ? {
                 review: testimonials.map((t) => ({
