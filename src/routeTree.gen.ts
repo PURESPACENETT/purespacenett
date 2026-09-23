@@ -29,6 +29,7 @@ import { Route as ZonesIndexRouteImport } from './routes/zones.index'
 import { Route as ZonesSlugRouteImport } from './routes/zones.$slug'
 import { Route as ApiPublicAvisRouteImport } from './routes/api/public/avis'
 import { Route as ApiPublicDevisRouteImport } from './routes/api/public/devis'
+import { Route as ApiPublicB2bLeadRouteImport } from './routes/api/public/b2b-lead'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
@@ -126,6 +127,11 @@ const ApiPublicAvisRoute = ApiPublicAvisRouteImport.update({
   path: '/api/public/avis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicB2bLeadRoute = ApiPublicB2bLeadRouteImport.update({
+  id: '/api/public/b2b-lead',
+  path: '/api/public/b2b-lead',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDevisRoute = ApiPublicDevisRouteImport.update({
   id: '/api/public/devis',
   path: '/api/public/devis',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/services/': typeof ServicesIndexRoute
   '/zones/': typeof ZonesIndexRoute
   '/api/public/avis': typeof ApiPublicAvisRoute
+  '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -431,6 +438,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAvisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/b2b-lead': ApiPublicB2bLeadRoute,
     '/api/public/devis': {
       id: '/api/public/devis'
       path: '/api/public/devis'
