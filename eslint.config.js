@@ -1,5 +1,5 @@
 import js from "eslint/js";
-import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
+import prettier from "eslint-plugin-prettier";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
@@ -17,6 +17,7 @@ export default tseslint.config(
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      prettier,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -37,5 +38,4 @@ export default tseslint.config(
       "prettier/prettier": "warn",
     },
   },
-  eslintPluginPrettier,
 );
