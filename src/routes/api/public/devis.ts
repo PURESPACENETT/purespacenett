@@ -53,7 +53,7 @@ export const Route = createFileRoute("/api/public/devis")({
           ["fullName", "email", "phone", "address", "propertyType", "surface", "serviceType", "frequency", "message", "company"]
             .map((key) => [key, formData.get(key) ?? ""]),
         );
-        (payload as Record<string, unknown>).consent = formData.get("consent") === "true";
+        (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
         const parsed = schema.safeParse(payload);
         if (!parsed.success) {
           return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400 });
