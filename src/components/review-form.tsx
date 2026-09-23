@@ -189,8 +189,8 @@ export function ReviewForm() {
       )}
 
       <p className="mt-4 text-xs text-muted-foreground">
-        Votre avis nous est envoyé directement. Nous ne le publions sur le site qu'avec votre accord,
-        et jamais modifié.
+        Votre avis nous est envoyé directement. Il n'est pas publié automatiquement sur le site.
+        Toute republication sur notre site fera l'objet d'un accord séparé.
       </p>
     </form>
   );
