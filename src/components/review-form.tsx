@@ -39,7 +39,8 @@ export function ReviewForm() {
       const response = await fetch("/api/public/avis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...raw, rating }),
+        // la case de consentement arrive en chaîne "true"/absente via FormData : on la convertit en booléen
+        body: JSON.stringify({ ...raw, rating, consent: raw.consent === "true" }),
       });
       if (!response.ok) throw new Error("api");
       trackEvent("avis_envoye", { note: rating });

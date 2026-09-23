@@ -19,6 +19,10 @@ export function CookieConsent() {
 
   useEffect(() => {
     setVisible(!window.localStorage.getItem(STORAGE_KEY));
+    // rouvre le bandeau quand « Gérer mes cookies » efface le choix enregistré
+    const reopen = () => setVisible(!window.localStorage.getItem(STORAGE_KEY));
+    window.addEventListener("psn-consent-change", reopen);
+    return () => window.removeEventListener("psn-consent-change", reopen);
   }, []);
 
   const choose = (accepted: boolean) => {
