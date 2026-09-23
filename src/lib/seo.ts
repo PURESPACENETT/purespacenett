@@ -26,6 +26,7 @@ export const localBusinessJsonLd = {
   ],
   address: {
     "@type": "PostalAddress",
+    streetAddress: business.address,
     addressLocality: business.city,
     postalCode: business.postalCode,
     addressRegion: business.region,
@@ -57,6 +58,7 @@ export const serviceJsonLd = (name: string, description: string, path: string) =
     telephone: "+33759483021",
     address: {
       "@type": "PostalAddress",
+      streetAddress: business.address,
       addressLocality: business.city,
       postalCode: business.postalCode,
       addressCountry: business.country,
