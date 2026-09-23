@@ -185,9 +185,8 @@ function ZoneDetail() {
           {zone.postalCode ? ` (${zone.postalCode})` : ""}
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Voici les demandes pour lesquelles nos clients de {zone.name}
-          {zone.postalCode ? ` et du ${zone.postalCode}` : ""} nous trouvent sur Google, et la page
-          qui y répond.
+          Voici des recherches associées aux prestations de nettoyage à {zone.name}
+          {zone.postalCode ? ` et dans le ${zone.postalCode}` : ""}, avec les pages de notre site qui y répondent.
         </p>
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {queries.map((q) => (
