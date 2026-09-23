@@ -188,8 +188,6 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/mentions-legales': typeof MentionsLegalesRoute
-  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/zones/$slug': typeof ZonesSlugRoute
   '/services/': typeof ServicesIndexRoute
