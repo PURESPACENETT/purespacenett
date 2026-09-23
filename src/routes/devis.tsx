@@ -3,6 +3,7 @@ import { business, whatsappHref } from "@/content/business";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { QuoteForm } from "@/components/quote-form";
+import { SocialProof } from "@/components/published-reviews";
 import { Breadcrumbs, CheckList, Eyebrow, Section } from "@/components/site-blocks";
 import { LocalInfo } from "@/components/local-info";
 import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
@@ -64,6 +65,15 @@ function DevisPage() {
               <h2 className="font-display text-lg font-bold">Ce que vous obtenez</h2>
               <div className="mt-4">
                 <CheckList items={business.usp} />
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <h2 className="font-display text-lg font-bold">Avis clients</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Consultez les retours publiés avant de nous confier votre chantier.
+              </p>
+              <div className="mt-4">
+                <SocialProof limit={2} />
               </div>
             </div>
             <div className="rounded-2xl bg-sand p-6 text-sm text-sand-foreground">
