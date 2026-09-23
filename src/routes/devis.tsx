@@ -18,7 +18,7 @@ export const Route = createFileRoute("/devis")({
     meta: pageMeta({ title, description, path }),
     links: [{ rel: "canonical", href: canonicalUrl(path) }],
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify({ ...localBusinessJsonLd, url: path }) },
+      { type: "application/ld+json", children: JSON.stringify({ ...localBusinessJsonLd, url: canonicalUrl(path) }) },
       {
         type: "application/ld+json",
         children: JSON.stringify(
