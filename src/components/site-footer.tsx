@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { business, whatsappHref } from "@/content/business";
+import { reopenCookieConsent } from "@/components/cookie-consent";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { siteImages } from "@/lib/site-images";
@@ -142,6 +143,13 @@ export function SiteFooter() {
           <div className="flex flex-wrap gap-x-4 gap-y-1">
             <Link to="/mentions-legales" className="hover:text-ink-foreground hover:underline">Mentions légales</Link>
             <Link to="/politique-confidentialite" className="hover:text-ink-foreground hover:underline">Confidentialité</Link>
+            <button
+              type="button"
+              onClick={reopenCookieConsent}
+              className="hover:text-ink-foreground hover:underline"
+            >
+              Gérer mes cookies
+            </button>
             <p>{business.hours}</p>
           </div>
         </div>
