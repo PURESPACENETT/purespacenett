@@ -12,6 +12,7 @@ import {
 import {
   canonicalUrl,
   breadcrumbJsonLd,
+  faqJsonLd,
   cityBusinessJsonLd,
   geoMeta,
   localOgMeta,
@@ -68,6 +69,10 @@ export const Route = createFileRoute("/zones/$slug")({
                 .map((s) => ({ name: s.navName, path: `/services/${s.slug}` })),
             }),
           ),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(faqJsonLd(zoneLocalAnswers(z).map((a) => ({ q: a.question, a: a.answer })))),
         },
         {
           type: "application/ld+json",
