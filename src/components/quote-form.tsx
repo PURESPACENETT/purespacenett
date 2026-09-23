@@ -313,7 +313,7 @@ export function QuoteForm() {
         />
         <span>
           J'accepte que mes données soient utilisées par {business.name} pour traiter ma demande de
-          devis et me recontacter. Elles ne sont jamais cédées à des tiers.
+          devis et me recontacter. Elles ne sont pas vendues à des tiers.
         </span>
       </label>
 
@@ -322,7 +322,7 @@ export function QuoteForm() {
         disabled={status === "sending"}
         className="mt-5 w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
       >
-        {status === "sending" ? "Envoi en cours…" : "Envoyer ma demande"}
+        {status === "sending" ? "Envoi en cours…" : "Recevoir mon devis gratuit"}
       </button>
 
       {status === "error" ? (
@@ -336,9 +336,8 @@ export function QuoteForm() {
         </p>
       )}
 
-      <p className="mt-2 text-xs text-muted-foreground">
-        Vous avez des photos des lieux ? Envoyez-les par WhatsApp ou par e-mail au {business.phone}{" "}
-        après votre demande.
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        Photos facultatives • Gratuit • Sans engagement • Réponse sous 24 h
       </p>
     </form>
   );
