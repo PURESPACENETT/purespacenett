@@ -18,9 +18,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: pageMeta({ title, description, path: "/" }),
     links: [{ rel: "canonical", href: canonicalUrl("/") }],
-    scripts: [
-      { type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) },
-    ],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) }],
   }),
   component: Index,
 });
@@ -99,14 +97,15 @@ function Index() {
               <div className="mt-6 rounded-2xl border border-primary/10 bg-primary/5 p-4 text-sm">
                 <p className="font-semibold">Votre demande en quelques minutes</p>
                 <p className="mt-1 text-muted-foreground">
-                  Décrivez le besoin, indiquez la surface et ajoutez vos photos si vous le souhaitez.
+                  Décrivez le besoin, indiquez la surface et ajoutez vos photos si vous le
+                  souhaitez.
                 </p>
               </div>
               <div className="mt-3 rounded-2xl bg-sand p-4 text-sm text-sand-foreground">
                 <p className="font-semibold">Besoin urgent&nbsp;?</p>
                 <p className="mt-1">
-                  Fin de chantier à livrer ou état des lieux demain : appelez-nous, nous réorganisons
-                  nos tournées quand c'est possible.
+                  Fin de chantier à livrer ou état des lieux demain : appelez-nous, nous
+                  réorganisons nos tournées quand c'est possible.
                 </p>
               </div>
             </div>

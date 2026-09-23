@@ -22,7 +22,8 @@ export const Route = createFileRoute("/avis")({
     // Remarque : Google n'affiche pas d'étoiles pour les avis qu'une entreprise publie sur
     // elle-même (LocalBusiness) ; le balisage reste descriptif, sans garantie d'extrait enrichi.
     const published = loaderData?.reviews ?? [];
-    const summary = loaderData && loaderData.count > 0 && loaderData.average !== null ? loaderData : null;
+    const summary =
+      loaderData && loaderData.count > 0 && loaderData.average !== null ? loaderData : null;
     return {
       meta: pageMeta({ title, description, path: "/avis" }),
       links: [{ rel: "canonical", href: canonicalUrl("/avis") }],
@@ -44,7 +45,12 @@ export const Route = createFileRoute("/avis")({
                   review: published.slice(0, 20).map((r) => ({
                     "@type": "Review",
                     author: { "@type": "Person", name: r.author_name },
-                    reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+                    reviewRating: {
+                      "@type": "Rating",
+                      ratingValue: r.rating,
+                      bestRating: 5,
+                      worstRating: 1,
+                    },
                     reviewBody: r.message,
                     datePublished: r.created_at.slice(0, 10),
                   })),
@@ -66,7 +72,9 @@ export const Route = createFileRoute("/avis")({
   },
   errorComponent: () => (
     <Section>
-      <p className="text-sm text-muted-foreground">Les avis ne peuvent pas être affichés pour le moment.</p>
+      <p className="text-sm text-muted-foreground">
+        Les avis ne peuvent pas être affichés pour le moment.
+      </p>
     </Section>
   ),
   component: AvisPage,
@@ -89,15 +97,16 @@ function AvisPage() {
           Ce que disent les clients de {business.name}
         </h1>
         <p className="mt-4 max-w-2xl text-base text-muted-foreground">
-          Syndics, gérants de bureaux, commerçants et particuliers du 93, de Paris et d'Île-de-France
-          nous confient l'entretien de leurs locaux. Voici leurs retours, publiés tels qu'ils nous
-          ont été laissés.
+          Syndics, gérants de bureaux, commerçants et particuliers du 93, de Paris et
+          d'Île-de-France nous confient l'entretien de leurs locaux. Voici leurs retours, publiés
+          tels qu'ils nous ont été laissés.
         </p>
         {data.count > 0 && data.average !== null && (
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Stars rating={data.average} className="size-5" />
             <p className="text-sm font-semibold">
-              {data.average.toLocaleString("fr-FR")}/5 · {data.count} avis publié{data.count > 1 ? "s" : ""} sur le site
+              {data.average.toLocaleString("fr-FR")}/5 · {data.count} avis publié
+              {data.count > 1 ? "s" : ""} sur le site
             </p>
           </div>
         )}
@@ -132,7 +141,9 @@ function AvisPage() {
         ) : (
           <div className="rounded-3xl border border-border bg-card p-8 text-center shadow-card">
             <Star className="mx-auto size-7 text-accent" />
-            <h2 className="mt-4 font-display text-xl font-bold">Aucun avis publié sur le site pour l'instant</h2>
+            <h2 className="mt-4 font-display text-xl font-bold">
+              Aucun avis publié sur le site pour l'instant
+            </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
               Les avis laissés via le formulaire ci-dessous sont affichés ici après vérification.
               Vous pouvez aussi consulter notre fiche Google.

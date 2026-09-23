@@ -53,7 +53,10 @@ export function SocialProof({ city, limit = 3 }: { city?: string; limit?: number
 
   const all = data?.reviews ?? [];
   const local = city ? all.filter((r) => r.city?.toLowerCase() === city.toLowerCase()) : [];
-  const shown = (local.length ? [...local, ...all.filter((r) => !local.includes(r))] : all).slice(0, limit);
+  const shown = (local.length ? [...local, ...all.filter((r) => !local.includes(r))] : all).slice(
+    0,
+    limit,
+  );
 
   return (
     <div>
@@ -61,7 +64,8 @@ export function SocialProof({ city, limit = 3 }: { city?: string; limit?: number
         <div className="flex flex-wrap items-center gap-3">
           <Stars rating={data.average} className="size-5" />
           <p className="text-sm font-semibold">
-            {data.average.toLocaleString("fr-FR")}/5 · {data.count} avis client{data.count > 1 ? "s" : ""} publié
+            {data.average.toLocaleString("fr-FR")}/5 · {data.count} avis client
+            {data.count > 1 ? "s" : ""} publié
             {data.count > 1 ? "s" : ""}
           </p>
         </div>

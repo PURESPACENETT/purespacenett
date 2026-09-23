@@ -23,7 +23,9 @@ import { Section } from "@/components/site-blocks";
 import { zones } from "@/content/zones";
 
 const SearchConsoleStats = lazy(() =>
-  import("@/components/search-console-stats").then((module) => ({ default: module.SearchConsoleStats })),
+  import("@/components/search-console-stats").then((module) => ({
+    default: module.SearchConsoleStats,
+  })),
 );
 const SeoAudit = lazy(() =>
   import("@/components/seo-audit").then((module) => ({ default: module.SeoAudit })),
@@ -77,7 +79,8 @@ function AdminPage() {
     reviewFilter === "tous" ? reviews : reviews.filter((r) => r.status === reviewFilter);
 
   const reviewMutation = useMutation({
-    mutationFn: (input: { id: string; status: ReviewStatus }) => changeReviewStatus({ data: input }),
+    mutationFn: (input: { id: string; status: ReviewStatus }) =>
+      changeReviewStatus({ data: input }),
     onSuccess: (_res, v) => {
       setReviewNotice(
         v.status === "publié"
@@ -89,10 +92,9 @@ function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["review-submissions"] });
       queryClient.invalidateQueries({ queryKey: ["published-reviews"] });
     },
-    onError: (e) => setReviewNotice(`Échec : ${e instanceof Error ? e.message : "action impossible"}`),
+    onError: (e) =>
+      setReviewNotice(`Échec : ${e instanceof Error ? e.message : "action impossible"}`),
   });
-
-
 
   const mutation = useMutation({
     mutationFn: (input: { id: string; status: "nouveau" | "traité" }) =>
@@ -247,13 +249,20 @@ function AdminPage() {
                   : "border border-border bg-card"
               }`}
             >
-              {f.label} ({f.value === "tous" ? reviews.length : reviews.filter((r) => r.status === f.value).length})
+              {f.label} (
+              {f.value === "tous"
+                ? reviews.length
+                : reviews.filter((r) => r.status === f.value).length}
+              )
             </button>
           ))}
         </div>
 
         {reviewNotice && (
-          <p role="status" className="mt-4 rounded-xl bg-secondary/60 px-4 py-2 text-sm font-medium">
+          <p
+            role="status"
+            className="mt-4 rounded-xl bg-secondary/60 px-4 py-2 text-sm font-medium"
+          >
             {reviewNotice}
           </p>
         )}
@@ -269,7 +278,10 @@ function AdminPage() {
           {filteredReviews.map((r) => {
             const pending = reviewMutation.isPending && reviewMutation.variables?.id === r.id;
             return (
-              <article key={r.id} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+              <article
+                key={r.id}
+                className="rounded-2xl border border-border bg-card p-5 shadow-card"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h3 className="font-display text-lg font-bold">
                     {r.author_name}
@@ -284,7 +296,11 @@ function AdminPage() {
                           : "bg-secondary text-foreground"
                     }`}
                   >
-                    {r.status === "publié" ? "Publié" : r.status === "refusé" ? "Refusé" : "En attente"}
+                    {r.status === "publié"
+                      ? "Publié"
+                      : r.status === "refusé"
+                        ? "Refusé"
+                        : "En attente"}
                   </span>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-3">

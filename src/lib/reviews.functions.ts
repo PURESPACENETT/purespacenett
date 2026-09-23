@@ -62,7 +62,8 @@ export const setReviewStatus = createServerFn({ method: "POST" })
       .select("id, status");
     if (error) throw new Error(error.message);
     // RLS filtre silencieusement : aucune ligne = pas les droits ou avis introuvable.
-    if (!updated || updated.length === 0) throw new Error("Action non autorisée ou avis introuvable");
+    if (!updated || updated.length === 0)
+      throw new Error("Action non autorisée ou avis introuvable");
     return { ok: true, id: data.id, status: data.status };
   });
 
@@ -79,17 +80,20 @@ export const getPublishedReviews = createServerFn({ method: "GET" }).handler(
       global: {
         fetch: (input, init) => {
           const h = new Headers(init?.headers);
-          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+            h.delete("Authorization");
           h.set("apikey", key);
           return fetch(input, { ...init, headers: h });
         },
       },
     });
 
-    const { data, error } = await (client.rpc as unknown as (fn: string) => Promise<{
-      data: PublishedReview[] | null;
-      error: { message: string } | null;
-    }>)("get_published_reviews");
+    const { data, error } = await (
+      client.rpc as unknown as (fn: string) => Promise<{
+        data: PublishedReview[] | null;
+        error: { message: string } | null;
+      }>
+    )("get_published_reviews");
 
     if (error) {
       console.error("Lecture des avis publiés impossible", error.message);
@@ -97,7 +101,9 @@ export const getPublishedReviews = createServerFn({ method: "GET" }).handler(
     }
     const reviews = (data ?? []).map((r) => ({ ...r, rating: Number(r.rating) }));
     const count = reviews.length;
-    const average = count ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / count) * 10) / 10 : null;
+    const average = count
+      ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / count) * 10) / 10
+      : null;
     return { reviews, count, average };
   },
 );
