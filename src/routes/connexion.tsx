@@ -81,7 +81,7 @@ function LoginPage() {
         return;
       }
 
-      await navigate({ to: "/admin" });
+      await navigate({ to: "/admin", search: { onglet: "tableau-de-bord" } });
     } catch (error) {
       console.error("[Connexion] Erreur d'authentification", error);
       const message = error instanceof Error ? error.message : "Erreur inattendue lors de la connexion.";

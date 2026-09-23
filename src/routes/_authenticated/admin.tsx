@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -92,7 +92,7 @@ function isAdminTab(value: unknown): value is AdminTab {
 export const Route = createFileRoute("/_authenticated/admin")({
   staticData: { sitemap: false },
   validateSearch: (search: Record<string, unknown>) => ({
-    onglet: isAdminTab(search.onglet) ? search.onglet : ("tableau-de-bord" as AdminTab),
+    onglet: isAdminTab(search["onglet"]) ? search["onglet"] : ("tableau-de-bord" as AdminTab),
   }),
   head: () => ({
     meta: [
@@ -256,7 +256,7 @@ function AdminPage() {
             quotes={quotes}
             filteredQuotes={filteredQuotes}
             isLoading={quotesQuery.isLoading}
-            error={quotesQuery.error}
+            error={Boolean(quotesQuery.error)}
             search={search}
             filter={quoteFilter}
             expandedQuoteId={expandedQuoteId}
@@ -274,7 +274,7 @@ function AdminPage() {
             reviews={reviews}
             filteredReviews={filteredReviews}
             isLoading={reviewsQuery.isLoading}
-            error={reviewsQuery.error}
+            error={Boolean(reviewsQuery.error)}
             filter={reviewFilter}
             pendingId={reviewMutation.isPending ? reviewMutation.variables?.id : undefined}
             notice={reviewNotice}
@@ -456,18 +456,19 @@ function DashboardTab({
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <button
+            <Button
               key={stat.label}
               type="button"
+              variant="ghost"
               onClick={() => onNavigate(stat.tab)}
-              className="rounded-lg border border-border bg-card p-5 text-left shadow-card transition-colors hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-auto w-full flex-col items-stretch whitespace-normal rounded-lg border border-border bg-card p-5 text-left shadow-card transition-colors hover:border-accent hover:bg-card focus-visible:ring-2"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
                 <Icon className="size-4 text-accent" aria-hidden="true" />
               </div>
               <span className="mt-3 block font-display text-3xl font-bold tabular-nums">{stat.value}</span>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -498,11 +499,11 @@ function RequestsTab({
   quotes: QuoteRequest[];
   filteredQuotes: QuoteRequest[];
   isLoading: boolean;
-  error: unknown;
+  error: boolean;
   search: string;
   filter: QuoteFilter;
   expandedQuoteId: string | null;
-  pendingId?: string;
+  pendingId: string | undefined;
   notice: string | null;
   onSearch: (value: string) => void;
   onFilter: (value: QuoteFilter) => void;
@@ -614,9 +615,9 @@ function ReviewsTab({
   reviews: ReviewSubmission[];
   filteredReviews: ReviewSubmission[];
   isLoading: boolean;
-  error: unknown;
+  error: boolean;
   filter: ReviewFilter;
-  pendingId?: string;
+  pendingId: string | undefined;
   notice: string | null;
   onFilter: (filter: ReviewFilter) => void;
   onRequestStatusChange: (review: ReviewSubmission, status: ReviewStatus) => void;
