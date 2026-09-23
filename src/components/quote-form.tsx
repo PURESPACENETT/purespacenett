@@ -58,7 +58,9 @@ const labelCls = "block text-sm font-medium";
 export function QuoteForm() {
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [error, setError] = useState<string | null>(null);\n  const [photos, setPhotos] = useState<File[]>([]);\n  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     trackEvent("formulaire_devis_vu");
