@@ -1,9 +1,12 @@
 import type { ComponentType } from 'react'
 
 export interface TemplateEntry {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: ComponentType<any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subject: string | ((data: Record<string, any>) => string)
   displayName?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   previewData?: Record<string, any>
   /** Fixed recipient — overrides caller-provided recipientEmail when set. */
   to?: string
