@@ -15,10 +15,10 @@ import { Route as AProposRouteImport } from './routes/a-propos'
 import { Route as AvisRouteImport } from './routes/avis'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
-import { Route as PolitiqueConfidentialiteRouteImport } from './routes/politique-confidentialite'
 import { Route as DevisRouteImport } from './routes/devis'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
+import { Route as PolitiqueConfidentialiteRouteImport } from './routes/politique-confidentialite'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TarifsRouteImport } from './routes/tarifs'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -59,16 +59,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
-  id: '/mentions-legales',
-  path: '/mentions-legales',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PolitiqueConfidentialiteRoute = PolitiqueConfidentialiteRouteImport.update({
-  id: '/politique-confidentialite',
-  path: '/politique-confidentialite',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DevisRoute = DevisRouteImport.update({
   id: '/devis',
   path: '/devis',
@@ -79,6 +69,17 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PolitiqueConfidentialiteRoute =
+  PolitiqueConfidentialiteRouteImport.update({
+    id: '/politique-confidentialite',
+    path: '/politique-confidentialite',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -137,10 +138,10 @@ export interface FileRoutesByFullPath {
   '/avis': typeof AvisRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
-  '/mentions-legales': typeof MentionsLegalesRoute
-  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/devis': typeof DevisRoute
   '/faq': typeof FaqRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -158,10 +159,10 @@ export interface FileRoutesByTo {
   '/avis': typeof AvisRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
-  '/mentions-legales': typeof MentionsLegalesRoute
-  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/devis': typeof DevisRoute
   '/faq': typeof FaqRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -181,10 +182,10 @@ export interface FileRoutesById {
   '/avis': typeof AvisRoute
   '/connexion': typeof ConnexionRoute
   '/contact': typeof ContactRoute
-  '/mentions-legales': typeof MentionsLegalesRoute
-  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/devis': typeof DevisRoute
   '/faq': typeof FaqRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
+  '/politique-confidentialite': typeof PolitiqueConfidentialiteRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarifs': typeof TarifsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -204,10 +205,10 @@ export interface FileRouteTypes {
     | '/avis'
     | '/connexion'
     | '/contact'
-    | '/mentions-legales'
-    | '/politique-confidentialite'
     | '/devis'
     | '/faq'
+    | '/mentions-legales'
+    | '/politique-confidentialite'
     | '/sitemap.xml'
     | '/tarifs'
     | '/admin'
@@ -225,10 +226,10 @@ export interface FileRouteTypes {
     | '/avis'
     | '/connexion'
     | '/contact'
-    | '/mentions-legales'
-    | '/politique-confidentialite'
     | '/devis'
     | '/faq'
+    | '/mentions-legales'
+    | '/politique-confidentialite'
     | '/sitemap.xml'
     | '/tarifs'
     | '/admin'
@@ -247,10 +248,10 @@ export interface FileRouteTypes {
     | '/avis'
     | '/connexion'
     | '/contact'
-    | '/mentions-legales'
-    | '/politique-confidentialite'
     | '/devis'
     | '/faq'
+    | '/mentions-legales'
+    | '/politique-confidentialite'
     | '/sitemap.xml'
     | '/tarifs'
     | '/_authenticated/admin'
@@ -270,10 +271,10 @@ export interface RootRouteChildren {
   AvisRoute: typeof AvisRoute
   ConnexionRoute: typeof ConnexionRoute
   ContactRoute: typeof ContactRoute
-  MentionsLegalesRoute: typeof MentionsLegalesRoute
-  PolitiqueConfidentialiteRoute: typeof PolitiqueConfidentialiteRoute
   DevisRoute: typeof DevisRoute
   FaqRoute: typeof FaqRoute
+  MentionsLegalesRoute: typeof MentionsLegalesRoute
+  PolitiqueConfidentialiteRoute: typeof PolitiqueConfidentialiteRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TarifsRoute: typeof TarifsRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
@@ -329,20 +330,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mentions-legales': {
-      id: '/mentions-legales'
-      path: '/mentions-legales'
-      fullPath: '/mentions-legales'
-      preLoaderRoute: typeof MentionsLegalesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/politique-confidentialite': {
-      id: '/politique-confidentialite'
-      path: '/politique-confidentialite'
-      fullPath: '/politique-confidentialite'
-      preLoaderRoute: typeof PolitiqueConfidentialiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/devis': {
       id: '/devis'
       path: '/devis'
@@ -355,6 +342,20 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mentions-legales': {
+      id: '/mentions-legales'
+      path: '/mentions-legales'
+      fullPath: '/mentions-legales'
+      preLoaderRoute: typeof MentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/politique-confidentialite': {
+      id: '/politique-confidentialite'
+      path: '/politique-confidentialite'
+      fullPath: '/politique-confidentialite'
+      preLoaderRoute: typeof PolitiqueConfidentialiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -448,10 +449,10 @@ const rootRouteChildren: RootRouteChildren = {
   AvisRoute: AvisRoute,
   ConnexionRoute: ConnexionRoute,
   ContactRoute: ContactRoute,
-  MentionsLegalesRoute: MentionsLegalesRoute,
-  PolitiqueConfidentialiteRoute: PolitiqueConfidentialiteRoute,
   DevisRoute: DevisRoute,
   FaqRoute: FaqRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
+  PolitiqueConfidentialiteRoute: PolitiqueConfidentialiteRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TarifsRoute: TarifsRoute,
   ServicesSlugRoute: ServicesSlugRoute,
