@@ -54,7 +54,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
 
         const data = parsed.data;
         const payload = {
-          clientType: "entreprise",
+          clientType: "sous_traitance",
           propertyType: data.propertyType,
           surfaceM2: data.surfaceM2,
           frequency: data.frequency,
@@ -67,7 +67,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
           email: data.email,
           phone: data.phone,
           message: [
-            "Source : site PURE SPACE NETT — canal B2B entreprises.",
+            "Source : site PURE SPACE NETT — demande de sous-traitance.",
             data.message,
           ].filter(Boolean).join("\n\n"),
         };
