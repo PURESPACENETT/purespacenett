@@ -9,7 +9,7 @@ const nav = [
   { to: "/zones", label: "Zones desservies" },
   { to: "/tarifs", label: "Tarifs" },
   { to: "/devis", label: "Devis gratuit" },
-  { to: "/sous-traitance", label: "Sous-traitance B2B" },
+  { to: "/entreprises", label: "Entreprises" },
   { to: "/avis", label: "Avis clients" },
   { to: "/faq", label: "FAQ" },
   { to: "/a-propos", label: "À propos" },
