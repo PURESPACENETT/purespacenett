@@ -5,6 +5,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const REVIEW_STATUSES = ["nouveau", "publié", "refusé"] as const;
 export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
 
+/** Avis créés lors des essais techniques : jamais publiables. */
+export function isTestReview(review: { author_name: string; message?: string | null }) {
+  const text = `${review.author_name} ${review.message ?? ""}`.toLowerCase();
+  return text.includes("test vérification qa") || text.includes("test verification qa");
+}
+
 export type ReviewSubmission = {
   id: string;
   author_name: string;
@@ -55,6 +61,16 @@ export const setReviewStatus = createServerFn({ method: "POST" })
     z.object({ id: z.string().uuid(), status: z.enum(REVIEW_STATUSES) }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    if (data.status === "publié") {
+      const { data: current, error: readError } = await context.supabase
+        .from("review_submissions")
+        .select("author_name, message")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (readError) throw new Error(readError.message);
+      if (!current) throw new Error("Action non autorisée ou avis introuvable");
+      if (isTestReview(current)) throw new Error("Un avis de test ne peut pas être publié");
+    }
     const { data: updated, error } = await context.supabase
       .from("review_submissions")
       .update({ status: data.status })
