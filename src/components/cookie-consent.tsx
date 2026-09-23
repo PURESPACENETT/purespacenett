@@ -8,6 +8,12 @@ export function getAnalyticsConsent(): boolean {
   return window.localStorage.getItem(STORAGE_KEY) === "accepted";
 }
 
+export const reopenCookieConsent = () => {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(STORAGE_KEY);
+  window.dispatchEvent(new Event("psn-consent-change"));
+};
+
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
