@@ -14,6 +14,23 @@ export const Route = createFileRoute("/connexion")({
   component: LoginPage,
 });
 
+async function withTimeout<T>(promise: Promise<T>, timeoutMs = 15000): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("Le service de connexion ne répond pas dans le délai prévu.")),
+          timeoutMs,
+        );
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 function LoginPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -28,25 +45,6 @@ function LoginPage() {
     setLoading(true);
     setError(null);
     setInfo(null);
-
-    // Évite qu'une requête réseau ou une configuration Supabase défaillante
-    // laisse définitivement le bouton bloqué sur « Patientez… ».
-    const withTimeout = async <T,>(promise: Promise<T>, timeoutMs = 15000): Promise<T> => {
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      try {
-        return await Promise.race([
-          promise,
-          new Promise<T>((_, reject) => {
-            timer = setTimeout(
-              () => reject(new Error("Le service de connexion ne répond pas dans le délai prévu.")),
-              timeoutMs,
-            );
-          }),
-        ]);
-      } finally {
-        if (timer) clearTimeout(timer);
-      }
-    };
 
     try {
       if (mode === "signup") {
