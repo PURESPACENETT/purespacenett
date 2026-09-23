@@ -29,31 +29,72 @@ function LoginPage() {
     setError(null);
     setInfo(null);
 
-    if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: `${window.location.origin}/connexion` },
-      });
-      setLoading(false);
-      if (error) {
-        setError("Création impossible : " + error.message);
+    // Évite qu'une requête réseau ou une configuration Supabase défaillante
+    // laisse définitivement le bouton bloqué sur « Patientez… ».
+    const withTimeout = async <T,>(promise: Promise<T>, timeoutMs = 15000): Promise<T> => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      try {
+        return await Promise.race([
+          promise,
+          new Promise<T>((_, reject) => {
+            timer = setTimeout(
+              () => reject(new Error("Le service de connexion ne répond pas dans le délai prévu.")),
+              timeoutMs,
+            );
+          }),
+        ]);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    };
+
+    try {
+      if (mode === "signup") {
+        const { error } = await withTimeout(
+          supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: window.location.origin + "/connexion" },
+          }),
+        );
+
+        if (error) {
+          setError("Création impossible : " + error.message);
+          return;
+        }
+
+        setMode("signin");
+        setInfo(
+          "Compte créé. Ouvrez l'e-mail de confirmation que nous venons de vous envoyer, puis connectez-vous.",
+        );
         return;
       }
-      setMode("signin");
-      setInfo(
-        "Compte créé. Ouvrez l'e-mail de confirmation que nous venons de vous envoyer, puis connectez-vous.",
-      );
-      return;
-    }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      setError("E-mail ou mot de passe incorrect.");
-      return;
+      const { error } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password }),
+      );
+
+      if (error) {
+        setError(
+          error.message.toLowerCase().includes("invalid login credentials")
+            ? "E-mail ou mot de passe incorrect."
+            : "Connexion impossible : " + error.message,
+        );
+        return;
+      }
+
+      await navigate({ to: "/admin" });
+    } catch (error) {
+      console.error("[Connexion] Erreur d'authentification", error);
+      const message = error instanceof Error ? error.message : "Erreur inattendue lors de la connexion.";
+      setError(
+        message.includes("Missing Supabase environment")
+          ? "La connexion Supabase n'est pas correctement configurée sur le site."
+          : message,
+      );
+    } finally {
+      setLoading(false);
     }
-    navigate({ to: "/admin" });
   };
 
   const field =
