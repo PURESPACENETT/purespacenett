@@ -44,9 +44,16 @@ function DevisPage() {
           Demandez votre devis de nettoyage
         </h1>
         <p className="mt-5 max-w-2xl text-base text-muted-foreground">
-          Remplissez le formulaire ci-dessous : nous étudions votre demande et revenons vers vous
-          sous 24 heures avec un chiffrage clair, ou une proposition de visite sur place.
+          Remplissez le formulaire en quelques minutes. Vous pouvez ajouter des photos pour nous aider
+          à comprendre le besoin. Nous revenons vers vous sous 24 heures avec un chiffrage clair ou
+          une proposition de visite sur place.
         </p>
+        <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">
+          <span className="rounded-full border border-border bg-card px-3 py-1.5">Gratuit</span>
+          <span className="rounded-full border border-border bg-card px-3 py-1.5">Sans engagement</span>
+          <span className="rounded-full border border-border bg-card px-3 py-1.5">Photos facultatives</span>
+          <span className="rounded-full border border-border bg-card px-3 py-1.5">Réponse sous 24 h</span>
+        </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-start">
           <QuoteForm />
@@ -59,7 +66,7 @@ function DevisPage() {
               </div>
             </div>
             <div className="rounded-2xl bg-sand p-6 text-sm text-sand-foreground">
-              <p className="font-semibold">Besoin d'une réponse tout de suite ?</p>
+              <p className="font-semibold">Vous préférez échanger directement ?</p>
               <p className="mt-2">
                 Appelez-nous au{" "}
                 <a className="font-semibold underline" href={business.phoneHref}>
