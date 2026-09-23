@@ -21,6 +21,7 @@ import {
 import { getZoneImage } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 import { ReviewRequestBlock } from "@/components/review-request";
+import { SocialProof } from "@/components/published-reviews";
 
 export const Route = createFileRoute("/zones/$slug")({
   staticData: { sitemap: true },
@@ -72,7 +73,9 @@ export const Route = createFileRoute("/zones/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify(faqJsonLd(zoneLocalAnswers(z).map((a) => ({ q: a.question, a: a.answer })))),
+          children: JSON.stringify(
+            faqJsonLd(zoneLocalAnswers(z).map((a) => ({ q: a.question, a: a.answer }))),
+          ),
         },
         {
           type: "application/ld+json",
@@ -92,7 +95,10 @@ export const Route = createFileRoute("/zones/$slug")({
 
 function ZoneDetail() {
   const { zone } = Route.useLoaderData();
-  const zoneIndex = Math.max(0, zones.findIndex((item) => item.slug === zone.slug));
+  const zoneIndex = Math.max(
+    0,
+    zones.findIndex((item) => item.slug === zone.slug),
+  );
   const queries = zoneQueries(zone);
   const answers = zoneLocalAnswers(zone);
   const zoneServices = zone.serviceSlugs
@@ -122,7 +128,9 @@ function ZoneDetail() {
               {zone.department} · société de nettoyage de proximité · devis gratuit sous 24 h
             </p>
             <p className="mt-5 max-w-2xl text-base text-muted-foreground">{zone.intro}</p>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">{zone.context}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">
+              {zone.context}
+            </p>
             <div className="mt-8">
               <CallButtons subject={`nettoyage ${zone.name}`} />
             </div>
@@ -168,7 +176,10 @@ function ZoneDetail() {
         </h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {answers.map((a) => (
-            <div key={a.question} className="rounded-2xl border border-border bg-card p-5 shadow-card">
+            <div
+              key={a.question}
+              className="rounded-2xl border border-border bg-card p-5 shadow-card"
+            >
               <h3 className="font-display text-base font-semibold">{a.question}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{a.answer}</p>
               {a.servicePath ? (
@@ -191,7 +202,8 @@ function ZoneDetail() {
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Voici des recherches associées aux prestations de nettoyage à {zone.name}
-          {zone.postalCode ? ` et dans le ${zone.postalCode}` : ""}, avec les pages de notre site qui y répondent.
+          {zone.postalCode ? ` et dans le ${zone.postalCode}` : ""}, avec les pages de notre site
+          qui y répondent.
         </p>
         <ul className="mt-5 grid gap-2 sm:grid-cols-2">
           {queries.map((q) => (
@@ -307,6 +319,9 @@ function ZoneDetail() {
         </h2>
         <div className="mt-6">
           <LocalInfo area={`${zone.name} et communes voisines`} />
+        </div>
+        <div className="mt-6">
+          <SocialProof city={zone.name} />
         </div>
         <div className="mt-6">
           <ReviewRequestBlock city={zone.name} />
