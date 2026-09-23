@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { business } from "@/content/business";
 import { trackEvent } from "@/lib/analytics";
 
@@ -58,7 +58,7 @@ const labelCls = "block text-sm font-medium";
 export function QuoteForm() {
   const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);\n  const [photos, setPhotos] = useState<File[]>([]);\n  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     trackEvent("formulaire_devis_vu");
@@ -91,10 +91,13 @@ export function QuoteForm() {
     setStatus("sending");
     setError(null);
     try {
+      const body = new FormData();
+      Object.entries(form).forEach(([key, value]) => body.append(key, String(value)));
+      photos.forEach((photo) => body.append("photos", photo));
+
       const res = await fetch("/api/public/devis", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body,
       });
       if (!res.ok) throw new Error(await res.text());
       trackEvent("devis_envoye", {
@@ -104,6 +107,8 @@ export function QuoteForm() {
       });
       setStatus("sent");
       setForm(emptyForm);
+      setPhotos([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch {
       trackEvent("devis_echec_envoi", { prestation: form.serviceType });
       setStatus("error");
@@ -241,6 +246,38 @@ export function QuoteForm() {
             ))}
           </select>
         </label>
+      </div>
+
+      <div className="mt-4">
+        <label className={labelCls} htmlFor="quote-photos">
+          Photos des lieux (facultatif)
+          <input
+            ref={fileInputRef}
+            id="quote-photos"
+            className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+            multiple
+            onChange={(e) => {
+              const selected = Array.from(e.target.files ?? []);
+              const valid = selected.filter((file) => file.size <= 5 * 1024 * 1024);
+              setPhotos(valid.slice(0, 5));
+              if (selected.some((file) => file.size > 5 * 1024 * 1024) || selected.length > 5) {
+                setError("Vous pouvez joindre jusqu'à 5 photos de 5 Mo maximum chacune.");
+              } else {
+                setError(null);
+              }
+            }}
+          />
+        </label>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Jusqu'à 5 photos, 5 Mo maximum chacune. JPG, PNG ou WebP (HEIC/HEIF selon votre appareil).
+        </p>
+        {photos.length > 0 ? (
+          <p className="mt-1 text-xs text-muted-foreground">
+            {photos.length} photo{photos.length > 1 ? "s" : ""} sélectionnée{photos.length > 1 ? "s" : ""}.
+          </p>
+        ) : null}
       </div>
 
       <label className="mt-4 block text-sm font-medium">
