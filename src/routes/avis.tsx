@@ -190,6 +190,17 @@ function AvisPage() {
                 <figcaption className="mt-3 text-sm">
                   <span className="font-display font-semibold">{t.author}</span>
                   <span className="block text-xs text-muted-foreground">{t.context}</span>
+                  {t.sourceUrl ? (
+                    <a
+                      href={t.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-xs font-semibold text-primary underline underline-offset-2"
+                      onClick={() => trackEvent("clic_fiche_google", { source: "avis_google" })}
+                    >
+                      Voir l'avis sur Google
+                    </a>
+                  ) : null}
                 </figcaption>
               </figure>
             ))}
