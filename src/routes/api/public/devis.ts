@@ -148,9 +148,16 @@ export const Route = createFileRoute("/api/public/devis")({
         // Le formulaire public utilise exclusivement le webhook Supabase sécurisé.
         // L'ancien endpoint Lovable n'est plus utilisé comme solution de repli.
         const crmUrl = SECURE_QUOTE_WEBHOOK_URL;
-        const { data: bridgeSecret, error: bridgeSecretError } =
-          await supabaseAdmin.rpc("get_quote_webhook_secret");
-        const crmSecret = bridgeSecretError ? "" : (bridgeSecret ?? "").trim();
+
+        // Le secret du bridge doit venir d'une variable d'environnement serveur.
+        // Le RPC local est conservé uniquement comme compatibilité avec une ancienne
+        // configuration ; le projet public ne possède pas cette fonction par défaut.
+        let crmSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
+        if (!crmSecret) {
+          const { data: bridgeSecret, error: bridgeSecretError } =
+            await supabaseAdmin.rpc("get_quote_webhook_secret");
+          crmSecret = bridgeSecretError ? "" : (bridgeSecret ?? "").trim();
+        }
         if (crmUrl && crmSecret) {
           const propertyTypeMap: Record<string, string> = {
             Maison: "logement",
