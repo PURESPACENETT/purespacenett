@@ -29,3 +29,12 @@
 - [ ] Vérifier les paramètres de production du pont B2B et les erreurs de transmission
 - [x] Vérifier et renforcer les pages, CTA et messages dédiés aux entreprises de nettoyage
 - [ ] Valider lint, build et tests du parcours B2B
+
+
+- [ ] CHANTIER F — Suivi commercial : pilotage du pipeline et attribution
+- [x] Renforcer le tableau de bord CRM avec pipeline par statut et valeur ouverte
+- [x] Séparer le suivi sous-traitance, entreprises et particuliers
+- [x] Ajouter le panier moyen des dossiers gagnés et les indicateurs de clôture
+- [x] Enrichir les événements analytics avec UTM, référent et page d'atterrissage
+- [x] Corriger le comptage des prospects intéressés pour éviter d'inclure les convertis
+- [ ] Raccorder durablement les sources d'acquisition au dossier CRM et contrôler la déduplication
