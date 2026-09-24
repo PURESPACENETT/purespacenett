@@ -15,6 +15,8 @@ const PHOTO_EXTENSIONS: Record<string, string> = {
 const ALLOWED_PHOTO_TYPES = new Set(Object.keys(PHOTO_EXTENSIONS));
 
 const noStore = { "Cache-Control": "no-store" };
+const SECURE_QUOTE_WEBHOOK_URL =
+  "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
@@ -143,9 +145,9 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
-        const crmUrl =
-          process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ??
-          "https://funnel-friendship.lovable.app/api/public/hooks/quote-request";
+        // Le formulaire public utilise exclusivement le webhook Supabase sécurisé.
+        // L'ancien endpoint Lovable n'est plus utilisé comme solution de repli.
+        const crmUrl = SECURE_QUOTE_WEBHOOK_URL;
         const { data: bridgeSecret, error: bridgeSecretError } =
           await supabaseAdmin.rpc("get_quote_webhook_secret");
         const crmSecret = bridgeSecretError ? "" : (bridgeSecret ?? "").trim();
