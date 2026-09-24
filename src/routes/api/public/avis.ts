@@ -42,7 +42,7 @@ export const Route = createFileRoute("/api/public/avis")({
 
         const parsed = schema.safeParse(payload);
         if (!parsed.success) {
-          return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400 });
+          return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400, headers: noStore });
         }
         const data = parsed.data;
 
