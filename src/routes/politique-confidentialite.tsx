@@ -56,12 +56,14 @@ function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-display text-xl font-bold">Finalités</h2>
+            <h2 className="font-display text-xl font-bold">Finalités et bases légales</h2>
             <p className="mt-3">
               Les données des demandes de devis servent à répondre à votre demande, préparer un
-              chiffrage et vous recontacter. Les données d'avis servent à traiter votre contribution
-              et, lorsque vous l'autorisez, à la publier. Les données de mesure d'audience servent à
-              comprendre l'utilisation du site et à l'améliorer lorsque vous avez accepté cette mesure.
+              chiffrage et, lorsque cela est nécessaire, préparer l'exécution d'une prestation. Le
+              traitement repose selon le cas sur les mesures précontractuelles prises à votre demande
+              ou sur l'exécution du contrat. Les données d'avis sont traitées sur la base de votre
+              consentement lorsqu'une publication est proposée. La mesure d'audience est activée
+              uniquement après votre choix d'acceptation.
             </p>
           </section>
 
@@ -77,10 +79,17 @@ function PrivacyPage() {
           <section>
             <h2 className="font-display text-xl font-bold">Durée de conservation</h2>
             <p className="mt-3">
-              Les données sont conservées pendant la durée nécessaire aux finalités pour lesquelles
-              elles sont traitées, puis supprimées ou archivées lorsque la conservation est imposée
-              par une obligation légale. Les durées précises peuvent dépendre de la nature de la demande
-              et des obligations applicables.
+              Les demandes de devis qui n'aboutissent pas à une commande sont conservées pendant une
+              durée maximale de 1 an à compter de leur émission, sauf nécessité documentée liée à un
+              litige ou obligation légale contraire. Les données de prospects utilisées à des fins de
+              prospection commerciale sont conservées pendant 3 ans à compter de leur collecte ou du
+              dernier contact émanant du prospect. Les données nécessaires à la gestion d'un client
+              peuvent être conservées pendant la relation commerciale puis, selon la finalité, pendant
+              les durées nécessaires aux obligations légales, comptables ou à la gestion d'un éventuel
+              contentieux. Les oppositions à la prospection sont conservées dans une liste d'opposition
+              pendant la durée nécessaire à leur prise en compte, avec un minimum de 3 ans lorsque cela
+              est applicable. Ces durées sont adaptées si une obligation légale ou une situation
+              contentieuse impose une conservation différente.
             </p>
           </section>
 
