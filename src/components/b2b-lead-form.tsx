@@ -36,9 +36,15 @@ export function B2BLeadForm() {
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState("");
+  const [started, setStarted] = useState(false);
 
-  const set = (key: string, value: string | boolean) =>
+  const set = (key: string, value: string | boolean) => {
+    if (!started) {
+      setStarted(true);
+      trackEvent("lead_b2b_commence", { source: "page_sous_traitance" });
+    }
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const toggleService = (value: string) =>
     setForm((prev) => ({
@@ -58,7 +64,7 @@ export function B2BLeadForm() {
       const response = await fetch("/api/public/b2b-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, surfaceM2: Number(form.surfaceM2), desiredDate: form.desiredDate || "" }),
+        body: JSON.stringify({ ...form, website: "", surfaceM2: Number(form.surfaceM2), desiredDate: form.desiredDate || "" }),
       });
       if (!response.ok) {
         const data = await response.json().catch(() => null);
@@ -67,7 +73,7 @@ export function B2BLeadForm() {
       trackEvent("lead_b2b_envoye", { source: "page_sous_traitance" });
       setStatus("sent");
     } catch (e) {
-      trackEvent("lead_b2b_echec", { source: "page_entreprises" });
+      trackEvent("lead_b2b_echec", { source: "page_sous_traitance" });
       setError(e instanceof Error ? e.message : "Transmission impossible");
       setStatus("error");
     }
@@ -156,7 +162,9 @@ export function B2BLeadForm() {
       </button>
 
       {status === "error" && <p className="mt-3 text-sm text-destructive">{error}</p>}
-      <p className="mt-3 text-center text-xs text-muted-foreground">Demande gratuite · sans engagement · réponse commerciale personnalisée</p>
+      <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+        <span>Demande gratuite</span><span>Sans engagement</span><span>Traitement confidentiel</span>
+      </div>
     </form>
   );
 }
