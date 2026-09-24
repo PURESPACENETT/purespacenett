@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Building2, Clock, ShieldCheck, Sparkles } from "lucide-react";
 import { business } from "@/content/business";
+import { testimonials } from "@/content/testimonials";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { CallButtons, CheckList, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
 import { canonicalUrl, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { siteImages } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
-import { SocialProof } from "@/components/published-reviews";
+import { GoogleReviewCard, SocialProof } from "@/components/published-reviews";
 
 const title = "Entreprise de nettoyage Île-de-France | PURE SPACE NETT";
 const description =
@@ -227,6 +228,13 @@ function Index() {
         <div className="mt-6">
           <SocialProof />
         </div>
+        {testimonials.some((review) => review.sourceUrl) && (
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {testimonials.filter((review) => review.sourceUrl).map((review) => (
+              <GoogleReviewCard key={review.author} review={review} />
+            ))}
+          </div>
+        )}
       </Section>
 
       <QuoteBanner subject="page d'accueil" />
