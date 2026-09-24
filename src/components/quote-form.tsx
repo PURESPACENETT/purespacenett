@@ -131,7 +131,7 @@ export function QuoteForm() {
       <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
         <h2 className="font-display text-2xl font-bold">Demande envoyée</h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          Merci ! Nous avons reçu votre demande et vous répondons sous 24 heures. Pour une urgence,
+          Merci ! Nous avons bien reçu votre demande. Nous revenons vers vous après étude de votre besoin. Pour une urgence,
           appelez-nous au{" "}
           <a
             className="font-semibold text-foreground"
@@ -390,7 +390,7 @@ export function QuoteForm() {
         </div>
       ) : (
         <p className="mt-3 text-xs text-muted-foreground">
-          Votre demande arrive directement dans la boîte {business.email}. Réponse sous 24 heures.
+          Votre demande arrive directement dans la boîte {business.email}. Nous revenons vers vous après étude de votre besoin.
         </p>
       )}
 
