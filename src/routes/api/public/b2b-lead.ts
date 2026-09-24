@@ -45,7 +45,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
 
         const parsed = schema.safeParse(body);
         if (!parsed.success) {
-          return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400 });
+          return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400, headers: noStore });
         }
 
         if (parsed.data.website) {
@@ -56,7 +56,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
         const secret = process.env["FUNNEL_B2B_WEBHOOK_SECRET"]?.trim();
         if (!url || !secret) {
           console.error("B2B CRM bridge is not configured");
-          return Response.json({ error: "Canal B2B temporairement indisponible" }, { status: 503 });
+          return Response.json({ error: "Canal B2B temporairement indisponible" }, { status: 503, headers: noStore });
         }
 
         const data = parsed.data;
@@ -92,7 +92,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
 
           if (!response.ok) {
             console.error("B2B CRM bridge rejected lead", response.status);
-            return Response.json({ error: "Transmission au CRM impossible" }, { status: 502 });
+            return Response.json({ error: "Transmission au CRM impossible" }, { status: 502, headers: noStore });
           }
 
           return Response.json({ ok: true });
