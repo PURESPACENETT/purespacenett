@@ -143,8 +143,12 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
-        const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim();
-        const crmSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim();
+        const crmUrl =
+          process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ??
+          "https://funnel-friendship.lovable.app/api/public/hooks/quote-request";
+        const { data: bridgeSecret, error: bridgeSecretError } =
+          await supabaseAdmin.rpc("get_quote_webhook_secret");
+        const crmSecret = bridgeSecretError ? "" : (bridgeSecret ?? "").trim();
         if (crmUrl && crmSecret) {
           const propertyTypeMap: Record<string, string> = {
             Maison: "logement",
