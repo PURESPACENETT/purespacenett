@@ -19,3 +19,13 @@
 - [x] Renforcer les CTA téléphone et WhatsApp sur la page devis
 - [x] Ajouter une preuve sociale au parcours de devis
 - [x] Valider lint et build sur GitHub Actions
+
+- [ ] CHANTIER E — Sous-traitance B2B : renforcer l'acquisition et la qualification
+- [x] Remplacer le lien Google utilisé pour demander un avis par le lien fourni
+- [x] Mesurer le début et l'échec du formulaire de sous-traitance avec une source cohérente
+- [x] Ajouter des options téléphone et WhatsApp après transmission d'une demande B2B
+- [x] Ajouter un honeypot serveur sur le formulaire B2B
+- [ ] Auditer le parcours de prospection et le raccordement CRM de bout en bout
+- [ ] Vérifier les paramètres de production du pont B2B et les erreurs de transmission
+- [ ] Vérifier les pages, CTA et messages dédiés aux entreprises de nettoyage
+- [ ] Valider lint, build et tests du parcours B2B
