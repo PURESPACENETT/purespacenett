@@ -45,6 +45,7 @@ export const frequencies = [
 const emptyForm = {
   fullName: "",
   clientType: "particulier",
+  companyName: "",
   email: "",
   phone: "",
   address: "",
@@ -205,6 +206,16 @@ export function QuoteForm() {
               </option>
             ))}
           </select>
+        </label>
+        <label className={labelCls}>
+          Entreprise (si applicable)
+          <input
+            className={field}
+            maxLength={160}
+            placeholder="Nom de l'entreprise"
+            value={form.companyName}
+            onChange={(e) => set("companyName", e.target.value)}
+          />
         </label>
         <label className={labelCls}>
           Email *
