@@ -9,6 +9,8 @@ export type Testimonial = {
   text?: string;
   /** Date de publication au format AAAA-MM (optionnel). */
   date?: string;
+  /** URL publique de la source de l’avis. */
+  sourceUrl?: string;
 };
 
 /**
@@ -22,6 +24,7 @@ export const testimonials: Testimonial[] = [
     context: "Avis Google · Nettoyage fin de chantier",
     rating: 5,
     text: "Service impeccable, franchement après avoir été déçu par 3 autres entreprises, PURE SPACE NETT sont intervenus avec full équipements et ont fait mon nettoyage de fin de chantier avec minutie. Je recommande vivement. Encore merci 🙏🙏",
+    sourceUrl: "https://share.google/AFl7knrUejrsqrXr8",
   },
   {
     author: "Karim Zitti",
