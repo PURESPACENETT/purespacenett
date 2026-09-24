@@ -69,11 +69,11 @@ export const Route = createFileRoute("/api/public/devis")({
         const data = parsed.data;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const bucket = "quote-photos";
         const photoUrls: string[] = [];
         const uploadedPhotoPaths: string[] = [];
 
         if (photos.length > 0) {
-          const bucket = "quote-photos";
           const { error: bucketError } = await supabaseAdmin.storage.createBucket(bucket, { public: false, fileSizeLimit: MAX_PHOTO_SIZE, allowedMimeTypes: [...ALLOWED_PHOTO_TYPES] });
           if (bucketError && !/already exists/i.test(bucketError.message)) {
             console.error("Création du stockage photos impossible", bucketError.message);
