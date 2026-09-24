@@ -151,6 +151,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_quote_webhook_secret: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "user"
