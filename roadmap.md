@@ -27,5 +27,5 @@
 - [x] Ajouter un honeypot serveur sur le formulaire B2B
 - [ ] Auditer le parcours de prospection et le raccordement CRM de bout en bout
 - [ ] Vérifier les paramètres de production du pont B2B et les erreurs de transmission
-- [ ] Vérifier les pages, CTA et messages dédiés aux entreprises de nettoyage
+- [x] Vérifier et renforcer les pages, CTA et messages dédiés aux entreprises de nettoyage
 - [ ] Valider lint, build et tests du parcours B2B
