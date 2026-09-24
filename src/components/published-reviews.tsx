@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { Quote, Star } from "lucide-react";
 import { getPublishedReviews, type PublishedReview } from "@/lib/reviews.functions";
+import type { Testimonial } from "@/content/testimonials";
 
 export const publishedReviewsQuery = queryOptions({
   queryKey: ["published-reviews"],
@@ -47,6 +48,34 @@ export function ReviewCard({ review }: { review: PublishedReview }) {
 }
 
 /** Preuve sociale : moyenne et nombre calculés uniquement sur les avis publiés. */
+
+export function GoogleReviewCard({ review }: { review: Testimonial }) {
+  return (
+    <figure className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-card">
+      <div className="flex items-center justify-between gap-3">
+        <Stars rating={review.rating} />
+        <span className="text-xs font-semibold text-muted-foreground">Avis Google</span>
+      </div>
+      {review.text ? (
+        <blockquote className="mt-4 flex-1 whitespace-pre-line text-sm leading-relaxed text-foreground/90">
+          “{review.text}”
+        </blockquote>
+      ) : (
+        <p className="mt-4 flex-1 text-sm text-muted-foreground">Avis laissé avec une note de {review.rating}/5 sur Google.</p>
+      )}
+      <figcaption className="mt-4 text-sm">
+        <span className="font-display font-semibold">{review.author}</span>
+        <span className="block text-xs text-muted-foreground">{review.context}</span>
+        {review.sourceUrl ? (
+          <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-primary underline underline-offset-2">
+            Voir sur Google
+          </a>
+        ) : null}
+      </figcaption>
+    </figure>
+  );
+}
+
 export function SocialProof({ city, limit = 3 }: { city?: string; limit?: number }) {
   const { data, isLoading } = useQuery(publishedReviewsQuery);
   if (isLoading) return null;
