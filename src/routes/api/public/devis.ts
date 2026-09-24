@@ -180,7 +180,7 @@ export const Route = createFileRoute("/api/public/devis")({
             postalCode: data.postalCode,
             desiredDate: data.desiredDate,
             contactName: data.fullName,
-            companyName: data.clientType === "particulier" ? "" : data.fullName,
+            companyName: "",
             email: data.email,
             phone: data.phone,
             message: [
