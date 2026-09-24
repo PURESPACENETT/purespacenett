@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { checkRateLimit, requestKey } from "@/lib/rate-limit";
 
-const noStore = { "Cache-Control": "no-store" };\n\nconst schema = z.object({
+const noStore = { "Cache-Control": "no-store" };
+
+const schema = z.object({
   contactName: z.string().trim().min(2).max(120),
   companyName: z.string().trim().min(2).max(160),
   email: z.string().trim().email().max(255),
