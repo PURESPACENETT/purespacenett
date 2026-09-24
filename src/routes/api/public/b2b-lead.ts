@@ -30,7 +30,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
           headers: { Allow: "POST", ...noStore },
         }),
       POST: async ({ request }) => {
-        const limit = checkRateLimit(requestKey(request, "b2b-lead"), { limit: 5, windowMs: 60 * 60 * 1000 });
+        const limit = await checkRateLimit(requestKey(request, "b2b-lead"), { limit: 5, windowMs: 60 * 60 * 1000 });
         if (!limit.allowed) {
           return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds), ...noStore } });
         }
