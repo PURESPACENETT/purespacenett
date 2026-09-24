@@ -6,6 +6,8 @@ const MAX_PHOTOS = 5;
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
 const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 
+const noStore = { "Cache-Control": "no-store" };
+
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
@@ -29,24 +31,30 @@ export const Route = createFileRoute("/api/public/devis")({
       GET: async () =>
         new Response("Method Not Allowed", {
           status: 405,
-          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow" },
+          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow", ...noStore },
         }),
       POST: async ({ request }) => {
         const limit = checkRateLimit(requestKey(request, "devis"), { limit: 5, windowMs: 60 * 60 * 1000 });
         if (!limit.allowed) {
-          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
+          return Response.json(
+            { error: "Trop de demandes. Réessayez plus tard." },
+            { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds), ...noStore } },
+          );
         }
 
         let formData: FormData;
         try {
           formData = await request.formData();
         } catch {
-          return Response.json({ error: "Requête invalide" }, { status: 400 });
+          return Response.json({ error: "Requête invalide" }, { status: 400, headers: noStore });
         }
 
         const photos = formData.getAll("photos").filter((value): value is File => value instanceof File);
         if (photos.length > MAX_PHOTOS || photos.some((photo) => photo.size > MAX_PHOTO_SIZE || !ALLOWED_PHOTO_TYPES.has(photo.type))) {
-          return Response.json({ error: "Photos invalides : 5 maximum, 5 Mo maximum chacune, JPG/PNG/WebP/HEIC/HEIF." }, { status: 400 });
+          return Response.json(
+            { error: "Photos invalides : 5 maximum, 5 Mo maximum chacune, JPG/PNG/WebP/HEIC/HEIF." },
+            { status: 400, headers: noStore },
+          );
         }
 
         const payload = Object.fromEntries(
@@ -56,19 +64,20 @@ export const Route = createFileRoute("/api/public/devis")({
         (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
         const parsed = schema.safeParse(payload);
         if (!parsed.success) {
-          return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400 });
+          return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400, headers: noStore });
         }
         const data = parsed.data;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const photoUrls: string[] = [];
+        const uploadedPhotoPaths: string[] = [];
 
         if (photos.length > 0) {
           const bucket = "quote-photos";
           const { error: bucketError } = await supabaseAdmin.storage.createBucket(bucket, { public: false, fileSizeLimit: MAX_PHOTO_SIZE, allowedMimeTypes: [...ALLOWED_PHOTO_TYPES] });
           if (bucketError && !/already exists/i.test(bucketError.message)) {
             console.error("Création du stockage photos impossible", bucketError.message);
-            return Response.json({ error: "Stockage des photos indisponible" }, { status: 500 });
+            return Response.json({ error: "Stockage des photos indisponible" }, { status: 500, headers: noStore });
           }
 
           for (const photo of photos) {
@@ -80,7 +89,10 @@ export const Route = createFileRoute("/api/public/devis")({
 
             if (uploadError) {
               console.error("Upload photo impossible", uploadError.message);
-              return Response.json({ error: "Une photo n'a pas pu être enregistrée" }, { status: 500 });
+              if (uploadedPhotoPaths.length > 0) {
+                await supabaseAdmin.storage.from(bucket).remove(uploadedPhotoPaths);
+              }
+              return Response.json({ error: "Une photo n'a pas pu être enregistrée" }, { status: 500, headers: noStore });
             }
 
             const { data: signed, error: signedError } = await supabaseAdmin.storage
@@ -89,8 +101,12 @@ export const Route = createFileRoute("/api/public/devis")({
 
             if (signedError || !signed?.signedUrl) {
               console.error("URL photo impossible", signedError?.message);
-              return Response.json({ error: "Accès aux photos impossible" }, { status: 500 });
+              if (uploadedPhotoPaths.length > 0) {
+                await supabaseAdmin.storage.from(bucket).remove(uploadedPhotoPaths);
+              }
+              return Response.json({ error: "Accès aux photos impossible" }, { status: 500, headers: noStore });
             }
+            uploadedPhotoPaths.push(path);
             photoUrls.push(signed.signedUrl);
           }
         }
@@ -112,7 +128,10 @@ export const Route = createFileRoute("/api/public/devis")({
 
         if (error) {
           console.error("Enregistrement du devis impossible", error.message);
-          return Response.json({ error: "Enregistrement impossible" }, { status: 500 });
+          if (uploadedPhotoPaths.length > 0) {
+            await supabaseAdmin.storage.from(bucket).remove(uploadedPhotoPaths);
+          }
+          return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
         try {
@@ -137,7 +156,7 @@ export const Route = createFileRoute("/api/public/devis")({
           console.error("Notification e-mail du devis impossible", mailError);
         }
 
-        return Response.json({ ok: true });
+        return Response.json({ ok: true }, { headers: noStore });
       },
     },
   },
