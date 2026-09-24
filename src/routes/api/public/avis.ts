@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { checkRateLimit, requestKey } from "@/lib/rate-limit";
 
-const schema = z.object({
+const noStore = { "Cache-Control": "no-store" };\n\nconst schema = z.object({
   authorName: z.string().trim().min(2).max(100),
   city: z.string().trim().max(80).optional().default(""),
   serviceType: z.string().trim().max(80).optional().default(""),
@@ -23,19 +23,19 @@ export const Route = createFileRoute("/api/public/avis")({
       GET: async () =>
         new Response("Method Not Allowed", {
           status: 405,
-          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow" },
+          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow", ...noStore },
         }),
       POST: async ({ request }) => {
         const limit = checkRateLimit(requestKey(request, "avis"), { limit: 5, windowMs: 60 * 60 * 1000 });
         if (!limit.allowed) {
-          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
+          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds), ...noStore } });
         }
 
         let payload: unknown;
         try {
           payload = await request.json();
         } catch {
-          return Response.json({ error: "Requête invalide" }, { status: 400 });
+          return Response.json({ error: "Requête invalide" }, { status: 400, headers: noStore });
         }
 
         const parsed = schema.safeParse(payload);
@@ -60,7 +60,7 @@ export const Route = createFileRoute("/api/public/avis")({
 
         if (error) {
           console.error("Enregistrement de l'avis impossible", error.message);
-          return Response.json({ error: "Enregistrement impossible" }, { status: 500 });
+          return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
         try {
@@ -81,7 +81,7 @@ export const Route = createFileRoute("/api/public/avis")({
           console.error("Notification e-mail de l'avis impossible", mailError);
         }
 
-        return Response.json({ ok: true });
+        return Response.json({ ok: true }, { headers: noStore });
       },
     },
   },
