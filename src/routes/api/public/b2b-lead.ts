@@ -16,6 +16,7 @@ const schema = z.object({
   desiredDate: z.string().trim().max(20).optional().default(""),
   message: z.string().trim().max(1500).optional().default(""),
   consent: z.literal(true),
+  website: z.string().max(0).optional().default(""),
 });
 
 export const Route = createFileRoute("/api/public/b2b-lead")({
@@ -50,6 +51,10 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
         if (!url || !secret) {
           console.error("B2B CRM bridge is not configured");
           return Response.json({ error: "Canal B2B temporairement indisponible" }, { status: 503 });
+        }
+
+        if (parsed.data.website) {
+          return Response.json({ ok: true });
         }
 
         const data = parsed.data;
