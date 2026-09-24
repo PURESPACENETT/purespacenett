@@ -121,6 +121,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_rate_limit: {
+        Args: {
+          p_bucket_key: string
+          p_limit: number
+          p_window_seconds: number
+        }
+        Returns: {
+          allowed: boolean
+          retry_after_seconds: number
+        }[]
+      }
       get_published_reviews: {
         Args: never
         Returns: {
