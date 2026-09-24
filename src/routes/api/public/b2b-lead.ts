@@ -46,15 +46,15 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
           return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400 });
         }
 
+        if (parsed.data.website) {
+          return Response.json({ ok: true });
+        }
+
         const url = process.env["FUNNEL_B2B_WEBHOOK_URL"]?.trim();
         const secret = process.env["FUNNEL_B2B_WEBHOOK_SECRET"]?.trim();
         if (!url || !secret) {
           console.error("B2B CRM bridge is not configured");
           return Response.json({ error: "Canal B2B temporairement indisponible" }, { status: 503 });
-        }
-
-        if (parsed.data.website) {
-          return Response.json({ ok: true });
         }
 
         const data = parsed.data;
