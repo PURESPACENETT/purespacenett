@@ -49,7 +49,7 @@ function attributionParams(): Record<string, string> {
     const value = url.searchParams.get(key);
     if (value) params[key] = value;
   }
-  if (document['referrer']) params.referrer = document.referrer;
+  if (document.referrer) params['referrer'] = document.referrer;
   params['landing_page'] = window.location.pathname;
   return params;
 }
