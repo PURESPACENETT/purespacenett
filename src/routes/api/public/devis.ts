@@ -19,6 +19,7 @@ const noStore = { "Cache-Control": "no-store" };
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
   clientType: z.enum(["entreprise", "sous_traitance", "particulier"]),
+  companyName: z.string().trim().max(160).optional().default(""),
   email: z.string().trim().email().max(255),
   phone: z.string().trim().min(6).max(30),
   address: z.string().trim().max(200).optional().default(""),
@@ -70,7 +71,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
 
         const payload = Object.fromEntries(
-          ["fullName", "clientType", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company"]
+          ["fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company"]
             .map((key) => [key, formData.get(key) ?? ""]),
         );
         (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
@@ -180,7 +181,7 @@ export const Route = createFileRoute("/api/public/devis")({
             postalCode: data.postalCode,
             desiredDate: data.desiredDate,
             contactName: data.fullName,
-            companyName: "",
+            companyName: data.companyName || "",
             email: data.email,
             phone: data.phone,
             message: [
