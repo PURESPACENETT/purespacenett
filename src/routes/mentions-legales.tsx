@@ -63,9 +63,13 @@ function LegalPage() {
 
           <section>
             <h2 className="font-display text-xl font-bold">Hébergement</h2>
+            <dl className="mt-3 space-y-2">
+              <div><dt className="font-semibold">Hébergeur</dt><dd>Lovable Labs Incorporated</dd></div>
+              <div><dt className="font-semibold">Adresse</dt><dd>1 Lincoln St, Boston, MA 02111, États-Unis</dd></div>
+            </dl>
             <p className="mt-3">
-              Les informations d'identification de l'hébergeur doivent être complétées selon
-              l'hébergeur effectivement utilisé pour la mise en ligne du domaine.
+              Le site est publié et hébergé via la plateforme Lovable. Cette mention est
+              fournie à titre informatif et ne constitue pas une certification.
             </p>
           </section>
 
