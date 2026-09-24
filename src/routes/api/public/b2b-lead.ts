@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { checkRateLimit, requestKey } from "@/lib/rate-limit";
 
-const noStore = { "Cache-Control": "no-store" };
+const noStore = { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" };
 
 const schema = z.object({
   contactName: z.string().trim().min(2).max(120),
@@ -18,7 +18,6 @@ const schema = z.object({
   desiredDate: z.string().trim().max(20).optional().default(""),
   message: z.string().trim().max(1500).optional().default(""),
   consent: z.literal(true),
-  website: z.string().max(0).optional().default(""),
 });
 
 export const Route = createFileRoute("/api/public/b2b-lead")({
@@ -28,12 +27,12 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
       GET: async () =>
         new Response("Method Not Allowed", {
           status: 405,
-          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow", ...noStore },
+          headers: { Allow: "POST", ...noStore },
         }),
       POST: async ({ request }) => {
         const limit = checkRateLimit(requestKey(request, "b2b-lead"), { limit: 5, windowMs: 60 * 60 * 1000 });
         if (!limit.allowed) {
-          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: noStore });
+          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds), ...noStore } });
         }
 
         let body: unknown;
@@ -43,13 +42,14 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
           return Response.json({ error: "Requête invalide" }, { status: 400, headers: noStore });
         }
 
+        // Piège anti-robots : analysé avant la validation, réponse neutre sans transmission.
+        if (body && typeof body === "object" && typeof (body as Record<string, unknown>)["website"] === "string" && ((body as Record<string, unknown>)["website"] as string).trim() !== "") {
+          return Response.json({ ok: true }, { headers: noStore });
+        }
+
         const parsed = schema.safeParse(body);
         if (!parsed.success) {
           return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400, headers: noStore });
-        }
-
-        if (parsed.data.website) {
-          return Response.json({ ok: true }, { headers: noStore });
         }
 
         const url = process.env["FUNNEL_B2B_WEBHOOK_URL"]?.trim();
@@ -95,10 +95,10 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
             return Response.json({ error: "Transmission au CRM impossible" }, { status: 502, headers: noStore });
           }
 
-          return Response.json({ ok: true });
+          return Response.json({ ok: true }, { headers: noStore });
         } catch (error) {
           console.error("B2B CRM bridge failed", error);
-          return Response.json({ error: "Transmission au CRM impossible" }, { status: 502 });
+          return Response.json({ error: "Transmission au CRM impossible" }, { status: 502, headers: noStore });
         }
       },
     },
