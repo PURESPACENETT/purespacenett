@@ -31,7 +31,7 @@ const field = "mt-1 w-full rounded-lg border border-input bg-background px-3 py-
 export function B2BLeadForm() {
   const [form, setForm] = useState({
     contactName: "", companyName: "", email: "", phone: "", propertyType: "bureaux",
-    surfaceM2: "", frequency: "hebdomadaire", services: ["nettoyage_courant"] as string[],
+    surfaceM2: "", frequency: "ponctuel", services: ["nettoyage_courant"] as string[],
     city: "", postalCode: "", desiredDate: "", message: "", consent: false,
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -87,7 +87,7 @@ export function B2BLeadForm() {
   if (status === "sent") {
     return (
       <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
-        <h2 className="font-display text-2xl font-bold">Votre demande a bien été transmise</h2>
+        <h2 className="font-display text-2xl font-bold">Votre demande de sous-traitance a bien été transmise</h2>
         <p className="mt-3 text-sm text-muted-foreground">Merci. Notre équipe va étudier votre besoin professionnel et revenir vers vous rapidement.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <a href={business.phoneHref} onClick={() => trackEvent("appel_telephone", { source: "b2b_confirmation" })} className="inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">Appeler {business.phone}</a>
@@ -100,8 +100,8 @@ export function B2BLeadForm() {
   return (
     <form onSubmit={submit} className="rounded-2xl border border-border bg-card p-6 shadow-card">
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block text-sm font-medium">Entreprise *
-          <input className={field} required maxLength={160} value={form.companyName} onChange={(e) => set("companyName", e.target.value)} placeholder="Nom de l'entreprise" />
+        <label className="block text-sm font-medium">Entreprise de nettoyage *
+          <input className={field} required maxLength={160} value={form.companyName} onChange={(e) => set("companyName", e.target.value)} placeholder="Nom de votre entreprise" />
         </label>
         <label className="block text-sm font-medium">Votre nom *
           <input className={field} required maxLength={120} value={form.contactName} onChange={(e) => set("contactName", e.target.value)} placeholder="Nom et prénom" />
