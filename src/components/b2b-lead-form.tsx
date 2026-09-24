@@ -46,13 +46,18 @@ export function B2BLeadForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const toggleService = (value: string) =>
+  const toggleService = (value: string) => {
+    if (!started) {
+      setStarted(true);
+      trackEvent("lead_b2b_commence", { source: "page_sous_traitance" });
+    }
     setForm((prev) => ({
       ...prev,
       services: prev.services.includes(value)
         ? prev.services.filter((item) => item !== value)
         : [...prev.services, value],
     }));
+  };
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -119,6 +124,10 @@ export function B2BLeadForm() {
         <label className="block text-sm font-medium">Démarrage souhaité
           <input className={field} type="date" value={form.desiredDate} onChange={(e) => set("desiredDate", e.target.value)} />
         </label>
+      </div>
+
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label>Site web<input tabIndex={-1} autoComplete="off" value="" onChange={() => undefined} name="website" /></label>
       </div>
 
       <fieldset className="mt-5">
