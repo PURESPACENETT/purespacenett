@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { business, whatsappHref } from "@/content/business";
 import { trackEvent } from "@/lib/analytics";
 
+export const clientTypes = [
+  { value: "entreprise", label: "Entreprise" },
+  { value: "sous_traitance", label: "Sous-traitance" },
+  { value: "particulier", label: "Particulier" },
+] as const;
+
 export const propertyTypes = [
   "Maison",
   "Appartement",
@@ -38,13 +44,17 @@ export const frequencies = [
 
 const emptyForm = {
   fullName: "",
+  clientType: "particulier",
   email: "",
   phone: "",
   address: "",
+  city: "",
+  postalCode: "",
   propertyType: "",
   surface: "",
   serviceType: "",
   frequency: "",
+  desiredDate: "",
   message: "",
   consent: false,
   // champ piège anti-robots, invisible pour les visiteurs
@@ -76,6 +86,8 @@ export function QuoteForm() {
       `Email : ${form.email}`,
       `Téléphone : ${form.phone}`,
       `Adresse : ${form.address}`,
+      `Ville : ${form.postalCode} ${form.city}`,
+      `Type de client : ${form.clientType}`,
       `Type de bien : ${form.propertyType}`,
       `Surface : ${form.surface} m²`,
       `Prestation : ${form.serviceType}`,
@@ -180,6 +192,21 @@ export function QuoteForm() {
           />
         </label>
         <label className={labelCls}>
+          Type de client *
+          <select
+            className={field}
+            required
+            value={form.clientType}
+            onChange={(e) => set("clientType", e.target.value as (typeof form)["clientType"])}
+          >
+            {clientTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={labelCls}>
           Email *
           <input
             className={field}
@@ -214,6 +241,28 @@ export function QuoteForm() {
           />
         </label>
         <label className={labelCls}>
+          Ville *
+          <input
+            className={field}
+            required
+            maxLength={120}
+            placeholder="Paris"
+            value={form.city}
+            onChange={(e) => set("city", e.target.value)}
+          />
+        </label>
+        <label className={labelCls}>
+          Code postal *
+          <input
+            className={field}
+            required
+            maxLength={10}
+            placeholder="75001"
+            value={form.postalCode}
+            onChange={(e) => set("postalCode", e.target.value)}
+          />
+        </label>
+        <label className={labelCls}>
           Type de bien
           <select
             className={field}
@@ -233,11 +282,21 @@ export function QuoteForm() {
           <input
             className={field}
             type="number"
-            min={0}
+            required
+            min={1}
             max={100000}
             placeholder="50"
             value={form.surface}
             onChange={(e) => set("surface", e.target.value)}
+          />
+        </label>
+        <label className={labelCls}>
+          Date souhaitée
+          <input
+            className={field}
+            type="date"
+            value={form.desiredDate}
+            onChange={(e) => set("desiredDate", e.target.value)}
           />
         </label>
         <label className={labelCls}>
@@ -395,7 +454,7 @@ export function QuoteForm() {
       )}
 
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        Photos facultatives • Gratuit • Sans engagement • Réponse sous 24 h
+        Photos facultatives • Gratuit • Sans engagement
       </p>
     </form>
   );
