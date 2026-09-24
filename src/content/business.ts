@@ -9,7 +9,7 @@ export const business = {
   whatsapp: "+33 7 59 48 30 21",
   whatsappNumber: "33759483021",
   googleBusinessUrl: "https://share.google/2u1kIaVRrVNB4drT0",
-  googleReviewUrl: "https://share.google/2u1kIaVRrVNB4drT0",
+  googleReviewUrl: "https://share.google/AFl7knrUejrsqrXr8",
   linkedinUrl: "https://www.linkedin.com/in/amazigh-benseghir-449828420",
   facebookUrl: "https://www.facebook.com/share/1BuEaVDznf/",
   instagramUrl: "https://www.instagram.com/purespacenett",
