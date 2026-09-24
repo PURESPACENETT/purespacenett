@@ -95,6 +95,8 @@ export const Route = createFileRoute("/api/public/devis")({
               return Response.json({ error: "Une photo n'a pas pu être enregistrée" }, { status: 500, headers: noStore });
             }
 
+            uploadedPhotoPaths.push(path);
+
             const { data: signed, error: signedError } = await supabaseAdmin.storage
               .from(bucket)
               .createSignedUrl(path, 7 * 24 * 60 * 60);
@@ -106,7 +108,6 @@ export const Route = createFileRoute("/api/public/devis")({
               }
               return Response.json({ error: "Accès aux photos impossible" }, { status: 500, headers: noStore });
             }
-            uploadedPhotoPaths.push(path);
             photoUrls.push(signed.signedUrl);
           }
         }
