@@ -41,10 +41,23 @@ export function trackPageView(path: string, title?: string) {
   });
 }
 
+function attributionParams(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const url = new URL(window.location.href);
+  const params: Record<string, string> = {};
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]) {
+    const value = url.searchParams.get(key);
+    if (value) params[key] = value;
+  }
+  if (document.referrer) params.referrer = document.referrer;
+  params.landing_page = window.location.pathname;
+  return params;
+}
+
 export function trackEvent(name: string, params?: Record<string, unknown>) {
   if (!measurementId || !getAnalyticsConsent()) return;
   if (!initialized) initAnalytics();
-  push("event", name, params ?? {});
+  push("event", name, { ...attributionParams(), ...(params ?? {}) });
 }
 
 export const analyticsEnabled = Boolean(measurementId);
