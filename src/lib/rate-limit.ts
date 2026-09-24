@@ -2,6 +2,10 @@
 // instance. À plusieurs instances (ou en production multi-région), migrer vers
 // un backend distribué (Redis/Upstash, ou un mécanisme Supabase) sans changer
 // l'API publique actuelle : checkRateLimit() et requestKey().
+// TODO(production): ce limiteur est en mémoire et ne vaut que pour une seule
+// instance. À plusieurs instances (ou en production multi-région), migrer vers
+// un backend distribué (Redis/Upstash, ou un mécanisme Supabase) sans changer
+// l'API publique actuelle : checkRateLimit() et requestKey().
 type Bucket = { count: number; resetAt: number };
 
 const buckets = new Map<string, Bucket>();
