@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { checkRateLimit, requestKey } from "@/lib/rate-limit";
 
-const schema = z.object({
+const noStore = { "Cache-Control": "no-store" };\n\nconst schema = z.object({
   contactName: z.string().trim().min(2).max(120),
   companyName: z.string().trim().min(2).max(160),
   email: z.string().trim().email().max(255),
@@ -26,19 +26,19 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
       GET: async () =>
         new Response("Method Not Allowed", {
           status: 405,
-          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow" },
+          headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow", ...noStore },
         }),
       POST: async ({ request }) => {
         const limit = checkRateLimit(requestKey(request, "b2b-lead"), { limit: 5, windowMs: 60 * 60 * 1000 });
         if (!limit.allowed) {
-          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429 });
+          return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: noStore });
         }
 
         let body: unknown;
         try {
           body = await request.json();
         } catch {
-          return Response.json({ error: "Requête invalide" }, { status: 400 });
+          return Response.json({ error: "Requête invalide" }, { status: 400, headers: noStore });
         }
 
         const parsed = schema.safeParse(body);
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
         }
 
         if (parsed.data.website) {
-          return Response.json({ ok: true });
+          return Response.json({ ok: true }, { headers: noStore });
         }
 
         const url = process.env["FUNNEL_B2B_WEBHOOK_URL"]?.trim();
