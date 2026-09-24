@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Building2, CheckCircle2, FileText, Handshake, Phone } from "lucide-react";
 import { business } from "@/content/business";
-import { Breadcrumbs, CallButtons, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
+import { Breadcrumbs, Eyebrow, Section, WhatsAppButton } from "@/components/site-blocks";
+import { trackEvent } from "@/lib/analytics";
 import { B2BLeadForm } from "@/components/b2b-lead-form";
 import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 
@@ -38,7 +39,11 @@ function SubcontractingPage() {
           <div>
             <h1 className="font-display text-4xl font-extrabold leading-tight sm:text-5xl">Vous avez des chantiers de nettoyage à déléguer ?</h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">PURE SPACE NETT travaille avec des entreprises de nettoyage qui recherchent un partenaire pour prendre en charge certains chantiers, renforcer leur capacité d'intervention ou couvrir un secteur géographique.</p>
-            <div className="mt-7"><CallButtons subject="partenariat sous-traitance B2B" /></div>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <a href="#transmettre-un-chantier" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Transmettre un chantier</a>
+              <a href={business.phoneHref} onClick={() => trackEvent("appel_telephone", { source: "sous_traitance_hero" })} className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary"><Phone className="size-4" /> Appeler le {business.phone}</a>
+              <WhatsAppButton subject="sous-traitance B2B" label="Écrire sur WhatsApp" variant="outline" />
+            </div>
             <p className="mt-3 text-xs text-muted-foreground">Brief · étude du chantier · proposition · intervention</p>
           </div>
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
@@ -60,7 +65,7 @@ function SubcontractingPage() {
           ))}
         </div>
       </Section>
-      <Section className="pt-0">
+      <Section id="transmettre-un-chantier" className="pt-0">
         <Eyebrow>Transmettre un chantier</Eyebrow>
         <h2 className="mt-3 font-display text-3xl font-bold">Décrivez-nous le chantier que vous souhaitez déléguer</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Votre demande est enregistrée dans notre espace commercial pour qualification et suivi.</p>
@@ -82,11 +87,26 @@ function SubcontractingPage() {
             <Eyebrow>Contact direct</Eyebrow>
             <h2 className="mt-3 font-display text-2xl font-bold">Vous préférez présenter le chantier par téléphone ?</h2>
             <p className="mt-4 text-sm text-muted-foreground">Appelez-nous directement pour nous exposer le besoin.</p>
-            <a href={business.phoneHref} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"><Phone className="size-4" /> {business.phone}</a>
+            <a href={business.phoneHref} onClick={() => trackEvent("appel_telephone", { source: "sous_traitance_contact" })} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary"><Phone className="size-4" /> {business.phone}</a>
           </div>
         </div>
       </Section>
-      <QuoteBanner subject="partenariat sous-traitance B2B" />
+      <Section className="pt-0">
+        <div className="rounded-3xl bg-ink px-6 py-10 text-ink-foreground sm:px-12">
+          <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
+            <div>
+              <Eyebrow>Prochaine étape</Eyebrow>
+              <h2 className="mt-3 font-display text-2xl font-bold sm:text-3xl">Vous avez un chantier à déléguer ?</h2>
+              <p className="mt-3 text-sm text-ink-foreground/75">Transmettez les informations dont vous disposez. Vous pouvez également nous présenter directement le chantier par téléphone ou WhatsApp.</p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <a href="#transmettre-un-chantier" className="inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground">Transmettre le chantier</a>
+              <a href={business.phoneHref} onClick={() => trackEvent("appel_telephone", { source: "sous_traitance_footer" })} className="inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-semibold">{business.phone}</a>
+              <WhatsAppButton subject="sous-traitance B2B" label="Écrire sur WhatsApp" variant="dark" className="justify-center" />
+            </div>
+          </div>
+        </div>
+      </Section>
     </>
   );
 }
