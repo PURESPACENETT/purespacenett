@@ -18,13 +18,17 @@ const noStore = { "Cache-Control": "no-store" };
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
+  clientType: z.enum(["entreprise", "sous_traitance", "particulier"]),
   email: z.string().trim().email().max(255),
   phone: z.string().trim().min(6).max(30),
   address: z.string().trim().max(200).optional().default(""),
+  city: z.string().trim().min(1).max(120),
+  postalCode: z.string().trim().min(4).max(10),
   propertyType: z.string().trim().max(50).optional().default(""),
-  surface: z.string().trim().max(20).optional().default(""),
+  surface: z.string().trim().min(1).max(20),
   serviceType: z.string().trim().min(2).max(80),
   frequency: z.string().trim().max(50).optional().default(""),
+  desiredDate: z.string().trim().max(20).optional().default(""),
   message: z.string().trim().max(2000).optional().default(""),
   consent: z.literal(true),
   // champ piège anti-robots : doit rester vide
@@ -66,7 +70,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
 
         const payload = Object.fromEntries(
-          ["fullName", "email", "phone", "address", "propertyType", "surface", "serviceType", "frequency", "message", "company"]
+          ["fullName", "clientType", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company"]
             .map((key) => [key, formData.get(key) ?? ""]),
         );
         (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
@@ -136,6 +140,73 @@ export const Route = createFileRoute("/api/public/devis")({
             await supabaseAdmin.storage.from(bucket).remove(uploadedPhotoPaths);
           }
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
+        }
+
+        const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim();
+        const crmSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim();
+        if (crmUrl && crmSecret) {
+          const propertyTypeMap: Record<string, string> = {
+            Maison: "logement",
+            Appartement: "logement",
+            Bureau: "bureaux",
+            Commerce: "commerce",
+            Immeuble: "immeuble",
+          };
+          const serviceMap: Record<string, string> = {
+            "Nettoyage de bureaux et locaux professionnels": "nettoyage_courant",
+            "Entretien de copropriété et parties communes": "nettoyage_courant",
+            "Entretien de local commercial ou boutique": "nettoyage_courant",
+            "Ménage régulier (particulier)": "nettoyage_courant",
+            "Ménage ponctuel / grand nettoyage": "nettoyage_courant",
+            "Nettoyage de vitres et vitrines": "vitrerie",
+            "Nettoyage fin de chantier": "fin_de_chantier",
+            "Remise en état après sinistre ou dégradation": "remise_en_etat",
+            "Désinfection et sanitaires": "desinfection",
+          };
+          const frequencyMap: Record<string, string> = {
+            "Une seule fois": "ponctuel",
+            Hebdomadaire: "hebdomadaire",
+            "Bi-mensuel": "plusieurs_semaine",
+            Mensuel: "hebdomadaire",
+          };
+          const crmPayload = {
+            sourceExternalId: inserted.id,
+            clientType: data.clientType,
+            propertyType: propertyTypeMap[data.propertyType] ?? "autre",
+            surfaceM2: Number(data.surface),
+            frequency: frequencyMap[data.frequency] ?? "ponctuel",
+            services: [serviceMap[data.serviceType] ?? "nettoyage_courant"],
+            city: data.city,
+            postalCode: data.postalCode,
+            desiredDate: data.desiredDate,
+            contactName: data.fullName,
+            companyName: data.clientType === "particulier" ? "" : data.fullName,
+            email: data.email,
+            phone: data.phone,
+            message: [
+              "Source : site PURE SPACE NETT — formulaire de devis.",
+              "Adresse : " + (data.address || "Non précisée"),
+              "Prestation : " + data.serviceType,
+              data.message,
+            ].filter(Boolean).join("\n"),
+          };
+
+          try {
+            const response = await fetch(crmUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-quote-webhook-secret": crmSecret,
+              },
+              body: JSON.stringify(crmPayload),
+              signal: AbortSignal.timeout(10000),
+            });
+            if (!response.ok) console.error("CRM quote bridge rejected request", response.status);
+          } catch (crmError) {
+            console.error("CRM quote bridge failed", crmError);
+          }
+        } else {
+          console.warn("CRM quote bridge is not configured");
         }
 
         try {
