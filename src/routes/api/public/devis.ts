@@ -15,8 +15,6 @@ const PHOTO_EXTENSIONS: Record<string, string> = {
 const ALLOWED_PHOTO_TYPES = new Set(Object.keys(PHOTO_EXTENSIONS));
 
 const noStore = { "Cache-Control": "no-store" };
-const SECURE_QUOTE_WEBHOOK_URL =
-  "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
@@ -145,19 +143,12 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
-        // Le formulaire public utilise exclusivement le webhook Supabase sécurisé.
-        // L'ancien endpoint Lovable n'est plus utilisé comme solution de repli.
-        const crmUrl = SECURE_QUOTE_WEBHOOK_URL;
-
-        // Le secret du bridge doit venir d'une variable d'environnement serveur.
-        // Le RPC local est conservé uniquement comme compatibilité avec une ancienne
-        // configuration ; le projet public ne possède pas cette fonction par défaut.
-        let crmSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
-        if (!crmSecret) {
-          const { data: bridgeSecret, error: bridgeSecretError } =
-            await supabaseAdmin.rpc("get_quote_webhook_secret");
-          crmSecret = bridgeSecretError ? "" : (bridgeSecret ?? "").trim();
-        }
+        const crmUrl =
+          process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ??
+          "https://funnel-friendship.lovable.app/api/public/hooks/quote-request";
+        const { data: bridgeSecret, error: bridgeSecretError } =
+          await supabaseAdmin.rpc("get_quote_webhook_secret");
+        const crmSecret = bridgeSecretError ? "" : (bridgeSecret ?? "").trim();
         if (crmUrl && crmSecret) {
           const propertyTypeMap: Record<string, string> = {
             Maison: "logement",
