@@ -28,7 +28,7 @@ export const Route = createFileRoute("/api/public/avis")({
           headers: { Allow: "POST", "X-Robots-Tag": "noindex, nofollow", ...noStore },
         }),
       POST: async ({ request }) => {
-        const limit = checkRateLimit(requestKey(request, "avis"), { limit: 5, windowMs: 60 * 60 * 1000 });
+        const limit = await checkRateLimit(requestKey(request, "avis"), { limit: 5, windowMs: 60 * 60 * 1000 });
         if (!limit.allowed) {
           return Response.json({ error: "Trop de demandes. Réessayez plus tard." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds), ...noStore } });
         }
