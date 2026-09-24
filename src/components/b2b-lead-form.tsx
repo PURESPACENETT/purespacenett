@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { business } from "@/content/business";
+import { business, whatsappHref } from "@/content/business";
 import { trackEvent } from "@/lib/analytics";
 
 const propertyTypes = [
@@ -84,7 +84,10 @@ export function B2BLeadForm() {
       <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
         <h2 className="font-display text-2xl font-bold">Votre demande a bien été transmise</h2>
         <p className="mt-3 text-sm text-muted-foreground">Merci. Notre équipe va étudier votre besoin professionnel et revenir vers vous rapidement.</p>
-        <a href={business.phoneHref} className="mt-6 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">Appeler {business.phone}</a>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <a href={business.phoneHref} onClick={() => trackEvent("appel_telephone", { source: "b2b_confirmation" })} className="inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">Appeler {business.phone}</a>
+          <a href={whatsappHref("suivi de ma demande de sous-traitance")} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent("clic_whatsapp", { source: "b2b_confirmation" })} className="inline-flex rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground">Écrire sur WhatsApp</a>
+        </div>
       </div>
     );
   }
