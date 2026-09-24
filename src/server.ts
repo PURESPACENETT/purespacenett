@@ -77,8 +77,6 @@ export default {
       headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
       // Report-Only: observe violations before switching to an enforcing CSP.
       headers.set("Content-Security-Policy-Report-Only", CSP_REPORT_ONLY);
-      // Report-Only: observe violations before switching to an enforcing CSP.
-      headers.set("Content-Security-Policy-Report-Only", CSP_REPORT_ONLY);
       return new Response(normalized.body, {
         status: normalized.status,
         statusText: normalized.statusText,

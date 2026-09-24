@@ -4,7 +4,15 @@ import { checkRateLimit, requestKey } from "@/lib/rate-limit";
 
 const MAX_PHOTOS = 5;
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
-const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
+// Extension déduite uniquement du type MIME validé, jamais du nom de fichier fourni.
+const PHOTO_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/heic": "heic",
+  "image/heif": "heif",
+};
+const ALLOWED_PHOTO_TYPES = new Set(Object.keys(PHOTO_EXTENSIONS));
 
 const noStore = { "Cache-Control": "no-store" };
 
@@ -74,14 +82,9 @@ export const Route = createFileRoute("/api/public/devis")({
         const uploadedPhotoPaths: string[] = [];
 
         if (photos.length > 0) {
-          const { error: bucketError } = await supabaseAdmin.storage.createBucket(bucket, { public: false, fileSizeLimit: MAX_PHOTO_SIZE, allowedMimeTypes: [...ALLOWED_PHOTO_TYPES] });
-          if (bucketError && !/already exists/i.test(bucketError.message)) {
-            console.error("Création du stockage photos impossible", bucketError.message);
-            return Response.json({ error: "Stockage des photos indisponible" }, { status: 500, headers: noStore });
-          }
-
+          // Le stockage privé "quote-photos" est déjà provisionné (privé, 5 Mo, types image autorisés).
           for (const photo of photos) {
-            const extension = photo.name.includes(".") ? photo.name.split(".").pop()?.toLowerCase() : "jpg";
+            const extension = PHOTO_EXTENSIONS[photo.type];
             const path = `devis/${crypto.randomUUID()}.${extension}`;
             const { error: uploadError } = await supabaseAdmin.storage
               .from(bucket)

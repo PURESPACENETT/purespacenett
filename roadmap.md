@@ -47,3 +47,5 @@
 - [ ] Contrôler le build et le lint du CRM après ajout du workflow CI
 - [ ] Vérifier les parcours critiques : devis, photos, sous-traitance B2B, connexion admin et modération des avis
 - [ ] Vérifier la cohérence production des connexions Supabase avant toute migration supplémentaire
+
+- [x] Corrections post-audit (CSP en double, TODO en double, extension photos, stockage photos, en-têtes et piège anti-robots B2B)
