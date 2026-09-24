@@ -38,3 +38,12 @@
 - [x] Enrichir les événements analytics avec UTM, référent et page d'atterrissage
 - [x] Corriger le comptage des prospects intéressés pour éviter d'inclure les convertis
 - [ ] Raccorder durablement les sources d'acquisition au dossier CRM et contrôler la déduplication
+
+
+- [ ] CHANTIER H — Qualité technique finale
+- [x] Renforcer le endpoint de devis : réponses sans cache et nettoyage des photos orphelines en cas d'échec
+- [x] Vérifier les protections serveur, le rate limiting, le honeypot et les réponses HTTP des endpoints publics
+- [ ] Vérifier le build et le lint finaux du site
+- [ ] Contrôler le build et le lint du CRM après ajout du workflow CI
+- [ ] Vérifier les parcours critiques : devis, photos, sous-traitance B2B, connexion admin et modération des avis
+- [ ] Vérifier la cohérence production des connexions Supabase avant toute migration supplémentaire
