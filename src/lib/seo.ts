@@ -1,11 +1,15 @@
 import { business } from "@/content/business";
+import logoAsset from "@/assets/pure-space-nett-logo.jpg.asset.json";
 
 /** Origine publique du site : les URL canoniques doivent être absolues pour Google. */
 export const SITE_URL = "https://purespacenett.com";
 
 /** Transforme un chemin interne en URL absolue auto-référencée. */
 export const canonicalUrl = (path: string) =>
-  path.startsWith("http") ? path : `${SITE_URL}${path === "/" ? "/" : path}`;
+  path.startsWith("http") ? path : `${SITE_URL}${path === "/" ? "" : path}`;
+
+/** Image Open Graph absolue, utilisée par les aperçus sociaux. */
+export const DEFAULT_OG_IMAGE = `${SITE_URL}${logoAsset.url}`;
 
 
 /** JSON-LD de l'entreprise, réutilisé sur les pages principales. */
@@ -211,8 +215,12 @@ export const pageMeta = ({
   { property: "og:type", content: type },
   { property: "og:url", content: canonicalUrl(path) },
   { property: "og:site_name", content: business.name },
+  { property: "og:image", content: DEFAULT_OG_IMAGE },
+  { property: "og:image:alt", content: `${business.name} — entreprise de nettoyage professionnel` },
   { property: "og:locale", content: "fr_FR" },
   { name: "twitter:card", content: "summary_large_image" },
   { name: "twitter:title", content: title },
   { name: "twitter:description", content: description },
+  { name: "twitter:image", content: DEFAULT_OG_IMAGE },
+  { name: "twitter:image:alt", content: `${business.name} — entreprise de nettoyage professionnel` },
 ];
