@@ -145,7 +145,7 @@ export const Route = createFileRoute("/api/public/devis")({
 
         const crmUrl =
           process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ??
-          "https://funnel-friendship.lovable.app/api/public/hooks/quote-request";
+          "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
         // Le routage reste historique, mais le secret serveur privilégie désormais
         // la variable d'environnement. Le RPC Vault reste un fallback de compatibilité.
         let crmSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
