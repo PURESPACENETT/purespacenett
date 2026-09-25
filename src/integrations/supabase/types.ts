@@ -121,17 +121,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      consume_rate_limit: {
-        Args: {
-          p_bucket_key: string
-          p_limit: number
-          p_window_seconds: number
-        }
-        Returns: {
-          allowed: boolean
-          retry_after_seconds: number
-        }[]
-      }
       get_published_reviews: {
         Args: never
         Returns: {
@@ -144,16 +133,13 @@ export type Database = {
           service_type: string
         }[]
       }
+      get_quote_webhook_secret: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
-      }
-      get_quote_webhook_secret: {
-        Args: Record<PropertyKey, never>
-        Returns: string
       }
     }
     Enums: {
