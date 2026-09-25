@@ -76,8 +76,9 @@ export async function checkRateLimit(
 }
 
 export function requestKey(request: Request, scope: string): string {
+  const cloudflareIp = request.headers.get("cf-connecting-ip")?.trim();
   const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const realIp = request.headers.get("x-real-ip")?.trim();
-  const ip = forwarded || realIp || "unknown";
+  const ip = cloudflareIp || forwarded || realIp || "unknown";
   return scope + ":" + ip;
 }
