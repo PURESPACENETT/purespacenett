@@ -193,7 +193,7 @@ export const zones: Zone[] = [
     intro:
       "Nous intervenons dans tout Paris, avec une présence renforcée sur les arrondissements de l'est : 10e, 11e, 18e, 19e et 20e.",
     context:
-      "Contraintes parisiennes bien connues : stationnement, accès par cour, horaires de livraison, voisinage. Nous organisons nos passages pour ne gêner ni les riverains ni votre activité.",
+      "Contraintes parisiennes bien connues : stationnement, accès par cour, horaires de livraison, voisinage. Nous organisons nos passages pour ne gêner ni les riverains ni votre activité. Pour les copropriétés, nous pouvons planifier l'entretien des halls, escaliers, ascenseurs et locaux poubelles avec une fréquence adaptée au passage des résidents. Pour les fins de chantier, nous intervenons sur le dépoussiérage, les traces de peinture ou d'enduit, les vitrages et la remise en état avant livraison, selon les accès et l'état réel du site.",
     sectors: [
       "Paris 10e — Gare du Nord, Canal Saint-Martin",
       "Paris 11e — République, Nation",
