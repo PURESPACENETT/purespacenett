@@ -160,7 +160,8 @@ export const services: Service[] = [
     ],
     details: [
       "Nous distinguons le nettoyage grossier, réalisé pendant le chantier pour permettre l'avancée des corps d'état, et le nettoyage de livraison, effectué juste avant la réception.",
-      "Le devis est établi au m² après visite ou sur plans, avec une date de livraison ferme : nos équipes s'adaptent aux dernières 48 heures avant réception, y compris le week-end.",
+      "À Paris et dans l'est parisien, nous adaptons l'organisation aux contraintes d'accès : stationnement, cages d'escalier étroites, horaires de livraison et copropriétés occupées. L'objectif est de remettre les surfaces, vitrages, sanitaires et menuiseries dans un état propre avant la livraison.",
+      "Pour les chantiers parisiens, le devis est établi au m² après visite ou sur plans, en tenant compte de la surface, du niveau d'encrassement, des accès et des déchets à traiter. La prestation peut être planifiée avant la réception finale, selon les contraintes du chantier.",
     ],
     faq: [
       {
