@@ -56,6 +56,8 @@ export const Route = createFileRoute("/api/public/avis")({
             rating: data.rating,
             message: data.message,
             email: data.email || null,
+            source: "site",
+            source_url: null,
           })
           .select("id")
           .single();
