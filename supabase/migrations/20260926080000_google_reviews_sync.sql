@@ -57,3 +57,16 @@ create policy "Admins can view Google review sync state"
   ));
 grant select on public.google_review_sync_state to authenticated;
 grant all on public.google_review_sync_state to service_role;
+create or replace function public.get_google_review_config()
+returns jsonb
+language sql
+security definer
+set search_path = public, vault
+as $$
+  select decrypted_secret::jsonb
+  from vault.decrypted_secrets
+  where name = 'google_business_profile_credentials'
+  limit 1
+$$;
+revoke all on function public.get_google_review_config() from public;
+grant execute on function public.get_google_review_config() to service_role;
