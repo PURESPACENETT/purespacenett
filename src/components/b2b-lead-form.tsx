@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { business, whatsappHref } from "@/content/business";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, trackLeadGenerated } from "@/lib/analytics";
 
 const propertyTypes = [
   ["bureaux", "Bureaux / locaux professionnels"],
@@ -75,6 +75,7 @@ export function B2BLeadForm() {
         const data = await response.json().catch(() => null);
         throw new Error(data?.error || "Transmission impossible");
       }
+      trackLeadGenerated({ source: "sous_traitance_b2b", type: "partenariat" });
       trackEvent("lead_b2b_envoye", { source: "page_sous_traitance" });
       setStatus("sent");
     } catch (e) {
@@ -98,7 +99,7 @@ export function B2BLeadForm() {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-border bg-card p-6 shadow-card">
+    <form id="lead-sous-traitance" name="lead-sous-traitance" onSubmit={submit} className="rounded-2xl border border-border bg-card p-6 shadow-card">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-medium">Entreprise de nettoyage *
           <input className={field} required maxLength={160} value={form.companyName} onChange={(e) => set("companyName", e.target.value)} placeholder="Nom de votre entreprise" />
