@@ -1,13 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { business } from "@/content/business";
 import { Breadcrumbs, Eyebrow, Section } from "@/components/site-blocks";
-import { QuoteForm } from "@/components/quote-form";
 import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 
-const title = "Contact et devis gratuit | PURE SPACE NETT";
+const title = "Contact | PURE SPACE NETT";
 const description =
-  "Contactez PURE SPACE NETT au 07 59 48 30 21 ou à contact@purespacenett.com pour un devis de nettoyage gratuit en Île-de-France. Réponse sous 24 heures.";
+  "Contactez PURE SPACE NETT au 07 59 48 30 21 ou à contact@purespacenett.com. Les demandes de devis passent désormais par notre parcours dédié de sous-traitance.";
 
 export const Route = createFileRoute("/contact")({
   staticData: { sitemap: true },
@@ -36,10 +35,9 @@ function ContactPage() {
       <Breadcrumbs items={[{ label: "Accueil", to: "/" }, { label: "Contact" }]} />
       <Section>
         <Eyebrow>Contact</Eyebrow>
-        <h1 className="mt-3 font-display text-4xl font-extrabold">Demander un devis gratuit</h1>
+        <h1 className="mt-3 font-display text-4xl font-extrabold">Nous contacter</h1>
         <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
-          Remplissez le formulaire ci-dessous et recevez votre devis personnalisé sous 24 h. Le plus
-          rapide reste le téléphone si votre besoin est urgent.
+          Pour une demande de devis, utilisez désormais notre parcours dédié. Il centralise les informations du chantier et permet son suivi commercial.
         </p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_1.2fr]">
@@ -90,7 +88,12 @@ function ContactPage() {
             </div>
           </div>
 
-          <QuoteForm />
+          <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Demande de devis</p>
+            <h2 className="mt-3 font-display text-2xl font-bold">Transmettre votre besoin</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">Le formulaire historique n’est plus utilisé. Pour transmettre un chantier et obtenir une proposition, utilisez la page dédiée.</p>
+            <Link to="/sous-traitance" className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">Accéder au formulaire de demande</Link>
+          </div>
         </div>
       </Section>
     </>
