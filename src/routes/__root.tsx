@@ -84,16 +84,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PURE SPACE NETT — Entreprise de nettoyage Île-de-France" },
-      {
-        name: "description",
-        content:
-          "Entreprise de nettoyage professionnel au Pré-Saint-Gervais : bureaux, copropriétés, fin de chantier, vitres et remise en état dans le 93, Paris et l'Île-de-France.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "PURE SPACE NETT" },
-      { property: "og:locale", content: "fr_FR" },
-      { name: "twitter:card", content: "summary_large_image" },
       // Vérification de propriété du site pour Google Search Console
       {
         name: "google-site-verification",
