@@ -17,8 +17,11 @@ export const Route = createFileRoute("/avis")({
   staticData: { sitemap: true },
   loader: ({ context }) => context.queryClient.ensureQueryData(publishedReviewsQuery),
   head: ({ loaderData }) => {
-    // Les avis affichés sur cette page sont des contenus éditoriaux contrôlés par l'entreprise.
-    // Nous conservons donc le balisage LocalBusiness descriptif, sans AggregateRating/Review auto-déclaré.
+    // Le loader fournit les avis publiés. Ne jamais référencer des variables
+    // locales au composant ici : head() est exécuté hors du rendu React.
+    // Le balisage reste descriptif et n'auto-déclare pas de note/Review
+    // d'entreprise, conformément aux contraintes SEO applicables aux avis auto-hébergés.
+    const summary = loaderData ?? { reviews: [], count: 0, average: null };
     return {
       meta: pageMeta({ title, description, path: "/avis" }),
       links: [{ rel: "canonical", href: canonicalUrl("/avis") }],
@@ -28,36 +31,6 @@ export const Route = createFileRoute("/avis")({
           children: JSON.stringify({
             ...localBusinessJsonLd,
             url: canonicalUrl("/avis"),
-          }),
-        },
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            ...localBusinessJsonLd,
-            url: canonicalUrl("/avis"),
-            ...(summary
-              ? {
-                  aggregateRating: {
-                    "@type": "AggregateRating",
-                    ratingValue: summary.average,
-                    reviewCount: summary.count,
-                    bestRating: 5,
-                    worstRating: 1,
-                  },
-                  review: published.slice(0, 20).map((r) => ({
-                    "@type": "Review",
-                    author: { "@type": "Person", name: r.author_name },
-                    reviewRating: {
-                      "@type": "Rating",
-                      ratingValue: r.rating,
-                      bestRating: 5,
-                      worstRating: 1,
-                    },
-                    reviewBody: r.message,
-                    datePublished: r.created_at.slice(0, 10),
-                  })),
-                }
-              : {}),
           }),
         },
         {
