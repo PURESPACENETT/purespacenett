@@ -89,7 +89,7 @@ export function CallButtons({ subject }: { subject: string }) {
       </a>
       <WhatsAppButton subject={subject} />
       <Link
-        to="/sous-traitance"
+        to="/devis"
         onClick={() => trackEvent("clic_devis", { source: subject })}
         className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
       >
@@ -117,7 +117,7 @@ export function QuoteBanner({ subject }: { subject: string }) {
           </div>
           <div className="flex flex-col gap-3">
             <Link
-              to="/sous-traitance"
+              to="/devis"
               onClick={() => trackEvent("clic_devis", { source: subject })}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground"
             >
