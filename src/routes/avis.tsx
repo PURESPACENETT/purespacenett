@@ -16,12 +16,10 @@ const description =
 export const Route = createFileRoute("/avis")({
   staticData: { sitemap: true },
   loader: ({ context }) => context.queryClient.ensureQueryData(publishedReviewsQuery),
-  head: ({ loaderData }) => {
-    // Le loader fournit les avis publiés. Ne jamais référencer des variables
-    // locales au composant ici : head() est exécuté hors du rendu React.
-    // Le balisage reste descriptif et n'auto-déclare pas de note/Review
-    // d'entreprise, conformément aux contraintes SEO applicables aux avis auto-hébergés.
-    const summary = loaderData ?? { reviews: [], count: 0, average: null };
+  head: () => {
+    // Ne jamais référencer des variables locales au composant ici : head() est
+    // exécuté hors du rendu React. Le balisage reste descriptif et n'auto-déclare
+    // pas de note/Review d'entreprise.
     return {
       meta: pageMeta({ title, description, path: "/avis" }),
       links: [{ rel: "canonical", href: canonicalUrl("/avis") }],
