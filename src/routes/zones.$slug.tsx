@@ -197,31 +197,51 @@ function ZoneDetail() {
 
       <Section className="pt-0">
         <h2 className="font-display text-2xl font-bold">
-          Recherches fréquentes de nettoyage à {zone.name}
+          Besoins de nettoyage pris en charge à {zone.name}
           {zone.postalCode ? ` (${zone.postalCode})` : ""}
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Voici des recherches associées aux prestations de nettoyage à {zone.name}
-          {zone.postalCode ? ` et dans le ${zone.postalCode}` : ""}, avec les pages de notre site
-          qui y répondent.
+          Entretien régulier, intervention ponctuelle ou remise en état : voici les demandes pour
+          lesquelles nous sommes le plus souvent sollicités localement.
         </p>
-        <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-          {queries.map((q) => (
-            <li key={q.query} className="text-sm text-muted-foreground">
-              {q.servicePath ? (
-                <Link
-                  to={q.servicePath}
-                  className="text-primary underline underline-offset-2 hover:no-underline"
-                >
-                  {q.query}
-                </Link>
-              ) : (
-                <span>{q.query}</span>
-              )}
-            </li>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              label: `Nettoyage de bureaux à ${zone.name}`,
+              path: "/services/nettoyage-bureaux",
+            },
+            {
+              label: `Entretien des copropriétés à ${zone.name}`,
+              path: "/services/nettoyage-copropriete",
+            },
+            {
+              label: `Nettoyage de fin de chantier à ${zone.name}`,
+              path: "/services/nettoyage-fin-de-chantier",
+            },
+            {
+              label: `Nettoyage de vitres à ${zone.name}`,
+              path: "/services/nettoyage-vitres",
+            },
+            {
+              label: `Ménage avant état des lieux à ${zone.name}`,
+              path: "/services/menage-etat-des-lieux",
+            },
+            {
+              label: `Remise en état à ${zone.name}`,
+              path: "/services/remise-en-etat",
+            },
+          ].map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className="rounded-2xl border border-border bg-card p-5 text-sm font-medium transition-colors hover:border-accent hover:text-primary"
+            >
+              {item.label}
+            </Link>
           ))}
-        </ul>
+        </div>
       </Section>
+
 
       <Section className="pt-0">
         <h2 className="font-display text-2xl font-bold">
