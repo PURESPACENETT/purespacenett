@@ -17,17 +17,19 @@ export const Route = createFileRoute("/avis")({
   staticData: { sitemap: true },
   loader: ({ context }) => context.queryClient.ensureQueryData(publishedReviewsQuery),
   head: ({ loaderData }) => {
-    // Schéma construit UNIQUEMENT à partir des avis publiés (review_submissions, statut « publié »).
-    // Les témoignages historiques (Google) ne sont pas repris dans le balisage ni dans la moyenne.
-    // Remarque : Google n'affiche pas d'étoiles pour les avis qu'une entreprise publie sur
-    // elle-même (LocalBusiness) ; le balisage reste descriptif, sans garantie d'extrait enrichi.
-    const published = loaderData?.reviews ?? [];
-    const summary =
-      loaderData && loaderData.count > 0 && loaderData.average !== null ? loaderData : null;
+    // Les avis affichés sur cette page sont des contenus éditoriaux contrôlés par l'entreprise.
+    // Nous conservons donc le balisage LocalBusiness descriptif, sans AggregateRating/Review auto-déclaré.
     return {
       meta: pageMeta({ title, description, path: "/avis" }),
       links: [{ rel: "canonical", href: canonicalUrl("/avis") }],
       scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            ...localBusinessJsonLd,
+            url: canonicalUrl("/avis"),
+          }),
+        },
         {
           type: "application/ld+json",
           children: JSON.stringify({
