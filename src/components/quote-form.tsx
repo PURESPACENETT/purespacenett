@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { business, whatsappHref } from "@/content/business";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, trackLeadGenerated } from "@/lib/analytics";
 
 export const clientTypes = [
   { value: "entreprise", label: "Entreprise" },
@@ -122,6 +122,7 @@ export function QuoteForm() {
         body,
       });
       if (!res.ok) throw new Error(await res.text());
+      trackLeadGenerated({ source: "formulaire_devis", prestation: form.serviceType, type_de_bien: form.propertyType, frequence: form.frequency });
       trackEvent("devis_envoye", {
         prestation: form.serviceType,
         type_de_bien: form.propertyType,
@@ -168,6 +169,8 @@ export function QuoteForm() {
 
   return (
     <form
+      id="demande-devis"
+      name="demande-devis"
       onSubmit={submit}
       onFocus={handleFormFocus}
       className="rounded-2xl border border-border bg-card p-6 shadow-card"
