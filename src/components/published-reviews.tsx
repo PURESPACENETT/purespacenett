@@ -37,11 +37,17 @@ export function ReviewCard({ review }: { review: PublishedReview }) {
       </div>
       <figcaption className="mt-3 text-sm">
         <span className="font-display font-semibold">{review.author_name}</span>
+        <span className="block text-xs text-muted-foreground">{review.source === "google" ? "Avis Google" : "Avis déposé sur le site"}</span>
         <span className="block text-xs text-muted-foreground">
           {[review.city, review.service_type, monthFmt.format(new Date(review.created_at))]
             .filter(Boolean)
             .join(" · ")}
         </span>
+        {review.source === "google" && review.source_url ? (
+          <a href={review.source_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs font-semibold text-primary underline underline-offset-2">
+            Voir sur Google
+          </a>
+        ) : null}
       </figcaption>
     </figure>
   );
