@@ -28,7 +28,7 @@ export function MobileActionBar() {
           WhatsApp
         </a>
         <Link
-          to="/sous-traitance"
+          to="/devis"
           onClick={() => trackEvent("clic_devis", { source: "barre_mobile" })}
           className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-primary/25 bg-card px-2 text-xs font-semibold text-primary"
         >
