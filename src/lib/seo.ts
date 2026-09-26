@@ -11,7 +11,6 @@ export const canonicalUrl = (path: string) =>
 /** Image Open Graph absolue, utilisée par les aperçus sociaux. */
 export const DEFAULT_OG_IMAGE = `${SITE_URL}${logoAsset.url}`;
 
-const absoluteUrl = (value: string) => canonicalUrl(value);
 
 
 /** JSON-LD de l'entreprise, réutilisé sur les pages principales. */
