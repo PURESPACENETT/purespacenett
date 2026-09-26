@@ -798,10 +798,27 @@ function ReviewsTab({
               className="rounded-lg border border-border bg-card p-5 shadow-card"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="font-display text-lg font-bold">
-                  {review.author_name}
-                  {review.city ? ` · ${review.city}` : ""}
-                </h3>
+                <div>
+                  <h3 className="font-display text-lg font-bold">
+                    {review.author_name}
+                    {review.city ? ` · ${review.city}` : ""}
+                  </h3>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                    <span className="rounded-full bg-secondary px-2.5 py-1 font-semibold">
+                      {review.source === "google" ? "Avis Google" : "Avis déposé sur le site"}
+                    </span>
+                    {review.source === "google" && review.source_url ? (
+                      <a
+                        href={review.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-primary underline underline-offset-2"
+                      >
+                        Voir sur Google
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
                 <span
                   className={cn(
                     "rounded-full px-3 py-1 text-xs font-semibold",
