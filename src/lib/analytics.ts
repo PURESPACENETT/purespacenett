@@ -60,4 +60,14 @@ export function trackEvent(name: string, params?: Record<string, unknown>) {
   push("event", name, { ...attributionParams(), ...(params ?? {}) });
 }
 
+export function trackLeadGenerated(params?: Record<string, unknown>) {
+  trackEvent("generate_lead", params);
+}
+
+export function trackContactClick(type: "phone" | "whatsapp" | "email", source: string) {
+  trackEvent(type === "phone" ? "contact_phone" : type === "whatsapp" ? "contact_whatsapp" : "contact_email", {
+    source,
+  });
+}
+
 export const analyticsEnabled = Boolean(measurementId);
