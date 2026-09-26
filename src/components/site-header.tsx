@@ -9,7 +9,8 @@ const nav = [
   { to: "/services", label: "Services" },
   { to: "/zones", label: "Zones desservies" },
   { to: "/tarifs", label: "Tarifs" },
-  { to: "/sous-traitance", label: "Demande de devis / sous-traitance" },
+  { to: "/devis", label: "Devis gratuit" },
+  { to: "/sous-traitance", label: "Sous-traitance B2B" },
   { to: "/avis", label: "Avis clients" },
   { to: "/faq", label: "FAQ" },
   { to: "/a-propos", label: "À propos" },
@@ -57,11 +58,11 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <Link
-            to="/sous-traitance"
+            to="/devis"
             onClick={() => trackEvent("clic_devis", { source: "header" })}
             className="hidden items-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
           >
-            Demander un devis
+            Devis gratuit
           </Link>
           <a
             href={business.phoneHref}
