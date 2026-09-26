@@ -34,6 +34,16 @@ const schema = z.object({
   consent: z.literal(true),
   // champ piège anti-robots : doit rester vide
   company: z.string().max(0).optional().default(""),
+  gclid: z.string().trim().max(200).optional().default(""),
+  gbraid: z.string().trim().max(200).optional().default(""),
+  wbraid: z.string().trim().max(200).optional().default(""),
+  utm_source: z.string().trim().max(100).optional().default(""),
+  utm_medium: z.string().trim().max(100).optional().default(""),
+  utm_campaign: z.string().trim().max(200).optional().default(""),
+  utm_content: z.string().trim().max(200).optional().default(""),
+  utm_term: z.string().trim().max(200).optional().default(""),
+  landing_page: z.string().trim().max(500).optional().default(""),
+  referrer: z.string().trim().max(1000).optional().default(""),
 });
 
 export const Route = createFileRoute("/api/public/devis")({
@@ -71,7 +81,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
 
         const payload = Object.fromEntries(
-          ["fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company"]
+          ["fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company", "gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "landing_page", "referrer"]
             .map((key) => [key, formData.get(key) ?? ""]),
         );
         (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
@@ -128,9 +138,28 @@ export const Route = createFileRoute("/api/public/devis")({
             address: data.address || null,
             property_type: data.propertyType || null,
             surface: data.surface || null,
+            surface_m2: Number(data.surface),
             service_type: data.serviceType,
+            services: data.serviceType ? [data.serviceType] : [],
             frequency: data.frequency || null,
             message: data.message || null,
+            client_type: data.clientType,
+            city: data.city,
+            postal_code: data.postalCode,
+            desired_date: data.desiredDate || null,
+            contact_name: data.fullName,
+            company_name: data.companyName || null,
+            source_system: "website",
+            gclid: data.gclid || null,
+            gbraid: data.gbraid || null,
+            wbraid: data.wbraid || null,
+            utm_source: data.utm_source || null,
+            utm_medium: data.utm_medium || null,
+            utm_campaign: data.utm_campaign || null,
+            utm_content: data.utm_content || null,
+            utm_term: data.utm_term || null,
+            landing_page: data.landing_page || null,
+            referrer: data.referrer || null,
           })
           .select("id")
           .single();
@@ -193,6 +222,16 @@ export const Route = createFileRoute("/api/public/devis")({
             companyName: data.companyName || "",
             email: data.email,
             phone: data.phone,
+            gclid: data.gclid || undefined,
+            gbraid: data.gbraid || undefined,
+            wbraid: data.wbraid || undefined,
+            utm_source: data.utm_source || undefined,
+            utm_medium: data.utm_medium || undefined,
+            utm_campaign: data.utm_campaign || undefined,
+            utm_content: data.utm_content || undefined,
+            utm_term: data.utm_term || undefined,
+            landing_page: data.landing_page || undefined,
+            referrer: data.referrer || undefined,
             message: [
               "Source : site PURE SPACE NETT — formulaire de devis.",
               "Adresse : " + (data.address || "Non précisée"),
