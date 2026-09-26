@@ -21,6 +21,8 @@ export type ReviewSubmission = {
   email: string | null;
   status: string;
   created_at: string;
+  source: "site" | "google";
+  source_url: string | null;
 };
 
 /** Avis publié, sans aucune donnée personnelle (pas d'e-mail). */
@@ -32,6 +34,8 @@ export type PublishedReview = {
   rating: number;
   message: string;
   created_at: string;
+  source: "site" | "google";
+  source_url: string | null;
 };
 
 export type PublishedReviewsSummary = {
@@ -46,7 +50,7 @@ export const listReviewSubmissions = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("review_submissions")
-      .select("id, author_name, city, service_type, rating, message, email, status, created_at")
+      .select("id, author_name, city, service_type, rating, message, email, status, created_at, source, source_url")
       .order("created_at", { ascending: false })
       .limit(500);
 
