@@ -1,14 +1,11 @@
 import { getAnalyticsConsent } from "@/components/cookie-consent";
+import { getMarketingAttribution } from "@/lib/attribution";
 
-const measurementId = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY"] as
-  | string
-  | undefined;
+const measurementId = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY"] as string | undefined;
+const googleAdsId = import.meta.env["VITE_GOOGLE_ADS_ID"] as string | undefined;
+const googleAdsConversionLabel = import.meta.env["VITE_GOOGLE_ADS_CONVERSION_LABEL"] as string | undefined;
 
-declare global {
-  interface Window {
-    dataLayer?: unknown[];
-  }
-}
+declare global { interface Window { dataLayer?: unknown[]; } }
 
 function push(...args: unknown[]) {
   if (typeof window === "undefined") return;
@@ -19,20 +16,20 @@ function push(...args: unknown[]) {
 let initialized = false;
 
 export function initAnalytics() {
-  if (initialized || typeof window === "undefined" || !measurementId || !getAnalyticsConsent()) return;
+  if (initialized || typeof window === "undefined" || !getAnalyticsConsent() || (!measurementId && !googleAdsId)) return;
   initialized = true;
-
+  const tagId = measurementId ?? googleAdsId!;
   const script = document.createElement("script");
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${tagId}`;
   document.head.appendChild(script);
-
   push("js", new Date());
-  push("config", measurementId, { send_page_view: false });
+  push("config", tagId, { send_page_view: false });
+  if (measurementId && googleAdsId && googleAdsId !== measurementId) push("config", googleAdsId, { send_page_view: false });
 }
 
 export function trackPageView(path: string, title?: string) {
-  if (!measurementId || !getAnalyticsConsent()) return;
+  if ((!measurementId && !googleAdsId) || !getAnalyticsConsent()) return;
   if (!initialized) initAnalytics();
   push("event", "page_view", {
     page_path: path,
@@ -41,33 +38,26 @@ export function trackPageView(path: string, title?: string) {
   });
 }
 
-function attributionParams(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  const url = new URL(window.location.href);
-  const params: Record<string, string> = {};
-  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]) {
-    const value = url.searchParams.get(key);
-    if (value) params[key] = value;
-  }
-  if (document.referrer) params['referrer'] = document.referrer;
-  params['landing_page'] = window.location.pathname;
-  return params;
-}
-
 export function trackEvent(name: string, params?: Record<string, unknown>) {
-  if (!measurementId || !getAnalyticsConsent()) return;
+  if ((!measurementId && !googleAdsId) || !getAnalyticsConsent()) return;
   if (!initialized) initAnalytics();
-  push("event", name, { ...attributionParams(), ...(params ?? {}) });
+  push("event", name, { ...getMarketingAttribution(), ...(params ?? {}) });
 }
 
 export function trackLeadGenerated(params?: Record<string, unknown>) {
   trackEvent("generate_lead", params);
-}
-
-export function trackContactClick(type: "phone" | "whatsapp" | "email", source: string) {
-  trackEvent(type === "phone" ? "contact_phone" : type === "whatsapp" ? "contact_whatsapp" : "contact_email", {
-    source,
+  if (typeof window === "undefined" || !getAnalyticsConsent() || !googleAdsId || !googleAdsConversionLabel) return;
+  if (!initialized) initAnalytics();
+  push("event", "conversion", {
+    send_to: `${googleAdsId}/${googleAdsConversionLabel}`,
+    ...getMarketingAttribution(),
+    ...params,
   });
 }
 
-export const analyticsEnabled = Boolean(measurementId);
+export function trackContactClick(type: "phone" | "whatsapp" | "email", source: string) {
+  trackEvent(type === "phone" ? "contact_phone" : type === "whatsapp" ? "contact_whatsapp" : "contact_email", { source });
+}
+
+export const analyticsEnabled = Boolean(measurementId || googleAdsId);
+export const googleAdsEnabled = Boolean(googleAdsId && googleAdsConversionLabel);
