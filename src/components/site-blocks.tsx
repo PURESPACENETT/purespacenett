@@ -89,7 +89,7 @@ export function CallButtons({ subject }: { subject: string }) {
       </a>
       <WhatsAppButton subject={subject} />
       <Link
-        to="/devis"
+        to="/sous-traitance"
         onClick={() => trackEvent("clic_devis", { source: subject })}
         className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
       >
