@@ -1,3 +1,5 @@
+import { getAnalyticsConsent } from "@/components/cookie-consent";
+
 const STORAGE_KEY = "psn-marketing-attribution";
 const KEYS = ["gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
 
@@ -16,7 +18,7 @@ function readStored(): MarketingAttribution {
 }
 
 export function captureMarketingAttribution(): MarketingAttribution {
-  if (typeof window === "undefined") return {};
+  if (typeof window === "undefined" || !getAnalyticsConsent()) return {};
 
   const url = new URL(window.location.href);
   const current: MarketingAttribution = readStored();
