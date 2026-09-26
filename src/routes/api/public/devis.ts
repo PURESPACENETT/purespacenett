@@ -129,9 +129,12 @@ export const Route = createFileRoute("/api/public/devis")({
             photoUrls.push(signed.signedUrl);
           }
         }
+        const leadId = crypto.randomUUID();
         const { data: inserted, error } = await supabaseAdmin
           .from("quote_requests")
           .insert({
+            id: leadId,
+            source_external_id: leadId,
             full_name: data.fullName,
             email: data.email,
             phone: data.phone,
