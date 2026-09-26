@@ -1,5 +1,9 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /connexion
+Disallow: /admin
+Disallow: /api/
+Disallow: /lovable/
 
 User-agent: Bingbot
 Allow: /
