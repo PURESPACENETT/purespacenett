@@ -334,7 +334,7 @@ function ZoneDetail() {
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            to="/sous-traitance"
+            to="/devis"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
           >
             Demander un devis de nettoyage à {zone.name}
