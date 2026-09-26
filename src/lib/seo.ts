@@ -11,6 +11,8 @@ export const canonicalUrl = (path: string) =>
 /** Image Open Graph absolue, utilisée par les aperçus sociaux. */
 export const DEFAULT_OG_IMAGE = `${SITE_URL}${logoAsset.url}`;
 
+const absoluteUrl = (value: string) => canonicalUrl(value);
+
 
 /** JSON-LD de l'entreprise, réutilisé sur les pages principales. */
 export const localBusinessJsonLd = {
@@ -21,6 +23,7 @@ export const localBusinessJsonLd = {
   telephone: "+33759483021",
   email: business.email,
   url: SITE_URL,
+  image: [DEFAULT_OG_IMAGE],
   hasMap: business.googleBusinessUrl,
   sameAs: [
     business.googleBusinessUrl,
@@ -216,9 +219,11 @@ export const pageMeta = ({
   { property: "og:url", content: canonicalUrl(path) },
   { property: "og:site_name", content: business.name },
   { property: "og:image", content: DEFAULT_OG_IMAGE },
+  { property: "og:image:type", content: "image/jpeg" },
   { property: "og:image:alt", content: `${business.name} — entreprise de nettoyage professionnel` },
   { property: "og:locale", content: "fr_FR" },
   { name: "twitter:card", content: "summary_large_image" },
+  { name: "twitter:url", content: canonicalUrl(path) },
   { name: "twitter:title", content: title },
   { name: "twitter:description", content: description },
   { name: "twitter:image", content: DEFAULT_OG_IMAGE },
