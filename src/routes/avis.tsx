@@ -122,7 +122,7 @@ function AvisPage() {
             Laisser un avis sur Google
           </a>
           <Link
-            to="/sous-traitance"
+            to="/devis"
             onClick={() => trackEvent("clic_devis", { source: "page_avis" })}
             className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary"
           >
