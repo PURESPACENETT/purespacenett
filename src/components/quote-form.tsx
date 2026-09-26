@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { business, whatsappHref } from "@/content/business";
 import { trackEvent, trackLeadGenerated } from "@/lib/analytics";
+import { getMarketingAttribution } from "@/lib/attribution";
 
 export const clientTypes = [
   { value: "entreprise", label: "Entreprise" },
@@ -116,13 +117,17 @@ export function QuoteForm() {
       const body = new FormData();
       Object.entries(form).forEach(([key, value]) => body.append(key, String(value)));
       photos.forEach((photo) => body.append("photos", photo));
+      const attribution = getMarketingAttribution();
+      Object.entries(attribution).forEach(([key, value]) => {
+        if (value) body.append(key, value);
+      });
 
       const res = await fetch("/api/public/devis", {
         method: "POST",
         body,
       });
       if (!res.ok) throw new Error(await res.text());
-      trackLeadGenerated({ source: "formulaire_devis", prestation: form.serviceType, type_de_bien: form.propertyType, frequence: form.frequency });
+      trackLeadGenerated({ source: "formulaire_devis", prestation: form.serviceType, type_de_bien: form.propertyType, frequence: form.frequency, gclid: getMarketingAttribution().gclid ?? undefined });
       trackEvent("devis_envoye", {
         prestation: form.serviceType,
         type_de_bien: form.propertyType,
