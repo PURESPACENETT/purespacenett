@@ -175,18 +175,25 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
-        const crmUrl =
-          process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ??
+        const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
           "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
-        // Le routage reste historique, mais le secret serveur privilégie désormais
-        // la variable d'environnement. Le RPC Vault reste un fallback de compatibilité.
-        let crmSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
-        if (!crmSecret) {
+
+        // Le secret partagé de production est stocké dans Supabase Vault.
+        // On le lit en priorité pour éviter qu'un ancien FUNNEL_QUOTE_WEBHOOK_SECRET
+        // ne provoque des 401 alors que le bridge utilise le secret Vault actuel.
+        const configuredEnvSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
+        let vaultSecret = "";
+        try {
           const { data: bridgeSecret, error: bridgeSecretError } =
             await supabaseAdmin.rpc("get_quote_webhook_secret");
-          crmSecret = bridgeSecretError ? "" : (bridgeSecret ?? "").trim();
+          if (!bridgeSecretError) vaultSecret = (bridgeSecret ?? "").trim();
+        } catch (secretError) {
+          console.error("Lecture du secret CRM Vault impossible", secretError);
         }
-        if (crmUrl && crmSecret) {
+
+        const crmSecrets = [...new Set([vaultSecret, configuredEnvSecret].filter(Boolean))];
+
+        if (crmUrl && crmSecrets.length > 0) {
           const propertyTypeMap: Record<string, string> = {
             Maison: "logement",
             Appartement: "logement",
@@ -243,19 +250,40 @@ export const Route = createFileRoute("/api/public/devis")({
             ].filter(Boolean).join("\n"),
           };
 
-          try {
-            const response = await fetch(crmUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-quote-webhook-secret": crmSecret,
-              },
-              body: JSON.stringify(crmPayload),
-              signal: AbortSignal.timeout(10000),
-            });
-            if (!response.ok) console.error("CRM quote bridge rejected request", response.status);
-          } catch (crmError) {
-            console.error("CRM quote bridge failed", crmError);
+          let crmAccepted = false;
+          for (const [index, crmSecret] of crmSecrets.entries()) {
+            try {
+              const response = await fetch(crmUrl, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-quote-webhook-secret": crmSecret,
+                },
+                body: JSON.stringify(crmPayload),
+                signal: AbortSignal.timeout(10000),
+              });
+
+              if (response.ok) {
+                crmAccepted = true;
+                break;
+              }
+
+              // Un 401 signifie généralement que le secret partagé n'est plus celui
+              // attendu par le bridge. Si un second secret configuré existe, on l'essaie.
+              console.error("CRM quote bridge rejected request", {
+                status: response.status,
+                secretSource: index === 0 && vaultSecret ? "vault" : "environment",
+              });
+
+              if (response.status !== 401) break;
+            } catch (crmError) {
+              console.error("CRM quote bridge failed", crmError);
+              break;
+            }
+          }
+
+          if (!crmAccepted) {
+            console.error("CRM quote bridge did not accept the lead");
           }
         } else {
           console.warn("CRM quote bridge is not configured");
