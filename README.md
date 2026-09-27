@@ -1,26 +1,69 @@
-# SEO Booster Pro
+# PURE SPACE NETT
 
-Je voudrais organiser et automatiser un SEO complet et fonctionnel pour ma micro entreprise de nettoyage, es-tu capable de faire ça ?
+Dépôt central de PURE SPACE NETT.
 
-This project was built with [Lovable](https://lovable.dev).
+## Architecture
 
-**Live app**: https://purespacenett.lovable.app
+- **Site public** : application à la racine du dépôt.
+- **CRM** : `apps/crm/`.
+- **Documentation technique** : `docs/`.
+- **CI** : `.github/workflows/`.
+- **Données et services backend** : Supabase.
 
-## Build with Lovable
+Le dépôt historique du CRM `PURESPACENETT/funnel-friendship` est conservé séparément comme sauvegarde pendant la période de validation de la centralisation.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/8bf96a43-3de9-43df-afd6-ecb75b34138a).
+## Séparation des responsabilités
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+### Projet ChatGPT « PURE SPACE NETT »
 
-## Development
+Référence pour :
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- stratégie ;
+- décisions métier ;
+- besoins ;
+- priorités ;
+- cahier des charges ;
+- SEO et marketing ;
+- règles métier du CRM.
+
+### GitHub / Codex
+
+Référence pour :
+
+- code ;
+- tests ;
+- corrections ;
+- branches ;
+- commits ;
+- CI/CD ;
+- documentation technique.
+
+### Supabase
+
+Référence pour :
+
+- base de données ;
+- authentification ;
+- stockage ;
+- Edge Functions ;
+- configuration d'exécution.
+
+Voir [`docs/PROJECT_OPERATING_MODEL.md`](docs/PROJECT_OPERATING_MODEL.md) et [`docs/CONTEXT_HANDOFF.md`](docs/CONTEXT_HANDOFF.md).
+
+## Développement
+
+Le développement est réalisé via GitHub/Codex.
+
+Le dépôt ne doit pas contenir de secrets. Les variables d'environnement réelles restent hors Git.
+
+Pour le CRM :
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+cd apps/crm
+bun install --frozen-lockfile
+bun run lint
+bun test
+bun run build
 ```
+
+La CI dédiée au CRM se trouve dans `.github/workflows/crm-ci.yml`.
