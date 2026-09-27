@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   refresh:
-    if: ${{ !startsWith(github.event.pull_request.head.sha, '') && !startsWith(github.event.pull_request.title, '[skip lockfile]') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
