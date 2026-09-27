@@ -136,6 +136,7 @@ const ApiPublicDevisRoute = ApiPublicDevisRouteImport.update({
   path: '/api/public/devis',
   getParentRoute: () => rootRouteImport,
 } as any)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/a-propos': typeof AProposRoute
@@ -157,7 +158,6 @@ export interface FileRoutesByFullPath {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
-
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -180,7 +180,6 @@ export interface FileRoutesByTo {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
-
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,7 +204,6 @@ export interface FileRoutesById {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
-
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,7 +228,6 @@ export interface FileRouteTypes {
     | '/api/public/avis'
     | '/api/public/b2b-lead'
     | '/api/public/devis'
-
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -253,7 +250,6 @@ export interface FileRouteTypes {
     | '/api/public/avis'
     | '/api/public/b2b-lead'
     | '/api/public/devis'
-
   id:
     | '__root__'
     | '/'
@@ -277,7 +273,6 @@ export interface FileRouteTypes {
     | '/api/public/avis'
     | '/api/public/b2b-lead'
     | '/api/public/devis'
-
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -301,7 +296,6 @@ export interface RootRouteChildren {
   ApiPublicAvisRoute: typeof ApiPublicAvisRoute
   ApiPublicB2bLeadRoute: typeof ApiPublicB2bLeadRoute
   ApiPublicDevisRoute: typeof ApiPublicDevisRoute
-
 }
 
 declare module '@tanstack/react-router' {
@@ -488,7 +482,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAvisRoute: ApiPublicAvisRoute,
   ApiPublicB2bLeadRoute: ApiPublicB2bLeadRoute,
   ApiPublicDevisRoute: ApiPublicDevisRoute,
-
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
