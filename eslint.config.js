@@ -14,6 +14,8 @@ export default tseslint.config(
       // Fichiers générés automatiquement (non modifiables à la main)
       "src/routeTree.gen.ts",
       "src/integrations/supabase/**",
+      // Le CRM possède sa propre configuration ESLint et sa propre CI.
+      "apps/crm/**",
     ],
   },
   {
