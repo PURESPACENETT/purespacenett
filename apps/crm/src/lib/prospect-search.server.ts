@@ -6,8 +6,6 @@ import {
   SECTORS,
 } from "./prospects-shared";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
-
 // Le Pré-Saint-Gervais — home base, used when a town cannot be located.
 const HOME = { latitude: 48.8869, longitude: 2.4064 };
 
@@ -39,14 +37,13 @@ interface PlaceResult {
 }
 
 function mapsKeys() {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
   const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
-  if (!lovableKey || !mapsKey) {
+  if (!mapsKey) {
     throw new Error(
-      "La recherche de prospects n'est pas configurée (connexion Google Maps manquante).",
+      "La recherche de prospects n'est pas configurée (clé Google Maps manquante).",
     );
   }
-  return { lovableKey, mapsKey };
+  return { mapsKey };
 }
 
 interface Point {
@@ -70,19 +67,15 @@ function distanceKm(a: Point, b: Point): number {
 export async function geocodeArea(
   area: string,
 ): Promise<{ latitude: number; longitude: number }> {
-  const { lovableKey, mapsKey } = mapsKeys();
-  const url = new URL(`${GATEWAY_URL}/maps/api/geocode/json`);
+  const { mapsKey } = mapsKeys();
+  const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
   url.searchParams.set("address", `${area}, France`);
   url.searchParams.set("language", "fr");
   url.searchParams.set("region", "fr");
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": mapsKey,
-      },
-    });
+    url.searchParams.set("key", mapsKey);
+    const response = await fetch(url);
     if (!response.ok) {
       console.error(`Geocoding failed [${response.status}]: ${await response.text()}`);
       return HOME;
@@ -107,18 +100,17 @@ export async function searchLocalBusinesses(
   area: string,
   radiusKm: number = DEFAULT_RADIUS_KM,
 ): Promise<{ prospects: FoundProspect[]; center: { latitude: number; longitude: number } }> {
-  const { lovableKey, mapsKey } = mapsKeys();
+  const { mapsKey } = mapsKeys();
 
   const sectorEntry = SECTORS.find((s) => s.value === sector);
   const phrase = sectorEntry ? sectorEntry.query : sector;
   const textQuery = `${phrase} à ${area}, France`;
   const center = await geocodeArea(area);
 
-  const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchText`, {
+  const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": mapsKey,
+      "X-Goog-Api-Key": mapsKey,
       "Content-Type": "application/json",
       "X-Goog-FieldMask": [
         "places.id",
