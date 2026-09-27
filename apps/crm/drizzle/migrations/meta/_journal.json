@@ -1,0 +1,118 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789821089735,
+      "tag": "0000_create_leads_platform",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789821188629,
+      "tag": "0001_add_notify_email_setting",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789822522829,
+      "tag": "0002_add_ai_qualification",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789822831499,
+      "tag": "0003_restrict_access_to_staff_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789823438673,
+      "tag": "0004_create_prospecting",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789826596534,
+      "tag": "0005_prospect_map_and_contacts",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789874146278,
+      "tag": "0006_harden_function_execute_and_public_quote_insert",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789954094974,
+      "tag": "0007_harden_role_authorization",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789954106253,
+      "tag": "0008_make_role_write_denials_restrictive",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789999439805,
+      "tag": "0009_create_linkedin_contacts",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790212028193,
+      "tag": "0010_automation_delivery_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790212484502,
+      "tag": "0011_add_followup_tracking_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790227073696,
+      "tag": "0012_crm_pipeline_foundations",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790260937028,
+      "tag": "0013_quote_requests_source_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790263087899,
+      "tag": "0014_prospects_do_not_contact",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1790263106069,
+      "tag": "0015_prospects_do_not_contact_reason",
+      "breakpoints": true
+    }
+  ]
+}
