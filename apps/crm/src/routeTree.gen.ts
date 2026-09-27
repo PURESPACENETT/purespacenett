@@ -471,13 +471,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksQuoteRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
-
-
-
-
-
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
