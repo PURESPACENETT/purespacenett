@@ -1,0 +1,315 @@
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
+import { draftOutreachEmail } from "./prospect-ai.server";
+import { scanWebsiteForEmails } from "./prospect-email.server";
+import { searchLocalBusinesses } from "./prospect-search.server";
+import { scoreProspect } from "./prospects-shared";
+import { sendTemplateEmail } from "./email-templates/send-email";
+
+/** Sectors and areas rotated across the week, Paris + Île-de-France. */
+const PLAN: { sector: string; area: string; radiusKm: number }[][] = [
+  [{ sector: "entreprise_nettoyage", area: "Le Pré-Saint-Gervais", radiusKm: 8 }, { sector: "syndic de copropriété", area: "Paris 11e", radiusKm: 4 }],
+  [{ sector: "cabinet de gestion immobilière", area: "Paris 17e", radiusKm: 4 }, { sector: "societe_proprete", area: "Pantin", radiusKm: 8 }],
+  [{ sector: "bureaux et coworking", area: "Paris 9e", radiusKm: 4 }, { sector: "nettoyage_chantier", area: "Bobigny", radiusKm: 8 }],
+  [{ sector: "entreprise_nettoyage", area: "Les Lilas", radiusKm: 8 }, { sector: "agence immobilière", area: "Boulogne-Billancourt", radiusKm: 5 }],
+  [{ sector: "clinique et cabinet médical", area: "Paris 15e", radiusKm: 4 }, { sector: "societe_proprete", area: "Bagnolet", radiusKm: 8 }],
+  [{ sector: "hôtel", area: "Paris 10e", radiusKm: 4 }, { sector: "entreprise_nettoyage", area: "Aubervilliers", radiusKm: 6 }],
+  [{ sector: "salle de sport", area: "Paris 12e", radiusKm: 4 }, { sector: "agence immobilière", area: "Versailles", radiusKm: 7 }],
+];
+
+/** Hard caps so a single run stays bounded and predictable. */
+const PREPARE_LIMIT = 6;
+const SEND_LIMIT = 8;
+
+
+async function createOutreachFollowUpTask(
+  prospectId: string,
+  companyName: string,
+  sentAt: string,
+) {
+  const title = "Relancer après premier email";
+  const dueAt = new Date(new Date(sentAt).getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: existing, error: existingError } = await supabaseAdmin
+    .from("prospect_tasks")
+    .select("id")
+    .eq("prospect_id", prospectId)
+    .eq("title", title)
+    .is("completed_at", null)
+    .limit(1)
+    .maybeSingle();
+  if (existingError) throw new Error(existingError.message);
+  if (existing) return;
+  const { data: task, error: taskError } = await supabaseAdmin
+    .from("prospect_tasks")
+    .insert({
+      prospect_id: prospectId,
+      title,
+      task_type: "relance",
+      due_at: dueAt,
+      priority: "normale",
+      created_by: null,
+    })
+    .select("id")
+    .single();
+  if (taskError) throw new Error(taskError.message);
+  await supabaseAdmin.from("prospect_activities").insert({
+    prospect_id: prospectId,
+    activity_type: "tache",
+    title: "Relance planifiée à J+3",
+    body: companyName,
+    occurred_at: sentAt,
+    metadata: { taskId: task.id, dueAt, origin: "automatique" },
+    dedupe_key: "followup-j3-" + prospectId,
+  });
+}
+
+function enforceAmazighSignature(value: string): string {
+  return value.replace(/\bAmine\b/gi, "Amazigh");
+}
+
+export interface DailyProspectionResult {
+  found: number;
+  created: number;
+  prepared: number;
+  sent: number;
+  contacted: { name: string; email: string; city: string | null }[];
+}
+
+/**
+ * One automatic prospecting round: find new companies around Paris and
+ * Île-de-France, look for their public email, write the first message,
+ * send it, and report every card that moved to "Contacté".
+ */
+export async function runDailyProspection(): Promise<DailyProspectionResult> {
+  // The rotation follows the business timezone, not the server/runtime timezone.
+  const parisWeekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Paris",
+    weekday: "short",
+  }).formatToParts(new Date()).find((part) => part.type === "weekday")?.value;
+  const weekdayIndex =
+    parisWeekday === "Sun" ? 0 :
+    parisWeekday === "Mon" ? 1 :
+    parisWeekday === "Tue" ? 2 :
+    parisWeekday === "Wed" ? 3 :
+    parisWeekday === "Thu" ? 4 :
+    parisWeekday === "Fri" ? 5 : 6;
+  const targets = PLAN[weekdayIndex] ?? PLAN[0]!;
+  let found = 0;
+  let created = 0;
+  let prepared = 0;
+
+  for (const target of targets) {
+    try {
+      const { prospects: results, center } = await searchLocalBusinesses(
+        target.sector,
+        target.area,
+        target.radiusKm,
+      );
+      found += results.length;
+
+      let fresh: typeof results = [];
+      if (results.length > 0) {
+        const { data: existing } = await supabaseAdmin
+          .from("prospects")
+          .select("external_id")
+          .in(
+            "external_id",
+            results.map((r) => r.external_id),
+          );
+        const known = new Set((existing ?? []).map((row) => row.external_id));
+        fresh = results.filter((r) => !known.has(r.external_id));
+      }
+
+      if (fresh.length > 0) {
+        const { data: inserted, error } = await supabaseAdmin
+          .from("prospects")
+          .insert(
+            fresh.map((f) => ({ ...f, source: "auto", status: "a_contacter" as const })),
+          )
+          .select("*");
+        if (error) throw new Error(error.message);
+        created += fresh.length;
+        prepared += await prepareRows((inserted ?? []).slice(0, PREPARE_LIMIT));
+      }
+
+      await supabaseAdmin.from("prospect_searches").insert({
+        sector: target.sector,
+        area: target.area,
+        radius_km: target.radiusKm,
+        center_lat: center.latitude,
+        center_lng: center.longitude,
+        found_count: results.length,
+        new_count: fresh.length,
+      });
+    } catch (error) {
+      console.error("daily prospection search failed", target, error);
+    }
+  }
+
+  const contacted = await sendPreparedOutreach();
+
+  await notifyOwner(contacted, "automatique", {
+    found,
+    created,
+    prepared,
+    sent: contacted.length,
+  });
+
+  return { found, created, prepared, sent: contacted.length, contacted };
+}
+
+/** Looks for a public email and writes the first message for each new company. */
+async function prepareRows(rows: any[]): Promise<number> {
+  let prepared = 0;
+
+  for (const row of rows) {
+    try {
+      const emails = row.website ? await scanWebsiteForEmails(row.website).catch(() => []) : [];
+      const draft = await draftOutreachEmail({
+        companyName: row.company_name,
+        sector: row.sector,
+        city: row.city,
+        postalCode: row.postal_code,
+        website: row.website,
+        notes: row.notes,
+      }).catch(() => null);
+
+      const safeDraft = draft
+        ? { subject: draft.subject, body: enforceAmazighSignature(draft.body) }
+        : null;
+
+      await supabaseAdmin
+        .from("prospects")
+        .update({
+          ...(emails[0] ? { email: emails[0] } : {}),
+          found_emails: emails,
+          ...(safeDraft
+            ? {
+                outreach_subject: safeDraft.subject,
+                outreach_body: safeDraft.body,
+                outreach_generated_at: new Date().toISOString(),
+              }
+            : {}),
+          score: scoreProspect({
+            postalCode: row.postal_code,
+            website: row.website,
+            phone: row.phone,
+            email: emails[0] ?? null,
+            reviewsCount: row.reviews_count,
+            sector: row.sector,
+          }),
+        })
+        .eq("id", row.id);
+
+      if (safeDraft) prepared += 1;
+    } catch (error) {
+      console.error("daily prospection prepare failed", row?.id, error);
+    }
+  }
+
+  return prepared;
+}
+
+/** Sends up to SEND_LIMIT reviewed-ready messages and flags them as contacted. */
+async function sendPreparedOutreach() {
+  const { data: ready } = await supabaseAdmin
+    .from("prospects")
+    .select("id, company_name, city, email, outreach_subject, outreach_body, outreach_generated_at, outreach_sent_at, do_not_contact")
+    .not("email", "is", null)
+    .not("outreach_subject", "is", null)
+    .not("outreach_body", "is", null)
+    .is("outreach_sent_at", null)
+    .eq("do_not_contact", false)
+    .in("status", ["nouveau", "a_contacter"])
+    .order("score", { ascending: false })
+    .limit(SEND_LIMIT);
+
+  const contacted: { name: string; email: string; city: string | null }[] = [];
+
+  for (const row of ready ?? []) {
+    try {
+      if (row.do_not_contact || row.outreach_sent_at) continue;
+      const safeBody = enforceAmazighSignature(row.outreach_body!);
+      if (safeBody !== row.outreach_body) {
+        const { error: signatureError } = await supabaseAdmin
+          .from("prospects")
+          .update({ outreach_body: safeBody })
+          .eq("id", row.id);
+        if (signatureError) throw new Error(signatureError.message);
+      }
+
+      const result = await sendTemplateEmail("prospect-outreach", row.email!, {
+        templateData: {
+          subject: row.outreach_subject,
+          body: safeBody,
+          companyName: row.company_name,
+        },
+        idempotencyKey: `prospect-outreach-${row.id}-${row.outreach_generated_at ?? "auto"}`,
+        replyTo: "contact@purespacenett.com",
+      });
+      if (!result.sent) continue;
+
+      const sentAt = new Date().toISOString();
+      const { error: statusError } = await supabaseAdmin
+        .from("prospects")
+        .update({ outreach_sent_at: sentAt, status: "contacte" })
+        .eq("id", row.id);
+      if (statusError) console.error("daily prospection status update failed", row.id, statusError.message);
+
+      await supabaseAdmin.from("prospect_activities").insert({
+        prospect_id: row.id,
+        activity_type: "email_envoye",
+        title: "Email de prospection envoyé",
+        body: row.outreach_subject,
+        occurred_at: sentAt,
+        metadata: { email: row.email, origin: "automatique", sentAt },
+        dedupe_key: "email-envoye-" + row.id + "-" + (row.outreach_generated_at ?? sentAt.slice(0, 10)),
+      });
+
+      try {
+        await createOutreachFollowUpTask(row.id, row.company_name, sentAt);
+      } catch (taskError) {
+        console.error("automatic J+3 follow-up task creation failed", row.id, taskError);
+      }
+
+      contacted.push({ name: row.company_name, email: row.email!, city: row.city });
+    } catch (error) {
+      console.error("daily prospection send failed", row.id, error);
+    }
+  }
+
+  return contacted;
+}
+
+/** Alerts the owner about every card that just moved to "Contacté". */
+export async function notifyOwner(
+  contacted: { name: string; email: string; city: string | null }[],
+  origin: "automatique" | "manuel",
+  counts?: { found: number; created: number; prepared: number; sent: number },
+) {
+  if (contacted.length === 0) return;
+
+  const { data: settings } = await supabaseAdmin
+    .from("pricing_settings")
+    .select("notify_email")
+    .limit(1)
+    .maybeSingle();
+  const ownerEmail = settings?.notify_email;
+  if (!ownerEmail) return;
+
+  const summary = counts
+    ? `${counts.found} entreprise(s) trouvée(s), ${counts.created} nouvelle(s) fiche(s), ${counts.prepared} message(s) préparé(s), ${counts.sent} email(s) envoyé(s).`
+    : "";
+
+  try {
+    await sendTemplateEmail("prospect-contacted-owner", ownerEmail, {
+      templateData: { companies: contacted, origin, summary },
+      idempotencyKey: `prospect-contacted-${origin}-${contacted
+        .map((c) => c.name + "|" + c.email)
+        .join(",")
+        .slice(0, 120)}-${new Date().toISOString().slice(0, 13)}`,
+    });
+  } catch (error) {
+    console.error("owner contacted alert failed", error);
+  }
+}
