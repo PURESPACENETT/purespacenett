@@ -96,34 +96,38 @@ export const analyzeSeoReport = createServerFn({ method: "POST" })
       throw new Error("Accès réservé à l'administrateur du site.");
     }
 
-    const key = process.env["OPENAI_API_KEY"];
-    if (!key) throw new Error("La clé OPENAI_API_KEY est absente de la configuration serveur.");
+    const key = process.env["LOVABLE_API_KEY"];
+    if (!key) throw new Error("La clé d'accès au service d'analyse est absente.");
 
     const excerpt = data.content.slice(0, MAX_CHARS);
     const truncated = data.content.length > MAX_CHARS;
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${key}`,
+        "Lovable-API-Key": key,
+        "X-Lovable-AIG-SDK": "fetch",
       },
       body: JSON.stringify({
-        model: "gpt-6-astra",
+        model: "openai/gpt-6-astra",
+        stream: true,
         store: false,
         reasoning: { effort: "medium", summary: "auto" },
         instructions: SYSTEM_PROMPT,
-        input: [{
-          role: "user",
-          content: [{
-            type: "input_text",
-            text: `Fichier analysé : ${data.filename}${truncated ? " (extrait des premières lignes, fichier volumineux)" : ""}
-
-Contenu du rapport :
-
-${excerpt}`,
-          }],
-        }],
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: `Fichier analysé : ${data.filename}${
+                  truncated ? " (extrait des premières lignes, fichier volumineux)" : ""
+                }\n\nContenu du rapport :\n\n${excerpt}`,
+              },
+            ],
+          },
+        ],
         text: {
           format: {
             type: "json_schema",
@@ -135,27 +139,51 @@ ${excerpt}`,
       }),
     });
 
-    if (!response.ok) {
+    if (!response.ok || !response.body) {
       const detail = await response.text().catch(() => "");
+      if (response.status === 402) {
+        throw new Error(
+          "Les crédits d'analyse sont épuisés. Rechargez-les dans les réglages de l'espace Lovable.",
+        );
+      }
       if (response.status === 429) {
-        throw new Error("Le service OpenAI est momentanément saturé ou soumis à une limite de débit. Réessayez.");
+        throw new Error("Le service d'analyse est momentanément saturé. Réessayez dans une minute.");
       }
       throw new Error(
         `L'analyse a échoué (code ${response.status}). ${detail.slice(0, 300)}`.trim(),
       );
     }
 
-    const payload = (await response.json()) as {
-      output_text?: string;
-      output?: Array<{ content?: Array<{ type?: string; text?: string }> }>;
-    };
-    let text = payload.output_text ?? "";
-    if (!text && Array.isArray(payload.output)) {
-      text = payload.output
-        .flatMap((item) => item.content ?? [])
-        .filter((item) => item.type === "output_text" && typeof item.text === "string")
-        .map((item) => item.text as string)
-        .join("");
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let text = "";
+
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      buffer += decoder.decode(chunk.value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.startsWith("data:")) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === "[DONE]") continue;
+        try {
+          const event = JSON.parse(payload) as {
+            type?: string;
+            delta?: string;
+            response?: { output_text?: string };
+          };
+          if (event.type === "response.output_text.delta" && typeof event.delta === "string") {
+            text += event.delta;
+          } else if (event.type === "response.completed" && event.response?.output_text) {
+            if (!text) text = event.response.output_text;
+          }
+        } catch {
+          // Ligne SSE partielle ou non JSON : on l'ignore.
+        }
+      }
     }
 
     if (!text.trim()) {

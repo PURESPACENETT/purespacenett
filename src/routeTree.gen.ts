@@ -30,6 +30,7 @@ import { Route as ZonesSlugRouteImport } from './routes/zones.$slug'
 import { Route as ApiPublicAvisRouteImport } from './routes/api/public/avis'
 import { Route as ApiPublicB2bLeadRouteImport } from './routes/api/public/b2b-lead'
 import { Route as ApiPublicDevisRouteImport } from './routes/api/public/devis'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -136,6 +137,12 @@ const ApiPublicDevisRoute = ApiPublicDevisRouteImport.update({
   path: '/api/public/devis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -180,6 +188,7 @@ export interface FileRoutesByTo {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -204,6 +213,7 @@ export interface FileRoutesById {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/api/public/avis'
     | '/api/public/b2b-lead'
     | '/api/public/devis'
+    | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/api/public/avis'
     | '/api/public/b2b-lead'
     | '/api/public/devis'
+    | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
@@ -273,6 +285,7 @@ export interface FileRouteTypes {
     | '/api/public/avis'
     | '/api/public/b2b-lead'
     | '/api/public/devis'
+    | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -296,6 +309,7 @@ export interface RootRouteChildren {
   ApiPublicAvisRoute: typeof ApiPublicAvisRoute
   ApiPublicB2bLeadRoute: typeof ApiPublicB2bLeadRoute
   ApiPublicDevisRoute: typeof ApiPublicDevisRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -447,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicDevisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -482,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAvisRoute: ApiPublicAvisRoute,
   ApiPublicB2bLeadRoute: ApiPublicB2bLeadRoute,
   ApiPublicDevisRoute: ApiPublicDevisRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

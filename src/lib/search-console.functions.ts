@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createSign } from "node:crypto";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { zones } from "@/content/zones";
 
+const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 const SITE_URL = "https://purespacenett.com";
 
 export type SearchRow = {
@@ -40,87 +40,17 @@ const InputSchema = z.object({
   proprieteChoisie: z.string().max(300).optional(),
 });
 
-function base64Url(value: string | Buffer) {
-  return Buffer.from(value).toString("base64url");
-}
-
-type GoogleServiceAccount = {
-  client_email?: string;
-  private_key?: string;
-  private_key_id?: string;
-};
-
-let cachedToken: { accessToken: string; expiresAt: number } | null = null;
-
-async function googleAccessToken(): Promise<string> {
-  if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) return cachedToken.accessToken;
-
-  const raw = process.env["GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON"];
-  if (!raw) {
+function headers() {
+  const lovableKey = process.env["LOVABLE_API_KEY"];
+  const connKey = process.env["GOOGLE_SEARCH_CONSOLE_API_KEY"];
+  if (!lovableKey || !connKey) {
     throw new Error(
-      "La connexion Google Search Console n'est pas configurée. Ajoutez GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON dans Vercel.",
+      "La connexion à Google Search Console n'est pas disponible pour ce site pour le moment.",
     );
   }
-
-  let account: GoogleServiceAccount;
-  try {
-    account = JSON.parse(raw) as GoogleServiceAccount;
-  } catch {
-    throw new Error("GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON est invalide.");
-  }
-
-  if (!account.client_email || !account.private_key) {
-    throw new Error("Le compte de service Google doit contenir client_email et private_key.");
-  }
-
-  const iat = Math.floor(Date.now() / 1000);
-  const header = base64Url(JSON.stringify({
-    alg: "RS256",
-    typ: "JWT",
-    ...(account.private_key_id ? { kid: account.private_key_id } : {}),
-  }));
-  const claim = base64Url(JSON.stringify({
-    iss: account.client_email,
-    scope: "https://www.googleapis.com/auth/webmasters.readonly",
-    aud: "https://oauth2.googleapis.com/token",
-    iat,
-    exp: iat + 3600,
-  }));
-  const unsigned = `${header}.${claim}`;
-  const signer = createSign("RSA-SHA256");
-  signer.update(unsigned);
-  signer.end();
-  const signature = signer.sign(account.private_key).toString("base64url");
-  const assertion = `${unsigned}.${signature}`;
-
-  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion,
-    }),
-  });
-
-  if (!tokenResponse.ok) {
-    const detail = await tokenResponse.text().catch(() => "");
-    throw new Error(
-      `Authentification Google Search Console impossible (${tokenResponse.status}). ${detail.slice(0, 300)}`.trim(),
-    );
-  }
-
-  const token = (await tokenResponse.json()) as { access_token?: string; expires_in?: number };
-  if (!token.access_token) throw new Error("Google n'a pas fourni de jeton d'accès.");
-  cachedToken = {
-    accessToken: token.access_token,
-    expiresAt: Date.now() + Math.max(60, token.expires_in ?? 3600) * 1000,
-  };
-  return token.access_token;
-}
-
-async function googleHeaders() {
   return {
-    Authorization: `Bearer ${await googleAccessToken()}`,
+    Authorization: `Bearer ${lovableKey}`,
+    "X-Connection-Api-Key": connKey,
     "Content-Type": "application/json",
   };
 }
@@ -139,9 +69,7 @@ function coversTarget(siteUrl: string, target: URL) {
 }
 
 async function resolveProperty(chosen?: string) {
-  const res = await fetch("https://www.googleapis.com/webmasters/v3/sites", {
-    headers: await googleHeaders(),
-  });
+  const res = await fetch(`${GATEWAY}/webmasters/v3/sites`, { headers: headers() });
   if (!res.ok) {
     throw new Error(`Google Search Console n'a pas répondu (${res.status}) : ${await res.text()}`);
   }
@@ -166,38 +94,20 @@ async function resolveProperty(chosen?: string) {
 
 async function query(property: string, body: Record<string, unknown>) {
   const res = await fetch(
-    `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(property)}/searchAnalytics/query`,
-    {
-      method: "POST",
-      headers: await googleHeaders(),
-      body: JSON.stringify(body),
-    },
+    `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(property)}/searchAnalytics/query`,
+    { method: "POST", headers: headers(), body: JSON.stringify(body) },
   );
   if (!res.ok) {
-    throw new Error(
-      `Lecture des statistiques Google impossible (${res.status}) : ${await res.text()}`,
-    );
+    throw new Error(`Lecture des statistiques Google impossible (${res.status}) : ${await res.text()}`);
   }
   const json = (await res.json()) as {
-    rows?: {
-      keys?: string[];
-      clicks?: number;
-      impressions?: number;
-      ctr?: number;
-      position?: number;
-    }[];
+    rows?: { keys?: string[]; clicks?: number; impressions?: number; ctr?: number; position?: number }[];
   };
   return json.rows ?? [];
 }
 
 function toRows(
-  rows: {
-    keys?: string[];
-    clicks?: number;
-    impressions?: number;
-    ctr?: number;
-    position?: number;
-  }[],
+  rows: { keys?: string[]; clicks?: number; impressions?: number; ctr?: number; position?: number }[],
 ): SearchRow[] {
   return rows.map((r) => ({
     cle: r.keys?.[0] ?? "—",
@@ -219,6 +129,7 @@ export const getSearchConsoleReport = createServerFn({ method: "POST" })
   .inputValidator((data) => InputSchema.parse(data))
   .handler(async ({ data }): Promise<SearchConsoleReport> => {
     const jours = data.jours ?? 28;
+    // Google a 2 à 3 jours de décalage sur les données.
     const endDate = isoDay(3);
     const startDate = isoDay(3 + jours);
     const property = await resolveProperty(data.proprieteChoisie);

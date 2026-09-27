@@ -274,10 +274,10 @@ export async function scanWebsiteForEmail(
   return emails[0] ?? null;
 }
 
-const CLAY_API_BASE = "https://api.clay.com/public/v0";
+const CLAY_GATEWAY = "https://connector-gateway.lovable.dev/clay";
 
 export function clayConfigured(): boolean {
-  return Boolean(process.env["CLAY_API_KEY"]);
+  return Boolean(process.env["LOVABLE_API_KEY"] && process.env["CLAY_API_KEY"]);
 }
 
 interface ClayPerson {
@@ -291,11 +291,12 @@ interface ClayPerson {
 }
 
 async function clayCall(path: string, body: unknown): Promise<Record<string, unknown>> {
-  const response = await fetch(`${CLAY_API_BASE}${path}`, {
+  const response = await fetch(`${CLAY_GATEWAY}${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "clay-api-key": process.env["CLAY_API_KEY"] ?? "",
+      Authorization: `Bearer ${process.env["LOVABLE_API_KEY"]}`,
+      "X-Connection-Api-Key": process.env["CLAY_API_KEY"] ?? "",
     },
     body: JSON.stringify(body),
   });

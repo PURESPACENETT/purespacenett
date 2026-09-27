@@ -136,17 +136,21 @@ export function buildFallbackOutreachEmails(input: OutreachInput): OutreachPropo
 /** AI returns three checked alternatives; any provider/schema/quality failure uses local drafts. */
 export async function draftOutreachEmails(input: OutreachInput): Promise<OutreachProposals> {
   const fallback = buildFallbackOutreachEmails(input);
-  const key = process.env["OPENAI_API_KEY"];
+  const key = process.env["LOVABLE_API_KEY"];
   if (!key) {
-    console.warn("OPENAI_API_KEY missing; using deterministic outreach fallback");
+    console.warn("LOVABLE_API_KEY missing; using deterministic outreach fallback");
     return fallback;
   }
 
-  const openai = createOpenAI({ apiKey: key });
+  const lovable = createOpenAI({
+    baseURL: "https://ai.gateway.lovable.dev/v1",
+    apiKey: key,
+    headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+  });
 
   try {
     const result = streamText({
-      model: openai.responses("gpt-6-astra"),
+      model: lovable.responses("openai/gpt-6-astra"),
       system: SYSTEM,
       prompt: buildPrompt(input),
       output: Output.object({ schema: outreachProposalsSchema }),
