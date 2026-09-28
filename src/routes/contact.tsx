@@ -38,7 +38,7 @@ function ContactPage() {
         <Eyebrow>Contact</Eyebrow>
         <h1 className="mt-3 font-display text-4xl font-extrabold">Demander un devis gratuit</h1>
         <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
-          Remplissez le formulaire ci-dessous et recevez votre devis personnalisé sous 24 h. Le plus
+          Remplissez le formulaire ci-dessous et recevez votre devis personnalisé après étude de votre demande. Le plus
           rapide reste le téléphone si votre besoin est urgent.
         </p>
 
