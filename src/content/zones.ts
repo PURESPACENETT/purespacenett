@@ -35,7 +35,7 @@ export const zones: Zone[] = [
     department: "Seine-Saint-Denis (93)",
     title: "Nettoyage Le Pré-Saint-Gervais (93310) — Bureaux & copropriétés",
     description:
-      "Entreprise de nettoyage au Pré-Saint-Gervais 93310 : bureaux, copropriétés, vitres, fin de chantier. Intervention rapide sur toute la commune, devis gratuit sous 24 h.",
+      "Entreprise de nettoyage au Pré-Saint-Gervais 93310 : bureaux, copropriétés, vitres, fin de chantier. Intervention rapide sur toute la commune, devis gratuit après étude de votre demande.",
     intro:
       "Nous sommes installés au Pré-Saint-Gervais : c'est notre ville, nous y intervenons en quelques minutes.",
     context:
@@ -57,7 +57,7 @@ export const zones: Zone[] = [
     department: "Seine-Saint-Denis (93)",
     title: "Nettoyage Pantin (93500) — Bureaux, immeubles, commerces",
     description:
-      "Société de nettoyage à Pantin 93500 : entretien de bureaux, parties communes, commerces et fin de chantier. Entreprise voisine, devis gratuit sous 24 h.",
+      "Société de nettoyage à Pantin 93500 : entretien de bureaux, parties communes, commerces et fin de chantier. Entreprise voisine, devis gratuit après étude de votre demande.",
     intro:
       "Pantin est notre commune voisine : bureaux du secteur des Grands Moulins, copropriétés du centre, commerces de la mairie.",
     context:
@@ -123,7 +123,7 @@ export const zones: Zone[] = [
     department: "Seine-Saint-Denis (93)",
     title: "Nettoyage Montreuil (93100) — Bureaux, immeubles, textiles",
     description:
-      "Entreprise de nettoyage à Montreuil 93100 : bureaux, coworkings, copropriétés, canapés et remise en état. Entreprise de l'est parisien, devis gratuit sous 24 h.",
+      "Entreprise de nettoyage à Montreuil 93100 : bureaux, coworkings, copropriétés, canapés et remise en état. Entreprise de l'est parisien, devis gratuit après étude de votre demande.",
     intro:
       "Montreuil mélange ateliers d'artistes, bureaux et copropriétés : nos prestations y sont très variées.",
     context:
@@ -189,7 +189,7 @@ export const zones: Zone[] = [
     department: "Paris (75)",
     title: "Nettoyage Paris est — 10e, 11e, 18e, 19e, 20e | PURE SPACE NETT",
     description:
-      "Entreprise de nettoyage à Paris, surtout 10e, 11e, 18e, 19e et 20e : bureaux, commerces, vitres, fin de chantier, état des lieux. Devis gratuit sous 24 h.",
+      "Entreprise de nettoyage à Paris, surtout 10e, 11e, 18e, 19e et 20e : bureaux, commerces, vitres, fin de chantier, état des lieux. Devis gratuit après étude de votre demande.",
     intro:
       "Nous intervenons dans tout Paris, avec une présence renforcée sur les arrondissements de l'est : 10e, 11e, 18e, 19e et 20e.",
     context:
@@ -211,7 +211,7 @@ export const zones: Zone[] = [
     department: "Île-de-France",
     title: "Nettoyage en Île-de-France — Entreprise PURE SPACE NETT",
     description:
-      "PURE SPACE NETT intervient dans toute l'Île-de-France : nettoyage de bureaux, copropriétés, fin de chantier, vitres et remise en état. Devis gratuit sous 24 h.",
+      "PURE SPACE NETT intervient dans toute l'Île-de-France : nettoyage de bureaux, copropriétés, fin de chantier, vitres et remise en état. Devis gratuit après étude de votre demande.",
     intro:
       "Notre base est en Seine-Saint-Denis, mais nous nous déplaçons dans toute l'Île-de-France pour les chantiers et les contrats réguliers.",
     context:
@@ -296,7 +296,7 @@ export const zoneLocalAnswers = (
   return [
     {
       question: `Entreprise nettoyage ${zone.name} : que faisons-nous exactement ?`,
-      answer: `PURE SPACE NETT est une entreprise de nettoyage basée au Pré-Saint-Gervais qui intervient à ${area} pour l'entretien de bureaux, les parties communes de copropriété, les commerces, les vitres, la fin de chantier et la remise en état. Contrat régulier ou intervention ponctuelle, devis gratuit sous 24 h.`,
+      answer: `PURE SPACE NETT est une entreprise de nettoyage basée au Pré-Saint-Gervais qui intervient à ${area} pour l'entretien de bureaux, les parties communes de copropriété, les commerces, les vitres, la fin de chantier et la remise en état. Contrat régulier ou intervention ponctuelle, devis gratuit après étude de votre demande.`,
     },
     {
       question: cp
@@ -312,7 +312,7 @@ export const zoneLocalAnswers = (
     },
     {
       question: `Combien coûte un nettoyage à ${zone.name} ?`,
-      answer: `Le tarif dépend de la surface, de la fréquence et du type de local. Nous nous déplaçons gratuitement à ${area} pour mesurer et chiffrer, puis nous remettons un devis détaillé sous 24 h, sans frais cachés.`,
+      answer: `Le tarif dépend de la surface, de la fréquence et du type de local. Nous nous déplaçons gratuitement à ${area} pour mesurer et chiffrer, puis nous remettons un devis détaillé après étude, sans frais cachés.`,
       servicePath: "/tarifs",
     },
     {

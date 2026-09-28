@@ -4,7 +4,7 @@ import { canonicalUrl, breadcrumbJsonLd, faqJsonLd, pageMeta } from "@/lib/seo";
 
 const title = "Tarifs de nettoyage et devis | PURE SPACE NETT";
 const description =
-  "Comment sont calculés nos tarifs de nettoyage en Île-de-France : entretien régulier, fin de chantier au m², remise en état, vitrerie, textiles. Devis gratuit sous 24 h.";
+  "Comment sont calculés nos tarifs de nettoyage en Île-de-France : entretien régulier, fin de chantier au m², remise en état, vitrerie, textiles. Devis gratuit après étude de votre demande.";
 
 const faq = [
   {

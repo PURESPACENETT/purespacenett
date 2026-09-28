@@ -124,7 +124,7 @@ export const cityBusinessJsonLd = ({
   name: `${business.name} — Nettoyage à ${city}`,
   description,
   url: canonicalUrl(path),
-  slogan: `Nettoyage ${city}${postalCode ? ` ${postalCode}` : ""} — devis gratuit sous 24 h`,
+  slogan: `Nettoyage ${city}${postalCode ? ` ${postalCode}` : ""} — devis gratuit`,
   areaServed: [
     {
       "@type": "City",

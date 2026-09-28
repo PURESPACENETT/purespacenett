@@ -12,7 +12,7 @@ import { DeferredReviews } from "@/components/deferred-reviews";
 
 const title = "Entreprise de nettoyage Île-de-France | PURE SPACE NETT";
 const description =
-  "PURE SPACE NETT, entreprise de nettoyage au Pré-Saint-Gervais : bureaux, copropriétés, fin de chantier, vitres, remise en état dans le 93, Paris et toute l'Île-de-France. Devis gratuit sous 24 h.";
+  "PURE SPACE NETT, entreprise de nettoyage au Pré-Saint-Gervais : bureaux, copropriétés, fin de chantier, vitres, remise en état dans le 93, Paris et toute l'Île-de-France. Devis gratuit, après étude de votre demande.";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
 const arguments_ = [
   {
     icon: Clock,
-    title: "Réponse sous 24 heures",
+    title: "Réponse rapide" ,
     text: "Un devis clair, sans engagement, après un échange téléphonique ou une visite sur place.",
   },
   {
@@ -76,12 +76,12 @@ function Index() {
             <div className="mt-8">
               <CallButtons subject="page d'accueil" />
               <p className="mt-3 text-xs text-muted-foreground">
-                Devis gratuit • Sans engagement • Réponse sous 24 h
+                Devis gratuit • Sans engagement • Réponse après étude
               </p>
             </div>
             <dl className="mt-10 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
               {[
-                ["24 h", "Délai de réponse"],
+                ["Rapide", "Délai de réponse"],
                 ["6 j/7", "Disponibilité"],
                 ["9", "Prestations"],
                 ["IDF", "Zone couverte"],

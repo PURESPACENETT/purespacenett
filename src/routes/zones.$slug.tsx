@@ -125,7 +125,7 @@ function ZoneDetail() {
               professionnel
             </h1>
             <p className="mt-2 text-sm font-medium text-muted-foreground">
-              {zone.department} · société de nettoyage de proximité · devis gratuit sous 24 h
+              {zone.department} · société de nettoyage de proximité · devis gratuit après étude de votre demande
             </p>
             <p className="mt-5 max-w-2xl text-base text-muted-foreground">{zone.intro}</p>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-foreground/90">

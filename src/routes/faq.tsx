@@ -14,7 +14,7 @@ import { canonicalUrl, breadcrumbJsonLd, faqJsonLd, localBusinessJsonLd, pageMet
 
 const title = "FAQ nettoyage — horaires, devis, tarifs, zones | PURE SPACE NETT";
 const description =
-  "Réponses aux questions fréquentes sur nos prestations de nettoyage en Seine-Saint-Denis et à Paris : horaires 7h–22h, devis gratuit sous 24 h, tarifs, prestations et villes couvertes.";
+  "Réponses aux questions fréquentes sur nos prestations de nettoyage en Seine-Saint-Denis et à Paris : horaires 7h–22h, devis gratuit, tarifs, prestations et villes couvertes.";
 
 export const Route = createFileRoute("/faq")({
   staticData: { sitemap: true },
