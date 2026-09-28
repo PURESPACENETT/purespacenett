@@ -176,7 +176,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
 
         const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
-          "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
+          "https://wewihwzeesxhugnupkpm.supabase.co/functions/v1/quote-request-webhook";
 
         // Le secret partagé de production est stocké dans Supabase Vault.
         // On le lit en priorité pour éviter qu'un ancien FUNNEL_QUOTE_WEBHOOK_SECRET
