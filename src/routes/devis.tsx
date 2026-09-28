@@ -9,9 +9,9 @@ import { LocalInfo } from "@/components/local-info";
 import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@/lib/seo";
 import { trackEvent } from "@/lib/analytics";
 
-const title = "Devis nettoyage gratuit en 24 h | PURE SPACE NETT";
+const title = "Devis nettoyage gratuit | PURE SPACE NETT";
 const description =
-  "Demandez un devis de nettoyage gratuit : bureaux, copropriétés, fin de chantier, vitres, état des lieux. Réponse sous 24 h dans le 93, à Paris et en Île-de-France.";
+  "Demandez un devis de nettoyage gratuit : bureaux, copropriétés, fin de chantier, vitres, état des lieux. Réponse après étude de votre demande dans le 93, à Paris et en Île-de-France.";
 const path = "/devis";
 
 export const Route = createFileRoute("/devis")({
