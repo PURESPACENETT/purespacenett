@@ -7,7 +7,7 @@ import { canonicalUrl, breadcrumbJsonLd, localBusinessJsonLd, pageMeta } from "@
 
 const title = "Contact et devis gratuit | PURE SPACE NETT";
 const description =
-  "Contactez PURE SPACE NETT au 07 59 48 30 21 ou à contact@purespacenett.com pour un devis de nettoyage gratuit en Île-de-France. Réponse sous 24 heures.";
+  "Contactez PURE SPACE NETT au 07 59 48 30 21 ou à contact@purespacenett.com pour un devis de nettoyage gratuit en Île-de-France. Réponse après étude de votre demande.";
 
 export const Route = createFileRoute("/contact")({
   staticData: { sitemap: true },
