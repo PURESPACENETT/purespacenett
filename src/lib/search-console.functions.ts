@@ -3,7 +3,8 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { zones } from "@/content/zones";
 
-const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
+const API_BASE = "https://www.googleapis.com/webmasters/v3";
+const OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const SITE_URL = "https://purespacenett.com";
 
 export type SearchRow = {
@@ -40,22 +41,45 @@ const InputSchema = z.object({
   proprieteChoisie: z.string().max(300).optional(),
 });
 
-function headers() {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
-  const connKey = process.env["GOOGLE_SEARCH_CONSOLE_API_KEY"];
-  if (!lovableKey || !connKey) {
+function oauthConfigured() {
+  return Boolean(
+    process.env["GOOGLE_SEARCH_CONSOLE_CLIENT_ID"] &&
+      process.env["GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET"] &&
+      process.env["GOOGLE_SEARCH_CONSOLE_REFRESH_TOKEN"],
+  );
+}
+
+async function headers() {
+  if (!oauthConfigured()) {
     throw new Error(
-      "La connexion à Google Search Console n'est pas disponible pour ce site pour le moment.",
+      "Google Search Console n'est pas configuré : renseignez GOOGLE_SEARCH_CONSOLE_CLIENT_ID, GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET et GOOGLE_SEARCH_CONSOLE_REFRESH_TOKEN.",
     );
   }
+  const body = new URLSearchParams({
+    client_id: process.env["GOOGLE_SEARCH_CONSOLE_CLIENT_ID"]!,
+    client_secret: process.env["GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET"]!,
+    refresh_token: process.env["GOOGLE_SEARCH_CONSOLE_REFRESH_TOKEN"]!,
+    grant_type: "refresh_token",
+  });
+  const tokenResponse = await fetch(OAUTH_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+  if (!tokenResponse.ok) {
+    throw new Error(
+      `Google OAuth n'a pas pu renouveler le jeton (${tokenResponse.status}) : ${await tokenResponse.text()}`,
+    );
+  }
+  const token = (await tokenResponse.json()) as { access_token?: string };
+  if (!token.access_token) throw new Error("Google OAuth n'a retourné aucun access_token.");
   return {
-    Authorization: `Bearer ${lovableKey}`,
-    "X-Connection-Api-Key": connKey,
+    Authorization: `Bearer ${token.access_token}`,
     "Content-Type": "application/json",
   };
 }
 
-function coversTarget(siteUrl: string, target: URL) {
+async function coversTarget(siteUrl: string, target: URL) {
   if (siteUrl.startsWith("sc-domain:")) {
     const domain = siteUrl.slice("sc-domain:".length).toLowerCase();
     const host = target.hostname.toLowerCase();
@@ -69,7 +93,7 @@ function coversTarget(siteUrl: string, target: URL) {
 }
 
 async function resolveProperty(chosen?: string) {
-  const res = await fetch(`${GATEWAY}/webmasters/v3/sites`, { headers: headers() });
+  const res = await fetch(`${API_BASE}/sites`, { headers: await headers() });
   if (!res.ok) {
     throw new Error(`Google Search Console n'a pas répondu (${res.status}) : ${await res.text()}`);
   }
@@ -94,8 +118,8 @@ async function resolveProperty(chosen?: string) {
 
 async function query(property: string, body: Record<string, unknown>) {
   const res = await fetch(
-    `${GATEWAY}/webmasters/v3/sites/${encodeURIComponent(property)}/searchAnalytics/query`,
-    { method: "POST", headers: headers(), body: JSON.stringify(body) },
+    `${API_BASE}/sites/${encodeURIComponent(property)}/searchAnalytics/query`,
+    { method: "POST", headers: await headers(), body: JSON.stringify(body) },
   );
   if (!res.ok) {
     throw new Error(`Lecture des statistiques Google impossible (${res.status}) : ${await res.text()}`);
