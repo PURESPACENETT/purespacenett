@@ -107,7 +107,7 @@ export function QuoteBanner({ subject }: { subject: string }) {
         <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
           <div>
             <h2 className="font-display text-2xl font-bold sm:text-3xl">
-              Un devis gratuit, une réponse sous 24 heures
+              Un devis gratuit, une réponse après étude de votre demande
             </h2>
             <p className="mt-3 text-sm text-ink-foreground/75">
               Décrivez-nous votre besoin : surface, fréquence souhaitée, contraintes d'horaires.
