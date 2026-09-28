@@ -57,23 +57,19 @@ const SYSTEM = [
   "nextStep : une seule phrase indiquant l'action commerciale à faire en premier.",
 ].join("\n");
 
-/** Generates a qualified summary of a quote request with Lovable AI. */
+/** Generates a qualified summary of a quote request with OpenAI. */
 export async function qualifyQuoteRequest(input: QualifyInput): Promise<Qualification | null> {
-  const key = process.env["LOVABLE_API_KEY"];
+  const key = process.env["OPENAI_API_KEY"];
   if (!key) {
-    console.error("LOVABLE_API_KEY missing, skipping AI qualification");
+    console.error("OPENAI_API_KEY missing, skipping AI qualification");
     return null;
   }
 
-  const lovable = createOpenAI({
-    baseURL: "https://ai.gateway.lovable.dev/v1",
-    apiKey: key,
-    headers: { "Lovable-API-Key": key, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-  });
+  const openai = createOpenAI({ apiKey: key });
 
   try {
     const result = streamText({
-      model: lovable.responses("openai/gpt-6-astra"),
+      model: openai.responses(process.env["OPENAI_MODEL"] ?? "gpt-5.6-luna"),
       system: SYSTEM,
       prompt: buildPrompt(input),
       output: Output.object({ schema: qualificationSchema }),

@@ -96,21 +96,20 @@ export const analyzeSeoReport = createServerFn({ method: "POST" })
       throw new Error("Accès réservé à l'administrateur du site.");
     }
 
-    const key = process.env["LOVABLE_API_KEY"];
-    if (!key) throw new Error("La clé d'accès au service d'analyse est absente.");
+    const key = process.env["OPENAI_API_KEY"];
+    if (!key) throw new Error("La clé OPENAI_API_KEY du service d'analyse est absente.");
 
     const excerpt = data.content.slice(0, MAX_CHARS);
     const truncated = data.content.length > MAX_CHARS;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+    const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Lovable-API-Key": key,
-        "X-Lovable-AIG-SDK": "fetch",
+        Authorization: `Bearer ${key}`,
       },
       body: JSON.stringify({
-        model: "openai/gpt-6-astra",
+        model: process.env["OPENAI_MODEL"] ?? "gpt-5.6-luna",
         stream: true,
         store: false,
         reasoning: { effort: "medium", summary: "auto" },
@@ -143,7 +142,7 @@ export const analyzeSeoReport = createServerFn({ method: "POST" })
       const detail = await response.text().catch(() => "");
       if (response.status === 402) {
         throw new Error(
-          "Les crédits d'analyse sont épuisés. Rechargez-les dans les réglages de l'espace Lovable.",
+          "Le service d'analyse OpenAI a refusé la requête. Vérifiez la configuration de la clé API et le budget du projet.",
         );
       }
       if (response.status === 429) {
