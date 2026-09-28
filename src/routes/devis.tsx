@@ -47,14 +47,14 @@ function DevisPage() {
         </h1>
         <p className="mt-5 max-w-2xl text-base text-muted-foreground">
           Remplissez le formulaire en quelques minutes. Vous pouvez ajouter des photos pour nous aider
-          à comprendre le besoin. Nous revenons vers vous sous 24 heures avec un chiffrage clair ou
+          à comprendre le besoin. Nous revenons vers vous après étude de la demande avec un chiffrage clair ou
           une proposition de visite sur place.
         </p>
         <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">
           <span className="rounded-full border border-border bg-card px-3 py-1.5">Gratuit</span>
           <span className="rounded-full border border-border bg-card px-3 py-1.5">Sans engagement</span>
           <span className="rounded-full border border-border bg-card px-3 py-1.5">Photos facultatives</span>
-          <span className="rounded-full border border-border bg-card px-3 py-1.5">Réponse sous 24 h</span>
+          <span className="rounded-full border border-border bg-card px-3 py-1.5">Réponse après étude</span>
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-start">
