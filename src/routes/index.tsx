@@ -8,7 +8,7 @@ import { CallButtons, CheckList, Eyebrow, QuoteBanner, Section } from "@/compone
 import { canonicalUrl, localBusinessJsonLd, pageMeta, websiteJsonLd } from "@/lib/seo";
 import { siteImages } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
-import { GoogleReviewCard, SocialProof } from "@/components/published-reviews";
+import { DeferredReviews } from "@/components/deferred-reviews";
 
 const title = "Entreprise de nettoyage Île-de-France | PURE SPACE NETT";
 const description =
@@ -237,15 +237,8 @@ function Index() {
         <Eyebrow>Avis clients</Eyebrow>
         <h2 className="mt-3 font-display text-3xl font-bold">Ils nous ont confié leur nettoyage</h2>
         <div className="mt-6">
-          <SocialProof />
+          <DeferredReviews testimonials={testimonials} />
         </div>
-        {testimonials.some((review) => review.sourceUrl) && (
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.filter((review) => review.sourceUrl).map((review) => (
-              <GoogleReviewCard key={review.author} review={review} />
-            ))}
-          </div>
-        )}
       </Section>
 
       <QuoteBanner subject="page d'accueil" />
