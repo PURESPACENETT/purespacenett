@@ -62,9 +62,9 @@ export const Route = createFileRoute("/nettoyage-de-bureaux")({
         content:
           "Nettoyage de bureaux et locaux professionnels en Île-de-France. Estimation immédiate en ligne.",
       },
-      { property: "og:url", content: "https://funnel-friendship.lovable.app/nettoyage-de-bureaux" },
+      { property: "og:url", content: "https://purespacenett.com/nettoyage-de-bureaux" },
     ],
-    links: [{ rel: "canonical", href: "https://funnel-friendship.lovable.app/nettoyage-de-bureaux" }],
+    links: [{ rel: "canonical", href: "https://purespacenett.com/nettoyage-de-bureaux" }],
     scripts: [
       {
         type: "application/ld+json",
