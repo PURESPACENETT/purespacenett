@@ -40,7 +40,7 @@ export function localBusinessJsonLd(props: LocalPageProps, path: string) {
     "@type": "CleaningService",
     name: BUSINESS.name,
     description: props.intro,
-    url: `https://funnel-friendship.lovable.app${path}`,
+    url: `https://www.purespacenett.com${path}`,
     telephone: BUSINESS.phoneE164,
     email: BUSINESS.email,
     sameAs: [BUSINESS.website, BUSINESS.googleMapsUrl],

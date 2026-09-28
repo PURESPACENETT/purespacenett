@@ -17,19 +17,27 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}${logoAsset.url}`;
 export const localBusinessJsonLd = {
   "@context": "https://schema.org",
   "@type": "CleaningService",
+  "@id": `${SITE_URL}/#business`,
   name: business.name,
+  legalName: business.legalName,
   description: business.tagline,
   telephone: "+33759483021",
   email: business.email,
   url: SITE_URL,
   image: [DEFAULT_OG_IMAGE],
+  logo: DEFAULT_OG_IMAGE,
   hasMap: business.googleBusinessUrl,
   sameAs: [
-    business.googleBusinessUrl,
     business.linkedinUrl,
     business.facebookUrl,
     business.instagramUrl,
   ],
+  identifier: {
+    "@type": "PropertyValue",
+    propertyID: "SIREN",
+    value: business.siren,
+  },
+  vatID: business.vatNumber,
   address: {
     "@type": "PostalAddress",
     streetAddress: business.address,
@@ -49,6 +57,24 @@ export const localBusinessJsonLd = {
     },
   ],
   priceRange: "€€",
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+33759483021",
+    email: business.email,
+    contactType: "customer service",
+    areaServed: "FR",
+    availableLanguage: ["fr"],
+  },
+};
+
+export const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}/#website`,
+  url: SITE_URL,
+  name: business.name,
+  publisher: { "@id": `${SITE_URL}/#business` },
+  inLanguage: "fr-FR",
 };
 
 export const serviceJsonLd = (name: string, description: string, path: string) => ({

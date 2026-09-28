@@ -5,7 +5,7 @@ import { testimonials } from "@/content/testimonials";
 import { services } from "@/content/services";
 import { zones } from "@/content/zones";
 import { CallButtons, CheckList, Eyebrow, QuoteBanner, Section } from "@/components/site-blocks";
-import { canonicalUrl, localBusinessJsonLd, pageMeta } from "@/lib/seo";
+import { canonicalUrl, localBusinessJsonLd, pageMeta, websiteJsonLd } from "@/lib/seo";
 import { siteImages } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 import { GoogleReviewCard, SocialProof } from "@/components/published-reviews";
@@ -19,7 +19,10 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: pageMeta({ title, description, path: "/" }),
     links: [{ rel: "canonical", href: canonicalUrl("/") }],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) },
+      { type: "application/ld+json", children: JSON.stringify(websiteJsonLd) },
+    ],
   }),
   component: Index,
 });
