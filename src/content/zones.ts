@@ -189,7 +189,7 @@ export const zones: Zone[] = [
     department: "Paris (75)",
     title: "Nettoyage Paris est — 10e, 11e, 18e, 19e, 20e | PURE SPACE NETT",
     description:
-      "Entreprise de nettoyage à Paris, surtout 10e, 11e, 18e, 19e et 20e : bureaux, commerces, vitres, fin de chantier, état des lieux. Devis gratuit sous 24 h.",
+      "Entreprise de nettoyage à Paris, surtout 10e, 11e, 18e, 19e et 20e : bureaux, commerces, vitres, fin de chantier, état des lieux. Devis gratuit après étude de votre demande.",
     intro:
       "Nous intervenons dans tout Paris, avec une présence renforcée sur les arrondissements de l'est : 10e, 11e, 18e, 19e et 20e.",
     context:
@@ -211,7 +211,7 @@ export const zones: Zone[] = [
     department: "Île-de-France",
     title: "Nettoyage en Île-de-France — Entreprise PURE SPACE NETT",
     description:
-      "PURE SPACE NETT intervient dans toute l'Île-de-France : nettoyage de bureaux, copropriétés, fin de chantier, vitres et remise en état. Devis gratuit sous 24 h.",
+      "PURE SPACE NETT intervient dans toute l'Île-de-France : nettoyage de bureaux, copropriétés, fin de chantier, vitres et remise en état. Devis gratuit après étude de votre demande.",
     intro:
       "Notre base est en Seine-Saint-Denis, mais nous nous déplaçons dans toute l'Île-de-France pour les chantiers et les contrats réguliers.",
     context:
