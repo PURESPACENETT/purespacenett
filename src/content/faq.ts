@@ -30,7 +30,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       {
         q: "Le devis est-il gratuit ?",
-        a: "Oui, le devis est gratuit et sans engagement. Remplissez le formulaire de demande de devis, écrivez-nous sur WhatsApp ou appelez-nous : vous recevez une réponse chiffrée sous 24 heures ouvrées.",
+        a: "Oui, le devis est gratuit et sans engagement. Remplissez le formulaire de demande de devis, écrivez-nous sur WhatsApp ou appelez-nous : vous recevez une réponse chiffrée après étude de votre demande.",
       },
       {
         q: "Comment se passe la visite avant le devis ?",
