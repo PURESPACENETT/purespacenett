@@ -36,7 +36,7 @@ export const business = {
   hours: "Du lundi au samedi, 7h – 22h — dimanche et jours fériés sur demande",
   openingHours: "Mo-Sa 07:00-22:00",
   usp: [
-    "Devis gratuit sous 24 h",
+    "Devis gratuit après étude de la demande",
     "Interventions ponctuelles ou contrats réguliers",
     "Prestations pour particuliers et professionnels",
     "Photos possibles avec la demande de devis",
