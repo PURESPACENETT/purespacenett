@@ -18,7 +18,15 @@ export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
   head: () => ({
     meta: pageMeta({ title, description, path: "/" }),
-    links: [{ rel: "canonical", href: canonicalUrl("/") }],
+    links: [
+      { rel: "canonical", href: canonicalUrl("/") },
+      {
+        rel: "preload",
+        as: "image",
+        href: siteImages.avantApres,
+        fetchPriority: "high",
+      },
+    ],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(localBusinessJsonLd) },
       { type: "application/ld+json", children: JSON.stringify(websiteJsonLd) },
