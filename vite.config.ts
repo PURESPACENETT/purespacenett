@@ -1,28 +1,23 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - TanStack devtools (dev-only, first), tanstackStart, viteReact, tailwindcss, tsConfigPaths,
-//     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
-//     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+// @lovable.dev/vite-tanstack-config remains temporarily as the TanStack Start build provider.
+// The application is being decoupled from the historical Lovable runtime; no Lovable service
+// is used as the development or deployment source of truth.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   vite: {
-    // These are public browser credentials, not secrets. Keeping the production
-    // values here prevents a published client bundle from losing them when the
-    // deployment environment is refreshed independently from the server runtime.
+    // Public browser credentials. The fallback is aligned with the canonical PURE SPACE NETT
+    // Supabase production project so the client cannot silently target an obsolete project.
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-        "https://tunjuiuibsbbsepdkorx.supabase.co",
+        "https://dgppmlkpvmvjkhsghtji.supabase.co",
       ),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        "sb_publishable_3YGmLGsmcp2tbDHVH9T2Aw_d--3ghe5",
+        "sb_publishable_Uqxxo1jp4wENhs7XKC53Wg_2RGn3dRw",
       ),
     },
   },
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
+    // Use the SSR error wrapper as the TanStack Start server entry.
     server: { entry: "server" },
   },
 });
