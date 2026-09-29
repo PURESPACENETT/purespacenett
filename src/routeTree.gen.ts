@@ -30,7 +30,6 @@ import { Route as ZonesSlugRouteImport } from './routes/zones.$slug'
 import { Route as ApiPublicAvisRouteImport } from './routes/api/public/avis'
 import { Route as ApiPublicB2bLeadRouteImport } from './routes/api/public/b2b-lead'
 import { Route as ApiPublicDevisRouteImport } from './routes/api/public/devis'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -137,12 +136,6 @@ const ApiPublicDevisRoute = ApiPublicDevisRouteImport.update({
   path: '/api/public/devis',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -165,7 +158,6 @@ export interface FileRoutesByFullPath {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -188,7 +180,6 @@ export interface FileRoutesByTo {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -213,7 +204,6 @@ export interface FileRoutesById {
   '/api/public/avis': typeof ApiPublicAvisRoute
   '/api/public/b2b-lead': typeof ApiPublicB2bLeadRoute
   '/api/public/devis': typeof ApiPublicDevisRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
