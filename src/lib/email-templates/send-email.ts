@@ -4,8 +4,7 @@ import { TEMPLATES } from './registry'
 
 // Server-only: reads RESEND_API_KEY and RESEND_FROM_EMAIL. Never import from client components.
 const SITE_NAME = "PURE SPACE NETT"
-// SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
-// It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
+// SENDER_DOMAIN is retained as a fallback reference for the verified sender domain.
 const FROM_DOMAIN = "purespacenett.com"
 
 export type SendTemplateEmailResult =
@@ -20,13 +19,7 @@ export interface SendTemplateEmailOptions {
   replyTo?: string
 }
 
-/**
- * Renders a registered template and sends it through Lovable's managed email
- * API. Suppression, retries, and rate limits are enforced by Lovable
- * server-side. A suppressed recipient is an expected outcome
- * ({ sent: false }); any other failure throws — EmailAPIError exposes
- * .code and .status for branching.
- */
+/** Renders a registered template and sends it through the Resend API. */
 export async function sendTemplateEmail(
   templateName: string,
   to: string,
