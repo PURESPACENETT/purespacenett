@@ -1,32 +1,35 @@
-# Client Acquisition Magic
+# CRM PURE SPACE NETT
 
-Que penses-tu du texte suivant, on peut faire un projet pareil nous même ?
+Application CRM interne de PURE SPACE NETT pour la prospection B2B, le suivi des prospects, les devis et les actions commerciales.
 
-"Systèmes automatisés d'acquisition clients — Tunnels de conversion et automatisation sur mesure
+## Architecture
 
+- Code source : GitHub `PURESPACENETT/purespacenett`
+- Application : `apps/crm/`
+- Base de données : Supabase
+- Déploiement : pipeline GitHub → Vercel
+- IA de prospection : OpenAI
+- E-mails transactionnels : Resend
 
+## Développement
 
-Digital Renforcy conçoit et déploie des systèmes automatisés d'acquisition clients sur-mesure. Tunnels de conversion, landing pages haute performance, formulaires intelligents, chatbots IA et automatisation complète du parcours prospect. Chaque contact est capté, qualifié et transmis automatiquement."
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://funnel-friendship.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/26b9f4d5-20ac-40f1-abaf-4e43b025acc6).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Depuis la racine du dépôt :
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun install --frozen-lockfile
+bun run lint
+bun run build
 ```
+
+Pour travailler spécifiquement sur le CRM :
+
+```sh
+cd apps/crm
+bun run dev
+```
+
+## Règle d'architecture
+
+GitHub est la source de vérité du développement. Les modifications doivent être effectuées dans le dépôt puis validées par la CI avant déploiement.
+
+Les anciens artefacts Lovable peuvent être conservés uniquement comme historique tant qu'une dépendance fonctionnelle n'a pas encore été migrée.
