@@ -17,7 +17,6 @@ export const Route = createFileRoute("/api/public/hooks/automatisation-quotidien
         const accepted = [
           process.env["AUTOMATION_CRON_SECRET"],
           process.env["CRON_SECRET"],
-          process.env["LOVABLE_CRON_SECRET"],
         ];
         if (!secretMatches(providedCronSecret(request), accepted)) {
           return new Response(JSON.stringify({ error: "unauthorized" }), {
