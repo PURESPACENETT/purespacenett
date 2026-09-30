@@ -218,7 +218,6 @@ export interface FileRoutesById {
   '/api/public/hooks/b2b-lead': typeof ApiPublicHooksB2bLeadRoute
   '/api/public/hooks/prospection-quotidienne': typeof ApiPublicHooksProspectionQuotidienneRoute
   '/api/public/hooks/quote-request': typeof ApiPublicHooksQuoteRequestRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_authenticated/app/demandes/': typeof AuthenticatedAppDemandesIndexRoute
 }
 export interface FileRouteTypes {
@@ -244,7 +243,6 @@ export interface FileRouteTypes {
     | '/api/public/hooks/b2b-lead'
     | '/api/public/hooks/prospection-quotidienne'
     | '/api/public/hooks/quote-request'
-    | '/lovable/email/transactional/preview'
     | '/app/demandes/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -267,7 +265,6 @@ export interface FileRouteTypes {
     | '/api/public/hooks/b2b-lead'
     | '/api/public/hooks/prospection-quotidienne'
     | '/api/public/hooks/quote-request'
-    | '/lovable/email/transactional/preview'
     | '/app/demandes'
   id:
     | '__root__'
@@ -292,7 +289,6 @@ export interface FileRouteTypes {
     | '/api/public/hooks/b2b-lead'
     | '/api/public/hooks/prospection-quotidienne'
     | '/api/public/hooks/quote-request'
-    | '/lovable/email/transactional/preview'
     | '/_authenticated/app/demandes/'
   fileRoutesById: FileRoutesById
 }
