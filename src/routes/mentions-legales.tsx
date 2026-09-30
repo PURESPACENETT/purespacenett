@@ -96,16 +96,15 @@ function LegalPage() {
             <dl className="mt-3 space-y-2">
               <div>
                 <dt className="font-semibold">Hébergeur</dt>
-                <dd>Lovable Labs Incorporated</dd>
+                <dd>Vercel Inc.</dd>
               </div>
               <div>
                 <dt className="font-semibold">Adresse</dt>
-                <dd>1 Lincoln St, Boston, MA 02111, États-Unis</dd>
+                <dd>440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis</dd>
               </div>
             </dl>
             <p className="mt-3">
-              Le site est publié et hébergé via la plateforme Lovable. Cette mention est fournie à
-              titre informatif et ne constitue pas une certification.
+              Le site est déployé et hébergé via la plateforme Vercel. Les informations d’hébergement sont fournies à titre informatif et doivent être vérifiées dans les mentions contractuelles du prestataire.
             </p>
           </section>
 
