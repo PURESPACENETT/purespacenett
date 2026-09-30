@@ -274,10 +274,10 @@ export async function scanWebsiteForEmail(
   return emails[0] ?? null;
 }
 
-const CLAY_GATEWAY = "https://connector-gateway.lovable.dev/clay";
+const CLAY_API_BASE = "https://api.clay.com/public/v0";
 
 export function clayConfigured(): boolean {
-  return Boolean(process.env["LOVABLE_API_KEY"] && process.env["CLAY_API_KEY"]);
+  return Boolean(process.env["CLAY_API_KEY"]);
 }
 
 interface ClayPerson {
@@ -290,15 +290,17 @@ interface ClayPerson {
   structured_location?: { country_iso?: string | null; city?: string | null };
 }
 
-async function clayCall(path: string, body: unknown): Promise<Record<string, unknown>> {
-  const response = await fetch(`${CLAY_GATEWAY}${path}`, {
-    method: "POST",
+async function clayCall(
+  path: string,
+  init: RequestInit = {},
+): Promise<Record<string, unknown>> {
+  const response = await fetch(`${CLAY_API_BASE}${path}`, {
+    ...init,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env["LOVABLE_API_KEY"]}`,
-      "X-Connection-Api-Key": process.env["CLAY_API_KEY"] ?? "",
+      "clay-api-key": process.env["CLAY_API_KEY"] ?? "",
+      ...(init.headers ?? {}),
     },
-    body: JSON.stringify(body),
   });
   const text = await response.text();
   if (!response.ok) {
@@ -335,13 +337,19 @@ export async function findContactViaClay(input: {
   if (!domain) return null;
 
   const created = await clayCall("/search/filters-mode", {
-    source_type: "people",
-    filters: { company_identifier: [domain] },
+    method: "POST",
+    body: JSON.stringify({
+      source_type: "people",
+      filters: { company_identifier: [domain] },
+    }),
   });
   const searchId = created["search_id"];
   if (typeof searchId !== "string") return null;
 
-  const run = await clayCall(`/search/filters-mode/${searchId}/run`, { limit: 25 });
+  const run = await clayCall(`/search/filters-mode/${searchId}/run`, {
+    method: "POST",
+    body: JSON.stringify({ limit: 25 }),
+  });
   const people = (run["data"] as ClayPerson[] | undefined) ?? [];
   if (people.length === 0) return null;
 
