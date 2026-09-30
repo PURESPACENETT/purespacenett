@@ -284,10 +284,15 @@ interface ClayPerson {
   name?: string;
   first_name?: string;
   last_name?: string;
+  fullName?: string;
   url?: string;
+  linkedInUrl?: string;
   domain?: string;
+  companyDomain?: string;
   latest_experience_title?: string;
+  jobTitle?: string;
   structured_location?: { country_iso?: string | null; city?: string | null };
+  locationCountry?: string | null;
 }
 
 async function clayCall(
@@ -353,27 +358,32 @@ export async function findContactViaClay(input: {
   const people = (run["data"] as ClayPerson[] | undefined) ?? [];
   if (people.length === 0) return null;
 
-  const french = people.filter(
-    (person) => (person.structured_location?.country_iso ?? "FR").toUpperCase() === "FR",
-  );
+  const french = people.filter((person) => {
+    const country =
+      person.structured_location?.country_iso ??
+      person.locationCountry ??
+      "FR";
+    return country.toUpperCase() === "FR" || country.toUpperCase() === "FRANCE";
+  });
   const pool = french.length > 0 ? french : people;
 
   const decisionMaker =
     pool.find((person) => {
-      const title = (person.latest_experience_title ?? "").toLowerCase();
+      const title = (person.jobTitle ?? person.latest_experience_title ?? "").toLowerCase();
       return DECISION_KEYWORDS.some((keyword) => title.includes(keyword));
     }) ?? pool[0];
 
   if (!decisionMaker) return null;
 
   const contactName =
+    decisionMaker.fullName ??
     decisionMaker.name ??
     [decisionMaker.first_name, decisionMaker.last_name].filter(Boolean).join(" ");
   if (!contactName) return null;
 
   return {
     contactName: contactName.replace(/\s*\[[^\]]*\]\s*/g, " ").trim(),
-    title: decisionMaker.latest_experience_title ?? null,
-    linkedin: decisionMaker.url ?? null,
+    title: decisionMaker.jobTitle ?? decisionMaker.latest_experience_title ?? null,
+    linkedin: decisionMaker.linkedInUrl ?? decisionMaker.url ?? null,
   };
 }
