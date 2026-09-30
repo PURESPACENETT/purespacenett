@@ -1,8 +1,7 @@
 import { getAnalyticsConsent } from "@/components/cookie-consent";
 import { getMarketingAttribution } from "@/lib/attribution";
 
-const measurementId = (import.meta.env["VITE_GOOGLE_ANALYTICS_ID"] ??
-  import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY"]) as string | undefined;
+const measurementId = import.meta.env["VITE_GOOGLE_ANALYTICS_ID"] as string | undefined;
 const googleAdsId = import.meta.env["VITE_GOOGLE_ADS_ID"] as string | undefined;
 const googleAdsConversionLabel = import.meta.env["VITE_GOOGLE_ADS_CONVERSION_LABEL"] as string | undefined;
 
