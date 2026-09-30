@@ -31,7 +31,6 @@ import { Route as ApiPublicHooksAutomatisationQuotidienneRouteImport } from './r
 import { Route as ApiPublicHooksB2bLeadRouteImport } from './routes/api/public/hooks/b2b-lead'
 import { Route as ApiPublicHooksProspectionQuotidienneRouteImport } from './routes/api/public/hooks/prospection-quotidienne'
 import { Route as ApiPublicHooksQuoteRequestRouteImport } from './routes/api/public/hooks/quote-request'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -151,13 +150,6 @@ const ApiPublicHooksQuoteRequestRoute =
     path: '/api/public/hooks/quote-request',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
@@ -179,7 +171,6 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/b2b-lead': typeof ApiPublicHooksB2bLeadRoute
   '/api/public/hooks/prospection-quotidienne': typeof ApiPublicHooksProspectionQuotidienneRoute
   '/api/public/hooks/quote-request': typeof ApiPublicHooksQuoteRequestRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/demandes/': typeof AuthenticatedAppDemandesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -202,7 +193,6 @@ export interface FileRoutesByTo {
   '/api/public/hooks/b2b-lead': typeof ApiPublicHooksB2bLeadRoute
   '/api/public/hooks/prospection-quotidienne': typeof ApiPublicHooksProspectionQuotidienneRoute
   '/api/public/hooks/quote-request': typeof ApiPublicHooksQuoteRequestRoute
-  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/demandes': typeof AuthenticatedAppDemandesIndexRoute
 }
 export interface FileRoutesById {
@@ -320,7 +310,6 @@ export interface RootRouteChildren {
   ApiPublicHooksB2bLeadRoute: typeof ApiPublicHooksB2bLeadRoute
   ApiPublicHooksProspectionQuotidienneRoute: typeof ApiPublicHooksProspectionQuotidienneRoute
   ApiPublicHooksQuoteRequestRoute: typeof ApiPublicHooksQuoteRequestRoute
-  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -479,13 +468,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksQuoteRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -541,7 +523,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksProspectionQuotidienneRoute:
     ApiPublicHooksProspectionQuotidienneRoute,
   ApiPublicHooksQuoteRequestRoute: ApiPublicHooksQuoteRequestRoute,
-  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
