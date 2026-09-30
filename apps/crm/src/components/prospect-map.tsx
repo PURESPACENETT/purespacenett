@@ -18,12 +18,10 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
-const BROWSER_KEY = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY"] as
-  | string
-  | undefined;
-const CHANNEL = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID"] as
-  | string
-  | undefined;
+const BROWSER_KEY = (import.meta.env["VITE_GOOGLE_MAPS_BROWSER_KEY"] ??
+  import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY"]) as string | undefined;
+const CHANNEL = (import.meta.env["VITE_GOOGLE_MAPS_TRACKING_ID"] ??
+  import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID"]) as string | undefined;
 
 const CALLBACK = "__pureSpaceMapsReady";
 
