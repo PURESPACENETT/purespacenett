@@ -12,7 +12,6 @@ export const Route = createFileRoute("/api/public/hooks/prospection-quotidienne"
         const accepted = [
           process.env["PROSPECTION_CRON_SECRET"],
           process.env["CRON_SECRET"],
-          process.env["LOVABLE_CRON_SECRET"],
         ];
         if (!secretMatches(providedCronSecret(request), accepted)) {
           return new Response(JSON.stringify({ error: "unauthorized" }), {
