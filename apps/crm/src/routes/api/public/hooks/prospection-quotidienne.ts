@@ -11,6 +11,7 @@ export const Route = createFileRoute("/api/public/hooks/prospection-quotidienne"
         const { secretMatches, providedCronSecret } = await import("@/lib/secret-compare.server");
         const accepted = [
           process.env["PROSPECTION_CRON_SECRET"],
+          process.env["CRON_SECRET"],
           process.env["LOVABLE_CRON_SECRET"],
         ];
         if (!secretMatches(providedCronSecret(request), accepted)) {
