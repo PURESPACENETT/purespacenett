@@ -1,4 +1,4 @@
--- Shared quote bridge secret is stored in Supabase Vault, not in Lovable build secrets.
+-- Shared quote bridge secret is stored in Supabase Vault, not in application build secrets.
 -- The actual Vault secret is provisioned separately in the production Supabase project.
 create or replace function public.get_quote_webhook_secret()
 returns text
