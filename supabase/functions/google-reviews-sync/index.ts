@@ -133,7 +133,7 @@ async function sync() {
   }
 
   const now = new Date().toISOString();
-  await supabaseAdmin.from("google_review_sync_state").upsert({
+  const { error: stateError } = await supabaseAdmin.from("google_review_sync_state").upsert({
     id: 1,
     account_id: config.account_id,
     location_id: config.location_id,
@@ -143,6 +143,7 @@ async function sync() {
     imported_count: imported,
     updated_at: now,
   });
+  if (stateError) throw new Error(`Mise à jour état synchronisation Google: ${stateError.message}`);
 
   return { ok: true, fetched: reviews.length, imported };
 }
@@ -158,12 +159,13 @@ Deno.serve(async (req) => {
     return Response.json(await sync());
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur inconnue";
-    await supabaseAdmin.from("google_review_sync_state").upsert({
+    const { error: stateError } = await supabaseAdmin.from("google_review_sync_state").upsert({
       id: 1,
       last_sync_at: new Date().toISOString(),
       last_error: message.slice(0, 1000),
       updated_at: new Date().toISOString(),
     });
+    if (stateError) console.error(`Échec de journalisation de la synchronisation Google: ${stateError.message}`);
     console.error(message);
     return Response.json({ ok: false, error: message }, { status: 502 });
   }
