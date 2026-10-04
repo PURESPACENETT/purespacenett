@@ -167,6 +167,52 @@ export default {
       time_increment: "1",
     });
 
+    const crmRevenueEvents: Array<Record<string, unknown>> = [];
+    const { data: revenueRows, error: revenueError } = await supabase
+      .from("meta_conversion_events")
+      .select("attribution_id,revenue_amount,currency,occurred_at")
+      .eq("conversion_type", "sale")
+      .eq("source", "crm")
+      .eq("currency", "EUR")
+      .gte("occurred_at", begin.toISOString())
+      .lte("occurred_at", end.toISOString());
+    if (revenueError) throw new Error("Unable to load CRM-attributed revenue.");
+
+    const attributionIds = [...new Set((revenueRows ?? [])
+      .map((event) => event.attribution_id)
+      .filter((id): id is string => Boolean(id)))];
+    let attributionRows: Array<Record<string, unknown>> = [];
+    if (attributionIds.length > 0) {
+      const { data, error } = await supabase
+        .from("meta_lead_attributions")
+        .select("id,meta_campaign_id,meta_adset_id,meta_ad_id")
+        .in("id", attributionIds);
+      if (error) throw new Error("Unable to load Meta revenue attribution.");
+      attributionRows = (data ?? []) as Array<Record<string, unknown>>;
+    }
+
+    const attributionById = new Map(
+      attributionRows.map((row) => [String(row.id), row]),
+    );
+    const revenueByInsight = new Map<string, number>();
+    const parisDate = (value: unknown) => new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Paris",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date(String(value)));
+    for (const event of revenueRows ?? []) {
+      const attribution = attributionById.get(String(event.attribution_id ?? ""));
+      if (!attribution) continue;
+      const key = [
+        parisDate(event.occurred_at),
+        String(attribution.meta_campaign_id ?? ""),
+        String(attribution.meta_adset_id ?? ""),
+        String(attribution.meta_ad_id ?? ""),
+      ].join(":");
+      revenueByInsight.set(key, (revenueByInsight.get(key) ?? 0) + money(event.revenue_amount));
+    }
+
     for (const insight of insights) {
       const spend = money(insight.spend);
       const leads = actionCount(insight.actions, ["lead", "onsite_conversion.lead_grouped"]);
@@ -174,6 +220,13 @@ export default {
       const campaignId = String(insight.campaign_id ?? "");
       const adsetId = String(insight.adset_id ?? "");
       const adId = String(insight.ad_id ?? "");
+      const insightKey = [
+        String(insight.date_start ?? ""),
+        campaignId,
+        adsetId,
+        adId,
+      ].join(":");
+      const crmRevenue = revenueByInsight.get(insightKey) ?? 0;
 
       const { error } = await supabase.from("meta_insights_daily").upsert({
         account_id: account.id,
@@ -194,7 +247,7 @@ export default {
         cpc: money(insight.cpc),
         cpl: leads > 0 ? spend / leads : 0,
         conversions,
-        conversion_value: 0,
+        conversion_value: crmRevenue,
         currency: "EUR",
         raw: insight,
       }, { onConflict: "account_id,date,meta_campaign_id,meta_adset_id,meta_ad_id" });
