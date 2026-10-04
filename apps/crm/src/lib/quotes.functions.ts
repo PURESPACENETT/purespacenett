@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -242,13 +243,15 @@ export const updateRequestRevenue = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    // The CRM's generated database types predate the Meta attribution tables.
+    const metaDb = context.supabase as unknown as SupabaseClient;
     const { error: updateError } = await context.supabase
       .from("quote_requests")
       .update({ actual_revenue: data.actualRevenue })
       .eq("id", data.id);
     if (updateError) throw new Error(updateError.message);
 
-    const { data: attribution, error: attributionError } = await context.supabase
+    const { data: attribution, error: attributionError } = await metaDb
       .from("meta_lead_attributions")
       .select("id")
       .eq("quote_request_id", data.id)
@@ -257,7 +260,7 @@ export const updateRequestRevenue = createServerFn({ method: "POST" })
 
     if (attribution) {
       if (data.actualRevenue === null || data.actualRevenue === 0) {
-        const { error } = await context.supabase
+        const { error } = await metaDb
           .from("meta_conversion_events")
           .delete()
           .eq("quote_request_id", data.id)
