@@ -19,22 +19,21 @@ jobs:
     steps:
       - name: Check required secret
         env:
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_API_SECRET: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+          if [ -z "$SUPABASE_API_SECRET" ]; then
             echo "::error::Add SUPABASE_SERVICE_ROLE_KEY as a GitHub Actions secret."
             exit 1
           fi
 
       - name: Run Meta Ads sync
         env:
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_API_SECRET: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           response="$(curl --silent --show-error --fail-with-body --max-time 180 \
             --request POST \
             --url "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/meta-ads-sync" \
-            --header "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            --header "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            --header "apikey: $SUPABASE_API_SECRET" \
             --header "Content-Type: application/json" \
             --data '{}')"
           printf '%s' "$response" | jq -e '.ok == true' >/dev/null
