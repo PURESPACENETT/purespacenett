@@ -1,17 +1,15 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { withSupabase } from "npm:@supabase/server@1";
 
 const GRAPH_VERSION = Deno.env.get("META_GRAPH_API_VERSION");
 const ACCESS_TOKEN = Deno.env.get("META_ACCESS_TOKEN");
 const ACCOUNT_ID = Deno.env.get("META_AD_ACCOUNT_ID");
 const ACCOUNT_NAME = Deno.env.get("META_AD_ACCOUNT_NAME") ?? "PURE SPACE NETT — Meta Ads";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-if (!GRAPH_VERSION || !ACCESS_TOKEN || !ACCOUNT_ID || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+if (!GRAPH_VERSION || !ACCESS_TOKEN || !ACCOUNT_ID || !SUPABASE_URL) {
   throw new Error("Missing Meta/Supabase configuration.");
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 async function graph(path: string, params: Record<string, string> = {}) {
   const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${path.replace(/^\//, "")}`);
@@ -50,24 +48,9 @@ function actionCount(actions: unknown, names: string[]) {
   }, 0);
 }
 
-function isServiceRoleRequest(request: Request) {
-  const token = request.headers.get("authorization")?.match(/^Bearer\\s+([^\\s]+)$/i)?.[1];
-  const encodedPayload = token?.split(".")[1];
-  if (!encodedPayload) return false;
-
-  try {
-    const base64 = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
-    const payload = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "=")));
-    return payload.role === "service_role";
-  } catch {
-    return false;
-  }
-}
-
-Deno.serve(async (request) => {
-  if (!isServiceRoleRequest(request)) {
-    return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
+export default {
+  fetch: withSupabase({ auth: "secret" }, async (request, ctx) => {
+  const supabase = ctx.supabaseAdmin;
   if (request.method !== "POST") return Response.json({ ok: false, error: "POST required" }, { status: 405 });
 
   const startedAt = new Date().toISOString();
@@ -237,4 +220,5 @@ Deno.serve(async (request) => {
     }
     return Response.json({ ok: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
-});
+  })
+};
