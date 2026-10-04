@@ -1,7 +1,7 @@
 project_id = "dgppmlkpvmvjkhsghtji"
 
 [functions.meta-ads-sync]
-verify_jwt = true
+verify_jwt = false
 
 [functions.meta-leads-webhook]
 verify_jwt = false
