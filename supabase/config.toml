@@ -1,1 +1,7 @@
-project_id = "tunjuiuibsbbsepdkorx"
+project_id = "dgppmlkpvmvjkhsghtji"
+
+[functions.meta-ads-sync]
+verify_jwt = true
+
+[functions.meta-leads-webhook]
+verify_jwt = false

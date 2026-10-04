@@ -1,0 +1,41 @@
+name: Meta Ads daily sync
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: meta-ads-daily-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check required secret
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::Add SUPABASE_SERVICE_ROLE_KEY as a GitHub Actions secret."
+            exit 1
+          fi
+
+      - name: Run Meta Ads sync
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          response="$(curl --silent --show-error --fail-with-body --max-time 180 \
+            --request POST \
+            --url "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/meta-ads-sync" \
+            --header "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            --header "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            --header "Content-Type: application/json" \
+            --data '{}')"
+          printf '%s' "$response" | jq -e '.ok == true' >/dev/null
+          printf '%s' "$response" | jq -c '{ok, rows_upserted}'
