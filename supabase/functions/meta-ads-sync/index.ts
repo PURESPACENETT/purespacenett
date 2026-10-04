@@ -50,7 +50,24 @@ function actionCount(actions: unknown, names: string[]) {
   }, 0);
 }
 
+function isServiceRoleRequest(request: Request) {
+  const token = request.headers.get("authorization")?.match(/^Bearer\\s+([^\\s]+)$/i)?.[1];
+  const encodedPayload = token?.split(".")[1];
+  if (!encodedPayload) return false;
+
+  try {
+    const base64 = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "=")));
+    return payload.role === "service_role";
+  } catch {
+    return false;
+  }
+}
+
 Deno.serve(async (request) => {
+  if (!isServiceRoleRequest(request)) {
+    return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
   if (request.method !== "POST") return Response.json({ ok: false, error: "POST required" }, { status: 405 });
 
   const startedAt = new Date().toISOString();
