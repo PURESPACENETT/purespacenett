@@ -15,6 +15,7 @@ import {
   getRequest,
   qualifyRequest,
   updateRequestStatus,
+  updateRequestRevenue,
 } from "@/lib/quotes.functions";
 import {
   CLIENT_TYPES,
@@ -53,6 +54,7 @@ function RequestDetailPage() {
 
   const fetchRequest = useServerFn(getRequest);
   const setStatus = useServerFn(updateRequestStatus);
+  const saveRevenue = useServerFn(updateRequestRevenue);
   const createNote = useServerFn(addNote);
   const removeRequest = useServerFn(deleteRequest);
   const runQualify = useServerFn(qualifyRequest);
@@ -72,6 +74,19 @@ function RequestDetailPage() {
       toast.success("Statut mis à jour");
     },
     onError: () => toast.error("Mise à jour impossible"),
+  });
+
+  const revenueMutation = useMutation({
+    mutationFn: (actualRevenue: number | null) =>
+      saveRevenue({ data: { id, actualRevenue } }),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["request", id] });
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      toast.success(result.metaAttributed
+        ? "Chiffre d’affaires enregistré et attribution Meta mise à jour"
+        : "Chiffre d’affaires enregistré");
+    },
+    onError: () => toast.error("Enregistrement du chiffre d’affaires impossible"),
   });
 
   const noteMutation = useMutation({
@@ -291,6 +306,47 @@ function RequestDetailPage() {
               {formatEuros(Number(request.estimate_max))}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">Par intervention, hors taxes.</p>
+          </section>
+
+          <section className="rounded-xl border border-border bg-card p-5">
+            <h2 className="text-base text-foreground">Chiffre d’affaires réalisé</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Saisissez le montant réel signé ou facturé hors taxes. Une estimation de devis ne sera pas comptée comme un revenu.
+            </p>
+            <form
+              className="mt-3 flex gap-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const formData = new FormData(event.currentTarget);
+                const raw = String(formData.get("actual_revenue") ?? "").trim();
+                const amount = raw === "" ? null : Number(raw);
+                if (amount !== null && (!Number.isFinite(amount) || amount < 0)) {
+                  toast.error("Saisissez un montant HT valide");
+                  return;
+                }
+                revenueMutation.mutate(amount);
+              }}
+            >
+              <input
+                name="actual_revenue"
+                type="number"
+                min="0"
+                max="9999999999.99"
+                step="0.01"
+                defaultValue={request.actual_revenue ?? ""}
+                aria-label="Chiffre d’affaires réel HT en euros"
+                placeholder="Montant HT en €"
+                className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
+              />
+              <Button type="submit" size="sm" disabled={revenueMutation.isPending}>
+                {revenueMutation.isPending ? "Enregistrement…" : "Enregistrer"}
+              </Button>
+            </form>
+            {request.actual_revenue != null && (
+              <p className="mt-2 text-sm font-medium text-foreground">
+                Enregistré : {formatEuros(Number(request.actual_revenue))}
+              </p>
+            )}
           </section>
 
           <section className="rounded-xl border border-border bg-card p-5">
