@@ -125,12 +125,20 @@ Deno.serve(async (request) => {
             meta_adset_id: lead.adset_id ? String(lead.adset_id) : null,
             meta_ad_id: lead.ad_id ? String(lead.ad_id) : (value.ad_id ? String(value.ad_id) : null),
             lead_created_at: lead.created_time ? new Date(lead.created_time).toISOString() : null,
-            contact_name: contactName || null,
-            email,
-            phone,
-            raw: { webhook: value, lead },
+            raw: {
+              event_field: change.field,
+              lead_id: leadId,
+              page_id: value.page_id ? String(value.page_id) : String(entry.id ?? ""),
+              form_id: lead.form_id ? String(lead.form_id) : (value.form_id ? String(value.form_id) : null),
+              campaign_id: lead.campaign_id ? String(lead.campaign_id) : null,
+              adset_id: lead.adset_id ? String(lead.adset_id) : null,
+              ad_id: lead.ad_id ? String(lead.ad_id) : (value.ad_id ? String(value.ad_id) : null),
+              field_names: Array.isArray(lead.field_data)
+                ? lead.field_data.map((field: Record<string, unknown>) => String(field.name ?? ""))
+                : [],
+            },
           }, { onConflict: "lead_external_id" })
-          .select("*")
+          .select("id,quote_request_id")
           .single();
 
         if (attributionError) throw new Error("Unable to save Meta lead attribution.");
@@ -138,38 +146,35 @@ Deno.serve(async (request) => {
         let quoteRequestId = attribution.quote_request_id as string | null;
 
         if (!quoteRequestId && contactName && email && phone) {
-          const { data: existing, error: existingError } = await supabase
+          const requestedClientType = fields.client_type;
+          const clientType = requestedClientType === "entreprise" || requestedClientType === "sous_traitance"
+            ? requestedClientType
+            : requestedClientType === "particulier"
+              ? "particulier"
+              : fields.company_name
+                ? "entreprise"
+                : "particulier";
+          const { data: requestRow, error: requestError } = await supabase
             .from("quote_requests")
+            .insert({
+              full_name: contactName,
+              contact_name: contactName,
+              company_name: fields.company_name || null,
+              email,
+              phone,
+              status: "nouveau",
+              client_type: clientType,
+              service_type: fields.service_type ?? "Demande via Meta Ads",
+              message: fields.message ?? null,
+              source_system: "meta_lead_ads",
+              estimate_min: 0,
+              estimate_max: 0,
+            })
             .select("id")
-            .eq("email", email)
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          if (existingError) throw new Error("Unable to find existing CRM request.");
+            .single();
 
-          if (existing) {
-            quoteRequestId = existing.id;
-          } else {
-            const { data: requestRow, error: requestError } = await supabase
-              .from("quote_requests")
-              .insert({
-                full_name: contactName,
-                email,
-                phone,
-                status: "nouveau",
-                client_type: fields.client_type === "entreprise" ? "entreprise" : "particulier",
-                service_type: fields.service_type ?? "Demande via Meta Ads",
-                message: fields.message ?? null,
-                source_system: "meta_lead_ads",
-                estimate_min: 0,
-                estimate_max: 0,
-              })
-              .select("id")
-              .single();
-
-            if (requestError) throw new Error("Unable to create CRM request.");
-            quoteRequestId = requestRow.id;
-          }
+          if (requestError) throw new Error("Unable to create CRM request.");
+          quoteRequestId = requestRow.id;
 
           const { error: linkError } = await supabase
             .from("meta_lead_attributions")
