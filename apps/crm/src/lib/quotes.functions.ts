@@ -232,6 +232,58 @@ export const updateRequestStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Private: record actual signed/billed revenue and synchronize the Meta conversion event. */
+export const updateRequestRevenue = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({
+      id: z.string().uuid(),
+      actualRevenue: z.number().finite().min(0).max(9999999999.99).nullable(),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { error: updateError } = await context.supabase
+      .from("quote_requests")
+      .update({ actual_revenue: data.actualRevenue })
+      .eq("id", data.id);
+    if (updateError) throw new Error(updateError.message);
+
+    const { data: attribution, error: attributionError } = await context.supabase
+      .from("meta_lead_attributions")
+      .select("id")
+      .eq("quote_request_id", data.id)
+      .maybeSingle();
+    if (attributionError) throw new Error(attributionError.message);
+
+    if (attribution) {
+      if (data.actualRevenue === null || data.actualRevenue === 0) {
+        const { error } = await context.supabase
+          .from("meta_conversion_events")
+          .delete()
+          .eq("quote_request_id", data.id)
+          .eq("conversion_type", "sale")
+          .eq("source", "crm");
+        if (error) throw new Error(error.message);
+      } else {
+        const { error } = await context.supabase
+          .from("meta_conversion_events")
+          .upsert({
+            attribution_id: attribution.id,
+            quote_request_id: data.id,
+            conversion_type: "sale",
+            revenue_amount: data.actualRevenue,
+            currency: "EUR",
+            occurred_at: new Date().toISOString(),
+            source: "crm",
+            metadata: { basis: "actual_revenue_ht" },
+          }, { onConflict: "quote_request_id,conversion_type" });
+        if (error) throw new Error(error.message);
+      }
+    }
+
+    return { ok: true, metaAttributed: Boolean(attribution) };
+  });
+
 export const addNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
