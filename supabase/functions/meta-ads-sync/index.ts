@@ -167,7 +167,6 @@ export default {
       time_increment: "1",
     });
 
-    const crmRevenueEvents: Array<Record<string, unknown>> = [];
     const { data: revenueRows, error: revenueError } = await supabase
       .from("meta_conversion_events")
       .select("attribution_id,revenue_amount,currency,occurred_at")
