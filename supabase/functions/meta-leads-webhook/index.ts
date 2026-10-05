@@ -22,7 +22,7 @@ function constantTimeEqual(left: string, right: string) {
   return difference === 0;
 }
 
-async function verifySignature(request: Request, rawBody: string): Promise<"valid" | "missing" | "malformed" | "mismatch"> {
+async function verifySignature(request: Request, rawBody: Uint8Array): Promise<"valid" | "missing" | "malformed" | "mismatch"> {
   const signature = request.headers.get("x-hub-signature-256");
   if (!signature) return "missing";
   if (!/^sha256=[a-f0-9]{64}$/i.test(signature)) return "malformed";
@@ -34,7 +34,7 @@ async function verifySignature(request: Request, rawBody: string): Promise<"vali
     false,
     ["sign"],
   );
-  const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(rawBody));
+  const digest = await crypto.subtle.sign("HMAC", key, rawBody);
   const expected = "sha256=" + [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
   return constantTimeEqual(signature.toLowerCase(), expected) ? "valid" : "mismatch";
 }
@@ -74,7 +74,7 @@ Deno.serve(async (request) => {
 
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
-  const rawBody = await request.text();
+  const rawBody = new Uint8Array(await request.arrayBuffer());
   const signatureStatus = await verifySignature(request, rawBody);
   if (signatureStatus !== "valid") {
     // Deliberately log only a fixed classification. Never log the signature, app secret, or body.
@@ -88,7 +88,7 @@ Deno.serve(async (request) => {
 
   let payload: Record<string, unknown>;
   try {
-    payload = JSON.parse(rawBody);
+    payload = JSON.parse(new TextDecoder().decode(rawBody));
   } catch {
     return new Response("Invalid JSON", { status: 400 });
   }
