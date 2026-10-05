@@ -346,6 +346,7 @@ export type Database = {
           ai_next_step: string | null
           ai_summary: string | null
           ai_urgency: string | null
+          actual_revenue: number | null
           city: string
           client_type: Database["public"]["Enums"]["client_type"]
           company_name: string | null
@@ -378,6 +379,7 @@ export type Database = {
           ai_next_step?: string | null
           ai_summary?: string | null
           ai_urgency?: string | null
+          actual_revenue?: number | null
           city: string
           client_type: Database["public"]["Enums"]["client_type"]
           company_name?: string | null
@@ -410,6 +412,7 @@ export type Database = {
           ai_next_step?: string | null
           ai_summary?: string | null
           ai_urgency?: string | null
+          actual_revenue?: number | null
           city?: string
           client_type?: Database["public"]["Enums"]["client_type"]
           company_name?: string | null
