@@ -170,7 +170,6 @@ export interface FileRoutesByFullPath {
   '/app/aujourdhui': typeof AuthenticatedAppAujourdhuiRoute
   '/app/linkedin': typeof AuthenticatedAppLinkedinRoute
   '/app/meta-ads': typeof AuthenticatedAppMetaAdsRoute
-  '/app/meta-ads': typeof AuthenticatedAppMetaAdsRoute
   '/app/pipeline': typeof AuthenticatedAppPipelineRoute
   '/app/prospection': typeof AuthenticatedAppProspectionRoute
   '/app/tarifs': typeof AuthenticatedAppTarifsRoute
@@ -193,6 +192,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/app/aujourdhui': typeof AuthenticatedAppAujourdhuiRoute
   '/app/linkedin': typeof AuthenticatedAppLinkedinRoute
+  '/app/meta-ads': typeof AuthenticatedAppMetaAdsRoute
   '/app/pipeline': typeof AuthenticatedAppPipelineRoute
   '/app/prospection': typeof AuthenticatedAppProspectionRoute
   '/app/tarifs': typeof AuthenticatedAppTarifsRoute
@@ -245,7 +245,6 @@ export interface FileRouteTypes {
     | '/app/aujourdhui'
     | '/app/linkedin'
     | '/app/meta-ads'
-    | '/app/meta-ads'
     | '/app/pipeline'
     | '/app/prospection'
     | '/app/tarifs'
@@ -268,6 +267,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/app/aujourdhui'
     | '/app/linkedin'
+    | '/app/meta-ads'
     | '/app/pipeline'
     | '/app/prospection'
     | '/app/tarifs'
