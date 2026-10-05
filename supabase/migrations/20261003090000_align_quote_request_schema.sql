@@ -1,3 +1,4 @@
+-- Idempotent schema alignment retained in GitHub as the source of truth.
 -- Align production quote request schema with the public quote form and CRM bridge.
 alter table public.quote_requests
   add column if not exists source_external_id uuid,
