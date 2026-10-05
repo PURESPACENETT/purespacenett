@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  BarChart3,
   CalendarCheck2,
   KanbanSquare,
   LayoutDashboard,
@@ -25,6 +26,7 @@ const NAV = [
   { to: "/app/aujourdhui", label: "À faire aujourd'hui", icon: CalendarCheck2, exact: false },
   { to: "/app/prospection", label: "Prospection", icon: Radar, exact: false },
   { to: "/app/linkedin", label: "LinkedIn", icon: Linkedin, exact: false },
+  { to: "/app/meta-ads", label: "Meta Ads", icon: BarChart3, exact: false },
   { to: "/app/tarifs", label: "Tarifs", icon: SlidersHorizontal, exact: false },
 ] as const;
 
