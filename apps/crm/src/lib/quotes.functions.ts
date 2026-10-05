@@ -268,7 +268,7 @@ export const updateRequestRevenue = createServerFn({ method: "POST" })
           .eq("source", "crm");
         if (error) throw new Error(error.message);
       } else {
-        const { error } = await context.supabase
+        const { error } = await metaDb
           .from("meta_conversion_events")
           .upsert({
             attribution_id: attribution.id,
