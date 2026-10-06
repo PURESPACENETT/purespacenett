@@ -51,7 +51,11 @@ function fieldMap(fieldData: unknown) {
 }
 
 class MetaLeadFetchError extends Error {
-  constructor(readonly httpStatus: number, readonly metaErrorCode: number | null) {
+  constructor(
+    readonly httpStatus: number,
+    readonly metaErrorCode: number | null,
+    readonly metaErrorSubcode: number | null,
+  ) {
     super("Meta lead fetch failed");
     this.name = "MetaLeadFetchError";
   }
@@ -66,14 +70,14 @@ async function fetchLead(leadId: string) {
     response = await fetch(url);
   } catch {
     // Never include fetch exceptions: some runtimes include the request URL, which contains the access token.
-    throw new MetaLeadFetchError(0, null);
+    throw new MetaLeadFetchError(0, null, null);
   }
 
   let payload: Record<string, unknown>;
   try {
     payload = await response.json();
   } catch {
-    throw new MetaLeadFetchError(response.status, null);
+    throw new MetaLeadFetchError(response.status, null, null);
   }
 
   const metaError = payload.error as Record<string, unknown> | undefined;
@@ -81,7 +85,10 @@ async function fetchLead(leadId: string) {
     const code = typeof metaError?.code === "number" && Number.isInteger(metaError.code)
       ? metaError.code
       : null;
-    throw new MetaLeadFetchError(response.status, code);
+    const subcode = typeof metaError?.error_subcode === "number" && Number.isInteger(metaError.error_subcode)
+      ? metaError.error_subcode
+      : null;
+    throw new MetaLeadFetchError(response.status, code, subcode);
   }
   return payload;
 }
@@ -228,7 +235,11 @@ Deno.serve(async (request) => {
       event: "meta_webhook_processing_failed",
       reason: safeReason,
       ...(error instanceof MetaLeadFetchError
-        ? { meta_http_status: error.httpStatus, meta_error_code: error.metaErrorCode }
+        ? {
+          meta_http_status: error.httpStatus,
+          meta_error_code: error.metaErrorCode,
+          meta_error_subcode: error.metaErrorSubcode,
+        }
         : {}),
     }));
     return new Response("Unable to process Meta lead event", { status: 502 });
