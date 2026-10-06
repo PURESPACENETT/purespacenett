@@ -50,13 +50,39 @@ function fieldMap(fieldData: unknown) {
   return result;
 }
 
+class MetaLeadFetchError extends Error {
+  constructor(readonly httpStatus: number, readonly metaErrorCode: number | null) {
+    super("Meta lead fetch failed");
+    this.name = "MetaLeadFetchError";
+  }
+}
+
 async function fetchLead(leadId: string) {
   const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${encodeURIComponent(leadId)}`);
   url.searchParams.set("access_token", LEAD_ACCESS_TOKEN!);
   url.searchParams.set("fields", "id,created_time,form_id,ad_id,adset_id,campaign_id,field_data,custom_disclaimer_responses");
-  const response = await fetch(url);
-  const payload = await response.json();
-  if (!response.ok || payload.error) throw new Error("Unable to retrieve Meta lead.");
+  let response: Response;
+  try {
+    response = await fetch(url);
+  } catch {
+    // Never include fetch exceptions: some runtimes include the request URL, which contains the access token.
+    throw new MetaLeadFetchError(0, null);
+  }
+
+  let payload: Record<string, unknown>;
+  try {
+    payload = await response.json();
+  } catch {
+    throw new MetaLeadFetchError(response.status, null);
+  }
+
+  const metaError = payload.error as Record<string, unknown> | undefined;
+  if (!response.ok || metaError) {
+    const code = typeof metaError?.code === "number" && Number.isInteger(metaError.code)
+      ? metaError.code
+      : null;
+    throw new MetaLeadFetchError(response.status, code);
+  }
   return payload;
 }
 
@@ -188,9 +214,22 @@ Deno.serve(async (request) => {
     }
   } catch (error) {
     // Avoid putting prospect fields or Graph API responses in Edge Function logs.
+    const fixedReasons: Record<string, string> = {
+      "Unable to save Meta lead attribution.": "attribution_upsert_failed",
+      "Unable to create CRM request.": "crm_request_insert_failed",
+      "Unable to link Meta attribution to CRM request.": "attribution_link_failed",
+    };
+    const safeReason = error instanceof MetaLeadFetchError
+      ? "meta_lead_fetch_failed"
+      : error instanceof Error
+        ? fixedReasons[error.message] ?? "unknown_processing_error"
+        : "unknown_processing_error";
     console.error(JSON.stringify({
       event: "meta_webhook_processing_failed",
-      reason: error instanceof Error ? error.message : "Unknown processing error",
+      reason: safeReason,
+      ...(error instanceof MetaLeadFetchError
+        ? { meta_http_status: error.httpStatus, meta_error_code: error.metaErrorCode }
+        : {}),
     }));
     return new Response("Unable to process Meta lead event", { status: 502 });
   }
