@@ -22,6 +22,7 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppAujourdhuiRouteImport } from './routes/_authenticated/app.aujourdhui'
 import { Route as AuthenticatedAppLinkedinRouteImport } from './routes/_authenticated/app.linkedin'
+import { Route as AuthenticatedAppMetaAdsRouteImport } from './routes/_authenticated/app.meta-ads'
 import { Route as AuthenticatedAppPipelineRouteImport } from './routes/_authenticated/app.pipeline'
 import { Route as AuthenticatedAppProspectionRouteImport } from './routes/_authenticated/app.prospection'
 import { Route as AuthenticatedAppTarifsRouteImport } from './routes/_authenticated/app.tarifs'
@@ -98,6 +99,12 @@ const AuthenticatedAppLinkedinRoute =
     path: '/linkedin',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppMetaAdsRoute =
+  AuthenticatedAppMetaAdsRouteImport.update({
+    id: '/meta-ads',
+    path: '/meta-ads',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppPipelineRoute =
   AuthenticatedAppPipelineRouteImport.update({
     id: '/pipeline',
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/app/aujourdhui': typeof AuthenticatedAppAujourdhuiRoute
   '/app/linkedin': typeof AuthenticatedAppLinkedinRoute
+  '/app/meta-ads': typeof AuthenticatedAppMetaAdsRoute
   '/app/pipeline': typeof AuthenticatedAppPipelineRoute
   '/app/prospection': typeof AuthenticatedAppProspectionRoute
   '/app/tarifs': typeof AuthenticatedAppTarifsRoute
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/app/aujourdhui': typeof AuthenticatedAppAujourdhuiRoute
   '/app/linkedin': typeof AuthenticatedAppLinkedinRoute
+  '/app/meta-ads': typeof AuthenticatedAppMetaAdsRoute
   '/app/pipeline': typeof AuthenticatedAppPipelineRoute
   '/app/prospection': typeof AuthenticatedAppProspectionRoute
   '/app/tarifs': typeof AuthenticatedAppTarifsRoute
@@ -209,6 +218,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/app/aujourdhui': typeof AuthenticatedAppAujourdhuiRoute
   '/_authenticated/app/linkedin': typeof AuthenticatedAppLinkedinRoute
+  '/_authenticated/app/meta-ads': typeof AuthenticatedAppMetaAdsRoute
   '/_authenticated/app/pipeline': typeof AuthenticatedAppPipelineRoute
   '/_authenticated/app/prospection': typeof AuthenticatedAppProspectionRoute
   '/_authenticated/app/tarifs': typeof AuthenticatedAppTarifsRoute
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/aujourdhui'
     | '/app/linkedin'
+    | '/app/meta-ads'
     | '/app/pipeline'
     | '/app/prospection'
     | '/app/tarifs'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/app/aujourdhui'
     | '/app/linkedin'
+    | '/app/meta-ads'
     | '/app/pipeline'
     | '/app/prospection'
     | '/app/tarifs'
@@ -280,6 +292,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/app/aujourdhui'
     | '/_authenticated/app/linkedin'
+    | '/_authenticated/app/meta-ads'
     | '/_authenticated/app/pipeline'
     | '/_authenticated/app/prospection'
     | '/_authenticated/app/tarifs'
@@ -401,6 +414,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppLinkedinRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/meta-ads': {
+      id: '/_authenticated/app/meta-ads'
+      path: '/meta-ads'
+      fullPath: '/app/meta-ads'
+      preLoaderRoute: typeof AuthenticatedAppMetaAdsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/pipeline': {
       id: '/_authenticated/app/pipeline'
       path: '/pipeline'
@@ -470,6 +490,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppAujourdhuiRoute: typeof AuthenticatedAppAujourdhuiRoute
   AuthenticatedAppLinkedinRoute: typeof AuthenticatedAppLinkedinRoute
+  AuthenticatedAppMetaAdsRoute: typeof AuthenticatedAppMetaAdsRoute
   AuthenticatedAppPipelineRoute: typeof AuthenticatedAppPipelineRoute
   AuthenticatedAppProspectionRoute: typeof AuthenticatedAppProspectionRoute
   AuthenticatedAppTarifsRoute: typeof AuthenticatedAppTarifsRoute
@@ -481,6 +502,7 @@ interface AuthenticatedAppRouteChildren {
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppAujourdhuiRoute: AuthenticatedAppAujourdhuiRoute,
   AuthenticatedAppLinkedinRoute: AuthenticatedAppLinkedinRoute,
+  AuthenticatedAppMetaAdsRoute: AuthenticatedAppMetaAdsRoute,
   AuthenticatedAppPipelineRoute: AuthenticatedAppPipelineRoute,
   AuthenticatedAppProspectionRoute: AuthenticatedAppProspectionRoute,
   AuthenticatedAppTarifsRoute: AuthenticatedAppTarifsRoute,
