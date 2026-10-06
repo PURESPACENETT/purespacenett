@@ -64,7 +64,7 @@ class MetaLeadFetchError extends Error {
 async function fetchLead(leadId: string) {
   const url = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/${encodeURIComponent(leadId)}`);
   url.searchParams.set("access_token", LEAD_ACCESS_TOKEN!);
-  url.searchParams.set("fields", "id,created_time,form_id,ad_id,adset_id,campaign_id,field_data,custom_disclaimer_responses");
+  url.searchParams.set("fields", "id,created_time,form_id,field_data");
   let response: Response;
   try {
     response = await fetch(url);
@@ -154,17 +154,21 @@ Deno.serve(async (request) => {
             source: "meta_lead_ads",
             meta_page_id: value.page_id ? String(value.page_id) : String(entry.id ?? ""),
             meta_form_id: lead.form_id ? String(lead.form_id) : (value.form_id ? String(value.form_id) : null),
-            meta_campaign_id: lead.campaign_id ? String(lead.campaign_id) : null,
-            meta_adset_id: lead.adset_id ? String(lead.adset_id) : null,
+            meta_campaign_id: lead.campaign_id ? String(lead.campaign_id) : (value.campaign_id ? String(value.campaign_id) : null),
+            meta_adset_id: lead.adset_id ? String(lead.adset_id) : (value.adset_id ? String(value.adset_id) : (value.adgroup_id ? String(value.adgroup_id) : null)),
             meta_ad_id: lead.ad_id ? String(lead.ad_id) : (value.ad_id ? String(value.ad_id) : null),
-            lead_created_at: lead.created_time ? new Date(lead.created_time).toISOString() : null,
+            lead_created_at: lead.created_time
+              ? new Date(lead.created_time).toISOString()
+              : typeof value.created_time === "number"
+                ? new Date(value.created_time * 1000).toISOString()
+                : null,
             raw: {
               event_field: change.field,
               lead_id: leadId,
               page_id: value.page_id ? String(value.page_id) : String(entry.id ?? ""),
               form_id: lead.form_id ? String(lead.form_id) : (value.form_id ? String(value.form_id) : null),
-              campaign_id: lead.campaign_id ? String(lead.campaign_id) : null,
-              adset_id: lead.adset_id ? String(lead.adset_id) : null,
+              campaign_id: lead.campaign_id ? String(lead.campaign_id) : (value.campaign_id ? String(value.campaign_id) : null),
+              adset_id: lead.adset_id ? String(lead.adset_id) : (value.adset_id ? String(value.adset_id) : (value.adgroup_id ? String(value.adgroup_id) : null)),
               ad_id: lead.ad_id ? String(lead.ad_id) : (value.ad_id ? String(value.ad_id) : null),
               field_names: Array.isArray(lead.field_data)
                 ? lead.field_data.map((field: Record<string, unknown>) => String(field.name ?? ""))
