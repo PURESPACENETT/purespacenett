@@ -36,11 +36,18 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
     if (data.sourceExternalId) {
       const { data: existing, error: existingError } = await supabaseAdmin
         .from("quote_requests")
-        .select("id")
+        .select("id, estimate_min, estimate_max, score")
         .eq("source_external_id", data.sourceExternalId)
         .maybeSingle();
       if (existingError) throw new Error("Impossible de vérifier le doublon de la demande.");
-      if (existing) return { id: existing.id, duplicate: true };
+      if (existing) {
+        return {
+          id: existing.id,
+          duplicate: true,
+          estimate: { min: Number(existing.estimate_min), max: Number(existing.estimate_max) },
+          score: Number(existing.score),
+        };
+      }
     }
 
     // Anti-spam: at most 3 requests per email per hour, no identical resubmission within 10 minutes.
@@ -108,10 +115,17 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
       if (error.code === "23505" && data.sourceExternalId) {
         const { data: duplicate } = await supabaseAdmin
           .from("quote_requests")
-          .select("id")
+          .select("id, estimate_min, estimate_max, score")
           .eq("source_external_id", data.sourceExternalId)
           .maybeSingle();
-        if (duplicate) return { id: duplicate.id, duplicate: true };
+        if (duplicate) {
+          return {
+            id: duplicate.id,
+            duplicate: true,
+            estimate: { min: Number(duplicate.estimate_min), max: Number(duplicate.estimate_max) },
+            score: Number(duplicate.score),
+          };
+        }
       }
       throw new Error(error.message);
     }
