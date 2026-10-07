@@ -357,6 +357,16 @@ export type Database = {
           estimate_max: number
           estimate_min: number
           frequency: string
+          gclid: string | null
+          gbraid: string | null
+          wbraid: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_term: string | null
+          landing_page: string | null
+          referrer: string | null
           id: string
           last_contacted_at: string | null
           message: string | null
@@ -390,6 +400,16 @@ export type Database = {
           estimate_max?: number
           estimate_min?: number
           frequency: string
+          gclid?: string | null
+          gbraid?: string | null
+          wbraid?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_term?: string | null
+          landing_page?: string | null
+          referrer?: string | null
           id?: string
           last_contacted_at?: string | null
           message?: string | null
@@ -423,6 +443,16 @@ export type Database = {
           estimate_max?: number
           estimate_min?: number
           frequency?: string
+          gclid?: string | null
+          gbraid?: string | null
+          wbraid?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_term?: string | null
+          landing_page?: string | null
+          referrer?: string | null
           id?: string
           last_contacted_at?: string | null
           message?: string | null
