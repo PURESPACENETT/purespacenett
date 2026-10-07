@@ -127,7 +127,7 @@ export function QuoteForm() {
         body,
       });
       if (!res.ok) throw new Error(await res.text());
-      trackLeadGenerated({ source: "formulaire_devis", prestation: form.serviceType, type_de_bien: form.propertyType, frequence: form.frequency, gclid: getMarketingAttribution().gclid ?? undefined });
+      trackLeadGenerated("quote", { source: "formulaire_devis", prestation: form.serviceType, type_de_bien: form.propertyType, frequence: form.frequency, gclid: getMarketingAttribution().gclid ?? undefined });
       trackEvent("devis_envoye", {
         prestation: form.serviceType,
         type_de_bien: form.propertyType,

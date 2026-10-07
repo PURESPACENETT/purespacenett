@@ -3,7 +3,8 @@ import { getMarketingAttribution } from "@/lib/attribution";
 
 const measurementId = import.meta.env["VITE_GOOGLE_ANALYTICS_ID"] as string | undefined;
 const googleAdsId = import.meta.env["VITE_GOOGLE_ADS_ID"] as string | undefined;
-const googleAdsConversionLabel = import.meta.env["VITE_GOOGLE_ADS_CONVERSION_LABEL"] as string | undefined;
+const quoteConversionLabel = import.meta.env["VITE_GOOGLE_ADS_QUOTE_CONVERSION_LABEL"] as string | undefined;
+const b2bConversionLabel = import.meta.env["VITE_GOOGLE_ADS_B2B_CONVERSION_LABEL"] as string | undefined;
 
 declare global { interface Window { dataLayer?: unknown[]; } }
 
@@ -44,12 +45,13 @@ export function trackEvent(name: string, params?: Record<string, unknown>) {
   push("event", name, { ...getMarketingAttribution(), ...(params ?? {}) });
 }
 
-export function trackLeadGenerated(params?: Record<string, unknown>) {
+export function trackLeadGenerated(type: "quote" | "b2b", params?: Record<string, unknown>) {
   trackEvent("generate_lead", params);
-  if (typeof window === "undefined" || !getAnalyticsConsent() || !googleAdsId || !googleAdsConversionLabel) return;
+  const conversionLabel = type === "quote" ? quoteConversionLabel : b2bConversionLabel;
+  if (typeof window === "undefined" || !getAnalyticsConsent() || !googleAdsId || !conversionLabel) return;
   if (!initialized) initAnalytics();
   push("event", "conversion", {
-    send_to: `${googleAdsId}/${googleAdsConversionLabel}`,
+    send_to: `${googleAdsId}/${conversionLabel}`,
     ...getMarketingAttribution(),
     ...params,
   });
@@ -60,4 +62,4 @@ export function trackContactClick(type: "phone" | "whatsapp" | "email", source: 
 }
 
 export const analyticsEnabled = Boolean(measurementId || googleAdsId);
-export const googleAdsEnabled = Boolean(googleAdsId && googleAdsConversionLabel);
+export const googleAdsEnabled = Boolean(googleAdsId && (quoteConversionLabel || b2bConversionLabel));
