@@ -228,7 +228,7 @@ function hasService(input: Pick<QuoteRequestInput, "services">, key: string): bo
 
 export function estimatePrice(
   input: Pick<QuoteRequestInput, "propertyType" | "surfaceM2" | "frequency" | "services"> & {
-    desiredDate?: string;
+    desiredDate?: string | undefined;
   },
   pricing: PricingSettings,
 ): { min: number; max: number } {
