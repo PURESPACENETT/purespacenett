@@ -23,7 +23,8 @@ function toPricing(row: Record<string, unknown> | null | undefined): PricingSett
       (row["frequency_multipliers"] as Record<string, number>) ??
       DEFAULT_PRICING.frequency_multipliers,
     service_surcharges:
-      (row["service_surcharges"] as Record<string, number>) ?? DEFAULT_PRICING.service_surcharges,
+      (row["service_surcharges"] as PricingSettings["service_surcharges"]) ??
+      DEFAULT_PRICING.service_surcharges,
   };
 }
 
@@ -338,7 +339,33 @@ export const updatePricing = createServerFn({ method: "POST" })
         range_spread: z.coerce.number().min(0).max(0.6),
         property_rates: z.record(z.string(), z.coerce.number().min(0).max(100)),
         frequency_multipliers: z.record(z.string(), z.coerce.number().min(0).max(10)),
-        service_surcharges: z.record(z.string(), z.coerce.number().min(0).max(10)),
+        service_surcharges: z.object({
+          hourly_rates: z.object({
+            entretien: z.coerce.number().min(0).max(200),
+            ponctuel: z.coerce.number().min(0).max(200),
+            technique: z.coerce.number().min(0).max(200),
+            complexe: z.coerce.number().min(0).max(200),
+            dimanche: z.coerce.number().min(0).max(200),
+            ferie: z.coerce.number().min(0).max(200),
+          }),
+          productivity_m2_per_hour: z.object({
+            standard: z.coerce.number().positive().max(100),
+            chantier: z.coerce.number().positive().max(100),
+            complexe: z.coerce.number().positive().max(100),
+          }),
+          per_m2_rates: z.object({
+            chantier_min: z.coerce.number().min(0).max(100),
+            chantier_standard: z.coerce.number().min(0).max(100),
+            chantier_max: z.coerce.number().min(0).max(100),
+            vitrerie_min: z.coerce.number().min(0).max(100),
+            vitrerie_standard: z.coerce.number().min(0).max(100),
+            vitrerie_max: z.coerce.number().min(0).max(100),
+          }),
+          textile_ranges: z.record(z.string(), z.object({
+            min: z.coerce.number().min(0).max(1000),
+            max: z.coerce.number().min(0).max(1000),
+          })),
+        }),
         notify_email: z.string().trim().email().max(255).or(z.literal("")),
       })
       .parse(input),

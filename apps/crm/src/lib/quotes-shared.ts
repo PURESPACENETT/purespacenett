@@ -68,6 +68,9 @@ export const quoteRequestSchema = z.object({
         "remise_en_etat",
         "fin_de_chantier",
         "desinfection",
+        "textile",
+        "forte_salissure",
+        "complexe",
       ]),
     )
     .min(1, "Choisissez au moins une prestation"),
@@ -88,22 +91,75 @@ export interface PricingSettings {
   range_spread: number;
   property_rates: Record<string, number>;
   frequency_multipliers: Record<string, number>;
-  service_surcharges: Record<string, number>;
+  service_surcharges: {
+    hourly_rates: {
+      entretien: number;
+      ponctuel: number;
+      technique: number;
+      complexe: number;
+      dimanche: number;
+      ferie: number;
+    };
+    productivity_m2_per_hour: {
+      standard: number;
+      chantier: number;
+      complexe: number;
+    };
+    per_m2_rates: {
+      chantier_min: number;
+      chantier_standard: number;
+      chantier_max: number;
+      vitrerie_min: number;
+      vitrerie_standard: number;
+      vitrerie_max: number;
+    };
+    textile_ranges: Record<string, { min: number; max: number }>;
+  };
 }
 
-/**
- * Pricing baseline: 25 EUR/hour, VAT-exempt pricing basis.
- * Rates below are derived from the supplied productivity assumptions:
- * 20 m²/h for standard sites and 15 m²/h for chantier/remise en état.
- */
+const DEFAULT_SERVICE_PRICING: PricingSettings["service_surcharges"] = {
+  hourly_rates: {
+    entretien: 25,
+    ponctuel: 30,
+    technique: 35,
+    complexe: 40,
+    dimanche: 32,
+    ferie: 32,
+  },
+  productivity_m2_per_hour: {
+    standard: 20,
+    chantier: 15,
+    complexe: 15,
+  },
+  per_m2_rates: {
+    chantier_min: 3.5,
+    chantier_standard: 6,
+    chantier_max: 9,
+    vitrerie_min: 5,
+    vitrerie_standard: 6.5,
+    vitrerie_max: 9,
+  },
+  textile_ranges: {
+    fauteuil: { min: 45, max: 60 },
+    canape_2_places: { min: 80, max: 125 },
+    canape_3_places: { min: 100, max: 150 },
+    canape_4_places: { min: 120, max: 160 },
+    canape_angle: { min: 140, max: 160 },
+    matelas_1_place: { min: 50, max: 60 },
+    matelas_2_places: { min: 70, max: 90 },
+    chaise_tissu: { min: 15, max: 20 },
+    tapis_moquette: { min: 15, max: 20 },
+  },
+};
+
 export const DEFAULT_PRICING: PricingSettings = {
-  min_price: 25,
+  min_price: 50,
   range_spread: 0,
   property_rates: {
     bureaux: 1.25,
     commerce: 1.25,
     immeuble: 1.25,
-    chantier: 1.6667,
+    chantier: 2.3333,
     logement: 1.25,
     autre: 1.25,
   },
@@ -114,35 +170,110 @@ export const DEFAULT_PRICING: PricingSettings = {
     quotidien: 1,
     contrat_annuel: 1,
   },
-  service_surcharges: {
-    nettoyage_courant: 0,
-    vitrerie: 0,
-    remise_en_etat: 0,
-    fin_de_chantier: 0,
-    desinfection: 0,
-  },
+  service_surcharges: DEFAULT_SERVICE_PRICING,
 };
 
+function isFrenchPublicHoliday(value?: string): boolean {
+  if (!value) return false;
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return false;
+
+  const monthDay = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  if (["01-01", "05-01", "05-08", "07-14", "08-15", "11-01", "11-11", "12-25"].includes(monthDay)) {
+    return true;
+  }
+
+  const year = date.getFullYear();
+  const easter = (() => {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month - 1, day);
+  })();
+
+  const diff = Math.round((date.getTime() - easter.getTime()) / 86400000);
+  return diff === 1 || diff === 39 || diff === 50;
+}
+
+function normalizeServicePricing(value: unknown): PricingSettings["service_surcharges"] {
+  const candidate = value as Partial<PricingSettings["service_surcharges"]> | null;
+  if (!candidate || typeof candidate !== "object" || !candidate.hourly_rates) {
+    return DEFAULT_SERVICE_PRICING;
+  }
+  return {
+    hourly_rates: { ...DEFAULT_SERVICE_PRICING.hourly_rates, ...candidate.hourly_rates },
+    productivity_m2_per_hour: {
+      ...DEFAULT_SERVICE_PRICING.productivity_m2_per_hour,
+      ...candidate.productivity_m2_per_hour,
+    },
+    per_m2_rates: { ...DEFAULT_SERVICE_PRICING.per_m2_rates, ...candidate.per_m2_rates },
+    textile_ranges: { ...DEFAULT_SERVICE_PRICING.textile_ranges, ...candidate.textile_ranges },
+  };
+}
+
+function hasService(input: Pick<QuoteRequestInput, "services">, key: string): boolean {
+  return input.services.includes(key as never);
+}
+
 export function estimatePrice(
-  input: Pick<QuoteRequestInput, "propertyType" | "surfaceM2" | "frequency" | "services">,
+  input: Pick<QuoteRequestInput, "propertyType" | "surfaceM2" | "frequency" | "services"> & {
+    desiredDate?: string | undefined;
+  },
   pricing: PricingSettings,
 ): { min: number; max: number } {
-  const rate = pricing.property_rates[input.propertyType] ?? 0.5;
-  const freq = pricing.frequency_multipliers[input.frequency] ?? 1;
-  const surcharge = input.services.reduce(
-    (sum, service) => sum + (pricing.service_surcharges[service] ?? 0),
-    0,
-  );
+  const servicePricing = normalizeServicePricing(pricing.service_surcharges);
+  const surface = Math.max(1, input.surfaceM2);
 
-  const base = Math.max(
-    pricing.min_price,
-    input.surfaceM2 * rate * (1 + surcharge) * freq,
-  );
-  const spread = pricing.range_spread;
-  return {
-    min: Math.round((base * (1 - spread)) / 5) * 5,
-    max: Math.round((base * (1 + spread)) / 5) * 5,
-  };
+  if (hasService(input, "vitrerie")) {
+    const min = Math.max(pricing.min_price, surface * servicePricing.per_m2_rates.vitrerie_min);
+    const max = Math.max(pricing.min_price, surface * servicePricing.per_m2_rates.vitrerie_max);
+    return {
+      min: Math.round(min / 5) * 5,
+      max: Math.round(max / 5) * 5,
+    };
+  }
+
+  if (hasService(input, "textile")) {
+    const ranges = Object.values(servicePricing.textile_ranges);
+    const min = Math.max(pricing.min_price, Math.min(...ranges.map((range) => range.min)));
+    const max = Math.max(pricing.min_price, Math.max(...ranges.map((range) => range.max)));
+    return { min, max };
+  }
+
+  const technical =
+    hasService(input, "fin_de_chantier") ||
+    hasService(input, "remise_en_etat") ||
+    hasService(input, "desinfection") ||
+    input.propertyType === "chantier";
+  const complex = input.services.some((service) => service === "forte_salissure" || service === "complexe");
+  const tier = complex ? "complexe" : technical ? "technique" : input.frequency === "ponctuel" ? "ponctuel" : "entretien";
+  const isSunday = input.desiredDate
+    ? new Date(`${input.desiredDate}T00:00:00`).getDay() === 0
+    : false;
+  const isHoliday = isFrenchPublicHoliday(input.desiredDate);
+  const specialRate = isHoliday
+    ? servicePricing.hourly_rates.ferie
+    : isSunday
+      ? servicePricing.hourly_rates.dimanche
+      : 0;
+  const hourlyRate = Math.max(servicePricing.hourly_rates[tier], specialRate);
+  const productivity = technical || complex
+    ? (complex ? servicePricing.productivity_m2_per_hour.complexe : servicePricing.productivity_m2_per_hour.chantier)
+    : servicePricing.productivity_m2_per_hour.standard;
+  const estimate = Math.max(pricing.min_price, surface * (hourlyRate / productivity));
+  const rounded = Math.round(estimate / 5) * 5;
+  return { min: rounded, max: rounded };
 }
 
 const RECURRING = new Set(["hebdomadaire", "plusieurs_semaine", "quotidien", "contrat_annuel"]);

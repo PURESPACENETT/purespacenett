@@ -23,7 +23,16 @@ const quoteImportSchema = z.object({
   message: z.string().trim().max(4000).optional().default(""),
 });
 
-const DEFAULT_SERVICE_KEYS = new Set(["nettoyage_courant", "vitrerie", "remise_en_etat", "fin_de_chantier", "desinfection"]);
+const DEFAULT_SERVICE_KEYS = new Set([
+  "nettoyage_courant",
+  "vitrerie",
+  "remise_en_etat",
+  "fin_de_chantier",
+  "desinfection",
+  "textile",
+  "forte_salissure",
+  "complexe",
+]);
 
 const DEFAULT_ALLOWED_ORIGINS = new Set([
   "https://purespacenett.com",
@@ -60,6 +69,17 @@ function normalizeServiceKeys(services: string[]): string[] {
     if (value.includes("fin de chantier")) return "fin_de_chantier";
     if (value.includes("remise en état") || value.includes("sinistre")) return "remise_en_etat";
     if (value.includes("désinfection") || value.includes("sanitaire")) return "desinfection";
+    if (
+      value.includes("canapé") ||
+      value.includes("fauteuil") ||
+      value.includes("matelas") ||
+      value.includes("tapis") ||
+      value.includes("moquette") ||
+      value.includes("textile")
+    ) return "textile";
+    if (value.includes("très dégrad") || value.includes("forte salissure") || value.includes("insalubre")) {
+      return "forte_salissure";
+    }
     return "nettoyage_courant";
   });
   return [...new Set(normalized)].filter((service) => DEFAULT_SERVICE_KEYS.has(service));
@@ -87,7 +107,7 @@ function parsePricing(row: Record<string, unknown> | null) {
       (row["frequency_multipliers"] as Record<string, number>) ??
       DEFAULT_PRICING.frequency_multipliers,
     service_surcharges:
-      (row["service_surcharges"] as Record<string, number>) ??
+      (row["service_surcharges"] as typeof DEFAULT_PRICING.service_surcharges) ??
       DEFAULT_PRICING.service_surcharges,
   };
 }
