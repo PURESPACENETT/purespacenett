@@ -49,6 +49,7 @@ export function labelOf(
 }
 
 export const quoteRequestSchema = z.object({
+  sourceExternalId: z.string().uuid().optional(),
   clientType: z.enum(["entreprise", "sous_traitance", "particulier"]),
   propertyType: z.enum(["bureaux", "commerce", "immeuble", "chantier", "logement", "autre"]),
   surfaceM2: z.coerce.number().int().min(1, "Surface requise").max(200000),
@@ -79,6 +80,16 @@ export const quoteRequestSchema = z.object({
   email: z.string().trim().email("Adresse email invalide").max(255),
   phone: z.string().trim().min(6, "Téléphone requis").max(30),
   message: z.string().trim().max(1500).optional().or(z.literal("")),
+  gclid: z.string().trim().max(200).optional(),
+  gbraid: z.string().trim().max(200).optional(),
+  wbraid: z.string().trim().max(200).optional(),
+  utm_source: z.string().trim().max(100).optional(),
+  utm_medium: z.string().trim().max(100).optional(),
+  utm_campaign: z.string().trim().max(200).optional(),
+  utm_content: z.string().trim().max(200).optional(),
+  utm_term: z.string().trim().max(200).optional(),
+  landing_page: z.string().trim().max(500).optional(),
+  referrer: z.string().trim().max(1000).optional(),
 });
 
 export type QuoteRequestInput = z.infer<typeof quoteRequestSchema>;

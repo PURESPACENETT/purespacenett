@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { business, whatsappHref } from "@/content/business";
 import { trackEvent, trackLeadGenerated } from "@/lib/analytics";
+import { getMarketingAttribution } from "@/lib/attribution";
 
 const propertyTypes = [
   ["bureaux", "Bureaux / locaux professionnels"],
@@ -29,6 +30,7 @@ const frequencies = [
 const field = "mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-ring/40";
 
 export function B2BLeadForm() {
+  const sourceExternalId = useRef<string | null>(null);
   const [form, setForm] = useState({
     contactName: "", companyName: "", email: "", phone: "", propertyType: "bureaux",
     surfaceM2: "", frequency: "ponctuel", services: ["nettoyage_courant"] as string[],
@@ -66,10 +68,18 @@ export function B2BLeadForm() {
     setError("");
 
     try {
+      sourceExternalId.current ??= crypto.randomUUID();
       const response = await fetch("/api/public/b2b-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, website: "", surfaceM2: Number(form.surfaceM2), desiredDate: form.desiredDate || "" }),
+        body: JSON.stringify({
+          ...form,
+          ...getMarketingAttribution(),
+          sourceExternalId: sourceExternalId.current,
+          website: "",
+          surfaceM2: Number(form.surfaceM2),
+          desiredDate: form.desiredDate || "",
+        }),
       });
       if (!response.ok) {
         const data = await response.json().catch(() => null);

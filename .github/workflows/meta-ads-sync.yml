@@ -31,6 +31,7 @@ jobs:
           SUPABASE_API_SECRET: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           response="$(curl --silent --show-error --fail-with-body --max-time 180 \
+            --retry 2 --retry-delay 5 \
             --request POST \
             --url "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/meta-ads-sync" \
             --header "apikey: $SUPABASE_API_SECRET" \

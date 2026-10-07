@@ -33,6 +33,23 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    if (data.sourceExternalId) {
+      const { data: existing, error: existingError } = await supabaseAdmin
+        .from("quote_requests")
+        .select("id, estimate_min, estimate_max, score")
+        .eq("source_external_id", data.sourceExternalId)
+        .maybeSingle();
+      if (existingError) throw new Error("Impossible de vérifier le doublon de la demande.");
+      if (existing) {
+        return {
+          id: existing.id,
+          duplicate: true,
+          estimate: { min: Number(existing.estimate_min), max: Number(existing.estimate_max) },
+          score: Number(existing.score),
+        };
+      }
+    }
+
     // Anti-spam: at most 3 requests per email per hour, no identical resubmission within 10 minutes.
     const hourAgo = new Date(Date.now() - 3600_000).toISOString();
     const { data: recent } = await supabaseAdmin
@@ -61,6 +78,8 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
     const { data: inserted, error } = await supabaseAdmin
       .from("quote_requests")
       .insert({
+        source_external_id: data.sourceExternalId ?? null,
+        source_system: data.sourceExternalId ? "purespacenett_site" : null,
         client_type: data.clientType,
         property_type: data.propertyType,
         surface_m2: data.surfaceM2,
@@ -75,6 +94,16 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
         email: data.email.trim().toLowerCase(),
         phone: data.phone,
         message: data.message || null,
+        gclid: data.gclid || null,
+        gbraid: data.gbraid || null,
+        wbraid: data.wbraid || null,
+        utm_source: data.utm_source || null,
+        utm_medium: data.utm_medium || null,
+        utm_campaign: data.utm_campaign || null,
+        utm_content: data.utm_content || null,
+        utm_term: data.utm_term || null,
+        landing_page: data.landing_page || null,
+        referrer: data.referrer || null,
         estimate_min: estimate.min,
         estimate_max: estimate.max,
         score,
@@ -82,7 +111,24 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
       .select("id")
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (error.code === "23505" && data.sourceExternalId) {
+        const { data: duplicate } = await supabaseAdmin
+          .from("quote_requests")
+          .select("id, estimate_min, estimate_max, score")
+          .eq("source_external_id", data.sourceExternalId)
+          .maybeSingle();
+        if (duplicate) {
+          return {
+            id: duplicate.id,
+            duplicate: true,
+            estimate: { min: Number(duplicate.estimate_min), max: Number(duplicate.estimate_max) },
+            score: Number(duplicate.score),
+          };
+        }
+      }
+      throw new Error(error.message);
+    }
 
     try {
       const { notifyNewRequest } = await import("./quote-notifications.server");
