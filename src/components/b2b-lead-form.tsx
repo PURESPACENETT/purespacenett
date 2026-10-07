@@ -75,7 +75,7 @@ export function B2BLeadForm() {
         const data = await response.json().catch(() => null);
         throw new Error(data?.error || "Transmission impossible");
       }
-      trackLeadGenerated({ source: "sous_traitance_b2b", type: "partenariat" });
+      trackLeadGenerated("b2b", { source: "sous_traitance_b2b", type: "partenariat" });
       trackEvent("lead_b2b_envoye", { source: "page_sous_traitance" });
       setStatus("sent");
     } catch (e) {
