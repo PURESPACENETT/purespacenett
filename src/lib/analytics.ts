@@ -39,14 +39,14 @@ export function initAnalytics() {
       wait_for_update: 500,
     });
 
-    const tagId = measurementId ?? googleAdsId!;
+    const tagId = googleAdsId ?? measurementId!;
     const script = document.createElement("script");
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${tagId}`;
     document.head.appendChild(script);
     push("js", new Date());
     push("config", tagId, { send_page_view: false });
-    if (measurementId && googleAdsId && googleAdsId !== measurementId) push("config", googleAdsId, { send_page_view: false });
+    if (measurementId && googleAdsId && googleAdsId !== measurementId) push("config", measurementId, { send_page_view: false });
   }
 
   // The site's existing opt-in covers audience analytics. Advertising
