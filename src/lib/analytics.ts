@@ -39,14 +39,17 @@ export function initAnalytics() {
       wait_for_update: 500,
     });
 
-    const tagId = measurementId ?? googleAdsId!;
+    // Load the Ads destination as the primary tag when available so Google Ads
+    // and Tag Assistant can identify the website tag directly. The same
+    // gtag.js instance still configures GA4 below; do not load a second tag.
+    const tagId = googleAdsId ?? measurementId!;
     const script = document.createElement("script");
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${tagId}`;
     document.head.appendChild(script);
     push("js", new Date());
     push("config", tagId, { send_page_view: false });
-    if (measurementId && googleAdsId && googleAdsId !== measurementId) push("config", googleAdsId, { send_page_view: false });
+    if (measurementId && googleAdsId && measurementId !== googleAdsId) push("config", measurementId, { send_page_view: false });
   }
 
   // The site's existing opt-in covers audience analytics. Advertising
