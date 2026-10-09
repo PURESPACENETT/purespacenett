@@ -6,12 +6,20 @@ const googleAdsId = import.meta.env["VITE_GOOGLE_ADS_ID"] as string | undefined;
 const quoteConversionLabel = import.meta.env["VITE_GOOGLE_ADS_QUOTE_CONVERSION_LABEL"] as string | undefined;
 const b2bConversionLabel = import.meta.env["VITE_GOOGLE_ADS_B2B_CONVERSION_LABEL"] as string | undefined;
 
-declare global { interface Window { dataLayer?: unknown[]; } }
+declare global {
+  interface Window {
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 
 function push(...args: unknown[]) {
   if (typeof window === "undefined") return;
   window.dataLayer = window.dataLayer ?? [];
-  window.dataLayer.push(args);
+  // Expose Google's standard global entry point so Tag Assistant and gtag.js
+  // consume the same queued commands, including when the library loads later.
+  window.gtag = window.gtag ?? ((...command: unknown[]) => window.dataLayer?.push(command));
+  window.gtag(...args);
 }
 
 let initialized = false;
@@ -83,3 +91,4 @@ export function trackContactClick(type: "phone" | "whatsapp" | "email", source: 
 
 export const analyticsEnabled = Boolean(measurementId || googleAdsId);
 export const googleAdsEnabled = Boolean(googleAdsId && (quoteConversionLabel || b2bConversionLabel));
+
