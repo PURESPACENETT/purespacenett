@@ -17,16 +17,36 @@ function push(...args: unknown[]) {
 let initialized = false;
 
 export function initAnalytics() {
-  if (initialized || typeof window === "undefined" || !getAnalyticsConsent() || (!measurementId && !googleAdsId)) return;
-  initialized = true;
-  const tagId = measurementId ?? googleAdsId!;
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${tagId}`;
-  document.head.appendChild(script);
-  push("js", new Date());
-  push("config", tagId, { send_page_view: false });
-  if (measurementId && googleAdsId && googleAdsId !== measurementId) push("config", googleAdsId, { send_page_view: false });
+  if (typeof window === "undefined" || (!measurementId && !googleAdsId)) return;
+
+  if (!initialized) {
+    initialized = true;
+    // Load the Google tag so Tag Assistant can detect it, while withholding
+    // analytics and advertising storage until the visitor makes a choice.
+    push("consent", "default", {
+      analytics_storage: "denied",
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+      wait_for_update: 500,
+    });
+
+    const tagId = measurementId ?? googleAdsId!;
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${tagId}`;
+    document.head.appendChild(script);
+    push("js", new Date());
+    push("config", tagId, { send_page_view: false });
+    if (measurementId && googleAdsId && googleAdsId !== measurementId) push("config", googleAdsId, { send_page_view: false });
+  }
+
+  // The site's existing opt-in covers audience analytics. Advertising
+  // storage and personalization remain denied because the consent UI does
+  // not request those permissions.
+  push("consent", "update", {
+    analytics_storage: getAnalyticsConsent() ? "granted" : "denied",
+  });
 }
 
 export function trackPageView(path: string, title?: string) {
