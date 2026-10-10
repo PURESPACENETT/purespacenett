@@ -104,11 +104,15 @@ function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-display text-xl font-bold">Mesure d'audience</h2>
+            <h2 className="font-display text-xl font-bold">Mesure d'audience et des demandes publicitaires</h2>
             <p className="mt-3">
-              Google Analytics n'est chargé qu'après votre choix d'acceptation dans le bandeau de
-              confidentialité. Un refus n'empêche pas l'utilisation du site. Vous pouvez modifier
-              votre choix en supprimant la préférence enregistrée dans votre navigateur.
+              Google Analytics et Google Ads sont utilisés uniquement selon les choix facultatifs
+              enregistrés dans le bandeau de confidentialité. Google Analytics mesure l'audience.
+              Si vous l'autorisez, Google Ads mesure les demandes envoyées après une annonce. Les
+              cookies publicitaires restent désactivés sans votre accord. Le site ne transmet pas
+              de données personnelles à Google Ads et ne demande pas la personnalisation des
+              annonces. Un refus n'empêche pas l'utilisation du site. Vous pouvez
+              modifier vos choix avec le bouton « Gérer mes cookies » en bas de page.
             </p>
           </section>
         </div>
@@ -116,3 +120,4 @@ function PrivacyPage() {
     </>
   );
 }
+

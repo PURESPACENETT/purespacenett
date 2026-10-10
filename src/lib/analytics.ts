@@ -1,4 +1,4 @@
-import { getAnalyticsConsent } from "@/components/cookie-consent";
+import { getAdvertisingConsent, getAnalyticsConsent } from "@/components/cookie-consent";
 import { getMarketingAttribution } from "@/lib/attribution";
 
 const measurementId = import.meta.env["VITE_GOOGLE_ANALYTICS_ID"] as string | undefined;
@@ -39,6 +39,9 @@ export function initAnalytics() {
       wait_for_update: 500,
     });
 
+    // Load the Ads destination as the primary tag when available so Google Ads
+    // and Tag Assistant can identify the website tag directly. The same
+    // gtag.js instance still configures GA4 below; do not load a second tag.
     const tagId = googleAdsId ?? measurementId!;
     const script = document.createElement("script");
     script.async = true;
@@ -46,14 +49,16 @@ export function initAnalytics() {
     document.head.appendChild(script);
     push("js", new Date());
     push("config", tagId, { send_page_view: false });
-    if (measurementId && googleAdsId && googleAdsId !== measurementId) push("config", measurementId, { send_page_view: false });
+    if (measurementId && googleAdsId && measurementId !== googleAdsId) push("config", measurementId, { send_page_view: false });
   }
 
-  // The site's existing opt-in covers audience analytics. Advertising
-  // storage and personalization remain denied because the consent UI does
-  // not request those permissions.
+  // Audience and advertising storage use separate opt-ins. Personalized ads
+  // and user-provided ad data remain disabled because the site does not request them.
   push("consent", "update", {
     analytics_storage: getAnalyticsConsent() ? "granted" : "denied",
+    ad_storage: getAdvertisingConsent() ? "granted" : "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
   });
 }
 
@@ -76,7 +81,7 @@ export function trackEvent(name: string, params?: Record<string, unknown>) {
 export function trackLeadGenerated(type: "quote" | "b2b", params?: Record<string, unknown>) {
   trackEvent("generate_lead", params);
   const conversionLabel = type === "quote" ? quoteConversionLabel : b2bConversionLabel;
-  if (typeof window === "undefined" || !getAnalyticsConsent() || !googleAdsId || !conversionLabel) return;
+  if (typeof window === "undefined" || !getAdvertisingConsent() || !googleAdsId || !conversionLabel) return;
   if (!initialized) initAnalytics();
   push("event", "conversion", {
     send_to: `${googleAdsId}/${conversionLabel}`,
