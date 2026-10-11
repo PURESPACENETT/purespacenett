@@ -12,6 +12,7 @@ import {
   Mail,
   MessageSquareQuote,
   Phone,
+  RefreshCw,
   Search,
   Settings2,
 } from "lucide-react";
@@ -43,14 +44,17 @@ import { listQuoteRequests, setQuoteStatus, type QuoteRequest } from "@/lib/quot
 import {
   isTestReview,
   listReviewSubmissions,
+  getGoogleReviewSyncState,
   setReviewStatus,
   type ReviewStatus,
   type ReviewSubmission,
+  type GoogleReviewSyncState,
 } from "@/lib/reviews.functions";
 import { cn } from "@/lib/utils";
 
 type AdminTab = "tableau-de-bord" | "demandes" | "avis" | "seo" | "outils";
-type QuoteFilter = "tous" | "nouveau" | "traité";
+type QuoteStatus = "nouveau" | "à relancer" | "traité";
+type QuoteFilter = "tous" | QuoteStatus;
 type ReviewFilter = ReviewStatus | "tous";
 
 const ADMIN_TABS: { value: AdminTab; label: string; shortLabel: string; icon: typeof BarChart3 }[] =
@@ -70,6 +74,7 @@ const ADMIN_TABS: { value: AdminTab; label: string; shortLabel: string; icon: ty
 const QUOTE_FILTERS: { value: QuoteFilter; label: string }[] = [
   { value: "tous", label: "Toutes" },
   { value: "nouveau", label: "À traiter" },
+  { value: "à relancer", label: "À relancer" },
   { value: "traité", label: "Traitées" },
 ];
 
@@ -137,11 +142,15 @@ function AdminPage() {
   const fetchQuotes = useServerFn(listQuoteRequests);
   const updateStatus = useServerFn(setQuoteStatus);
   const fetchReviews = useServerFn(listReviewSubmissions);
+  const fetchGoogleSyncState = useServerFn(getGoogleReviewSyncState);
   const changeReviewStatus = useServerFn(setReviewStatus);
   const [search, setSearch] = useState("");
   const [quoteFilter, setQuoteFilter] = useState<QuoteFilter>("tous");
   const [expandedQuoteId, setExpandedQuoteId] = useState<string | null>(null);
-  const [quoteToChange, setQuoteToChange] = useState<QuoteRequest | null>(null);
+  const [quoteToChange, setQuoteToChange] = useState<{
+    quote: QuoteRequest;
+    status: QuoteStatus;
+  } | null>(null);
   const [quoteNotice, setQuoteNotice] = useState<string | null>(null);
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>("nouveau");
   const [reviewNotice, setReviewNotice] = useState<string | null>(null);
@@ -159,6 +168,11 @@ function AdminPage() {
     queryKey: ["review-submissions"],
     queryFn: () => fetchReviews(),
   });
+  const googleSyncQuery = useQuery({
+    queryKey: ["google-review-sync-state"],
+    queryFn: () => fetchGoogleSyncState(),
+    refetchInterval: 60_000,
+  });
 
   const quotes: QuoteRequest[] = quotesQuery.data ?? [];
   const reviews: ReviewSubmission[] = reviewsQuery.data ?? [];
@@ -166,13 +180,15 @@ function AdminPage() {
   const pendingReviews = reviews.filter((review) => review.status === "nouveau").length;
 
   const quoteMutation = useMutation({
-    mutationFn: (input: { id: string; status: "nouveau" | "traité" }) =>
+    mutationFn: (input: { id: string; status: QuoteStatus }) =>
       updateStatus({ data: input }),
     onSuccess: (_response, variables) => {
       setQuoteNotice(
         variables.status === "traité"
           ? "Demande marquée comme traitée."
-          : "Demande rouverte et replacée dans les demandes à traiter.",
+          : variables.status === "à relancer"
+            ? "Demande placée dans les demandes à relancer."
+            : "Demande rouverte et replacée dans les demandes à traiter.",
       );
       setQuoteToChange(null);
       queryClient.invalidateQueries({ queryKey: ["quote-requests"] });
@@ -205,6 +221,26 @@ function AdminPage() {
         `Échec : ${error instanceof Error ? error.message : "l’action n’a pas pu être effectuée"}`,
       );
       setReviewToChange(null);
+    },
+  });
+
+  const googleSyncMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("google-reviews-sync", {
+        method: "POST",
+      });
+      if (error) throw new Error(data?.error ?? "Synchronisation Google impossible.");
+      if (data?.error) throw new Error(data.error);
+      return data as { ok: true; imported: number };
+    },
+    onSuccess: (result) => {
+      setReviewNotice(`${result.imported} avis Google synchronisé(s).`);
+      queryClient.invalidateQueries({ queryKey: ["review-submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["google-review-sync-state"] });
+    },
+    onError: (error) => {
+      setReviewNotice(error instanceof Error ? error.message : "Synchronisation Google impossible.");
+      queryClient.invalidateQueries({ queryKey: ["google-review-sync-state"] });
     },
   });
 
@@ -273,13 +309,18 @@ function AdminPage() {
             onSearch={setSearch}
             onFilter={setQuoteFilter}
             onToggleDetails={(id) => setExpandedQuoteId((current) => (current === id ? null : id))}
-            onRequestStatusChange={setQuoteToChange}
+            onRequestStatusChange={(quote, status) => setQuoteToChange({ quote, status })}
           />
         )}
 
         {onglet === "avis" && (
           <ReviewsTab
             reviews={reviews}
+            syncState={googleSyncQuery.data}
+            syncStateLoading={googleSyncQuery.isLoading}
+            syncStateError={Boolean(googleSyncQuery.error)}
+            syncPending={googleSyncMutation.isPending}
+            onSync={() => googleSyncMutation.mutate()}
             filteredReviews={filteredReviews}
             isLoading={reviewsQuery.isLoading}
             error={Boolean(reviewsQuery.error)}
@@ -310,13 +351,17 @@ function AdminPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>
               {quoteToChange?.status === "traité"
-                ? "Rouvrir cette demande ?"
-                : "Marquer comme traitée ?"}
+                ? "Marquer comme traitée ?"
+                : quoteToChange?.status === "à relancer"
+                  ? "Placer cette demande à relancer ?"
+                  : "Rouvrir cette demande ?"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {quoteToChange?.status === "traité"
-                ? "Elle reviendra dans la liste des demandes à traiter."
-                : "La demande restera enregistrée et pourra être rouverte à tout moment."}
+                ? "La demande restera enregistrée et pourra être rouverte à tout moment."
+                : quoteToChange?.status === "à relancer"
+                  ? "Elle restera enregistrée dans la liste dédiée aux relances."
+                  : "Elle reviendra dans la liste des demandes à traiter."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -326,8 +371,8 @@ function AdminPage() {
               onClick={() => {
                 if (!quoteToChange) return;
                 quoteMutation.mutate({
-                  id: quoteToChange.id,
-                  status: quoteToChange.status === "traité" ? "nouveau" : "traité",
+                  id: quoteToChange.quote.id,
+                  status: quoteToChange.status,
                 });
               }}
             >
@@ -559,7 +604,7 @@ function RequestsTab({
   onSearch: (value: string) => void;
   onFilter: (value: QuoteFilter) => void;
   onToggleDetails: (id: string) => void;
-  onRequestStatusChange: (quote: QuoteRequest) => void;
+  onRequestStatusChange: (quote: QuoteRequest, status: QuoteStatus) => void;
 }) {
   return (
     <section aria-labelledby="requests-title">
@@ -638,10 +683,16 @@ function RequestsTab({
                         "rounded-full px-2.5 py-1 text-xs font-semibold",
                         quote.status === "traité"
                           ? "bg-secondary text-foreground"
+                          : quote.status === "à relancer"
+                            ? "bg-destructive/15 text-destructive"
                           : "bg-accent text-accent-foreground",
                       )}
                     >
-                      {quote.status === "traité" ? "Traitée" : "À traiter"}
+                      {quote.status === "traité"
+                        ? "Traitée"
+                        : quote.status === "à relancer"
+                          ? "À relancer"
+                          : "À traiter"}
                     </span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -680,7 +731,9 @@ function RequestsTab({
                     type="button"
                     size="sm"
                     disabled={pending}
-                    onClick={() => onRequestStatusChange(quote)}
+                    onClick={() =>
+                      onRequestStatusChange(quote, quote.status === "traité" ? "nouveau" : "traité")
+                    }
                   >
                     {pending
                       ? "Enregistrement…"
@@ -688,6 +741,17 @@ function RequestsTab({
                         ? "Rouvrir"
                         : "Marquer traitée"}
                   </Button>
+                  {quote.status !== "à relancer" && quote.status !== "traité" && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={pending}
+                      onClick={() => onRequestStatusChange(quote, "à relancer")}
+                    >
+                      À relancer
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -697,6 +761,10 @@ function RequestsTab({
                     <QuoteField label="E-mail" value={quote.email} />
                     <QuoteField label="Téléphone" value={quote.phone} />
                     <QuoteField label="Adresse" value={quote.address} />
+                    <QuoteField
+                      label="Zone"
+                      value={[quote.postal_code, quote.city].filter(Boolean).join(" ") || null}
+                    />
                     <QuoteField label="Prestation" value={quote.service_type} />
                     <QuoteField label="Fréquence" value={quote.frequency} />
                     <QuoteField
@@ -730,6 +798,11 @@ function QuoteField({ label, value }: { label: string; value: string | null }) {
 
 function ReviewsTab({
   reviews,
+  syncState,
+  syncStateLoading,
+  syncStateError,
+  syncPending,
+  onSync,
   filteredReviews,
   isLoading,
   error,
@@ -740,6 +813,11 @@ function ReviewsTab({
   onRequestStatusChange,
 }: {
   reviews: ReviewSubmission[];
+  syncState: GoogleReviewSyncState | undefined;
+  syncStateLoading: boolean;
+  syncStateError: boolean;
+  syncPending: boolean;
+  onSync: () => void;
   filteredReviews: ReviewSubmission[];
   isLoading: boolean;
   error: boolean;
@@ -751,14 +829,46 @@ function ReviewsTab({
 }) {
   return (
     <section aria-labelledby="reviews-title">
-      <h2 id="reviews-title" className="font-display text-2xl font-bold">
-        Avis reçus depuis le site
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {isLoading
-          ? "Chargement…"
-          : `${reviews.length} avis · ${reviews.filter((review) => review.status === "nouveau").length} en attente · ${reviews.filter((review) => review.status === "publié").length} publié(s)`}
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 id="reviews-title" className="font-display text-2xl font-bold">
+            Avis clients et Google
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {isLoading
+              ? "Chargement…"
+              : `${reviews.length} avis · ${reviews.filter((review) => review.status === "nouveau").length} en attente · ${reviews.filter((review) => review.source === "google").length} avis Google`}
+          </p>
+        </div>
+        <Button type="button" variant="outline" onClick={onSync} disabled={syncPending}>
+          <RefreshCw aria-hidden="true" className={syncPending ? "animate-spin" : undefined} />
+          {syncPending ? "Synchronisation…" : "Synchroniser Google"}
+        </Button>
+      </div>
+      <div className="mt-4 rounded-lg border border-border bg-card p-4 text-sm" aria-live="polite">
+        {syncStateError ? (
+          <p role="alert" className="text-destructive">État de synchronisation Google indisponible.</p>
+        ) : syncStateLoading ? (
+          <p className="text-muted-foreground">Lecture de l’état Google…</p>
+        ) : syncState?.last_error ? (
+          <p role="status" className="text-destructive">
+            Dernière synchronisation en erreur ({syncState.last_sync_at ? dateFmt.format(new Date(syncState.last_sync_at)) : "date inconnue"}) : {syncState.last_error}
+          </p>
+        ) : syncState?.last_success_at ? (
+          <p role="status" className="text-accent-foreground">
+            Dernière synchronisation réussie le {dateFmt.format(new Date(syncState.last_success_at))} · {syncState.imported_count} avis récupéré(s).
+          </p>
+        ) : syncState?.configured ? (
+          <p className="text-muted-foreground">Aucune synchronisation effectuée pour le moment.</p>
+        ) : (
+          <div>
+            <p className="font-semibold">Synchronisation Google non configurée.</p>
+            <p className="mt-1 text-muted-foreground">
+              Il faut autoriser l’API Business Profile et enregistrer les identifiants OAuth dans le coffre Supabase avant de lancer la synchronisation.
+            </p>
+          </div>
+        )}
+      </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {REVIEW_FILTERS.map((item) => (
           <Button
@@ -841,11 +951,10 @@ function ReviewsTab({
                 <span className="text-xs text-muted-foreground">
                   {dateFmt.format(new Date(review.created_at))}
                   {review.service_type ? ` · ${review.service_type}` : ""}
-                  {review.email ? ` · ${review.email}` : ""}
                 </span>
               </div>
               <p className="mt-4 whitespace-pre-line rounded-lg bg-secondary/60 p-4 text-sm">
-                {review.message}
+                {review.message || "Cet avis ne contient pas de texte."}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {review.status !== "publié" && !isTestReview(review) && (

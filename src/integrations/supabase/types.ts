@@ -450,6 +450,39 @@ export type Database = {
         }
         Relationships: []
       }
+      google_review_sync_state: {
+        Row: {
+          id: number
+          account_id: string | null
+          location_id: string | null
+          last_sync_at: string | null
+          last_success_at: string | null
+          last_error: string | null
+          imported_count: number
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          account_id?: string | null
+          location_id?: string | null
+          last_sync_at?: string | null
+          last_success_at?: string | null
+          last_error?: string | null
+          imported_count?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          account_id?: string | null
+          location_id?: string | null
+          last_sync_at?: string | null
+          last_success_at?: string | null
+          last_error?: string | null
+          imported_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

@@ -18,7 +18,6 @@ export type ReviewSubmission = {
   service_type: string | null;
   rating: number;
   message: string;
-  email: string | null;
   status: string;
   created_at: string;
   source: "site" | "google";
@@ -44,13 +43,57 @@ export type PublishedReviewsSummary = {
   average: number | null;
 };
 
+export type GoogleReviewSyncState = {
+  configured: boolean;
+  last_sync_at: string | null;
+  last_success_at: string | null;
+  last_error: string | null;
+  imported_count: number;
+};
+
+/** État privé de synchronisation Google, réservé au compte propriétaire. */
+export const getGoogleReviewSyncState = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<GoogleReviewSyncState> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const rpc = supabaseAdmin.rpc as unknown as (
+      fn: string,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>;
+    const [{ data: config, error: configError }, { data: state, error: stateError }] =
+      await Promise.all([
+        rpc("get_google_review_config"),
+        context.supabase
+          .from("google_review_sync_state")
+          .select("last_sync_at, last_success_at, last_error, imported_count")
+          .eq("id", 1)
+          .maybeSingle(),
+      ]);
+
+    if (stateError) throw new Error("État de synchronisation Google indisponible.");
+    const values = config && typeof config === "object" ? (config as Record<string, unknown>) : {};
+    const configured = Boolean(
+      !configError &&
+        ["client_id", "client_secret", "refresh_token", "account_id", "location_id"].every(
+          (key) => typeof values[key] === "string" && values[key],
+        ),
+    );
+
+    return {
+      configured,
+      last_sync_at: state?.last_sync_at ?? null,
+      last_success_at: state?.last_success_at ?? null,
+      last_error: state?.last_error ?? null,
+      imported_count: state?.imported_count ?? 0,
+    };
+  });
+
 /** Liste des avis laissés depuis le site. RLS : réservé au rôle administrateur. */
 export const listReviewSubmissions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("review_submissions")
-      .select("id, author_name, city, service_type, rating, message, email, status, created_at, source, source_url")
+      .select("id, author_name, city, service_type, rating, message, status, created_at, source, source_url")
       .order("created_at", { ascending: false })
       .limit(500);
 

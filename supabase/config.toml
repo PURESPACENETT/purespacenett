@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.meta-leads-webhook]
 verify_jwt = false
+
+[functions.google-reviews-sync]
+verify_jwt = true

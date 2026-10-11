@@ -1,6 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
+const OWNER_EMAIL = "contact@purespacenett.com";
+
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   staticData: { sitemap: "exclude-subtree" },
@@ -10,6 +12,10 @@ export const Route = createFileRoute("/_authenticated")({
       // Les Server Functions restent l'autorité pour l'accès réel aux données privées.
       const { data, error } = await supabase.auth.getSession();
       if (error || !data.session?.user) throw redirect({ to: "/connexion" });
+      if (data.session.user.email?.toLowerCase() !== OWNER_EMAIL) {
+        await supabase.auth.signOut();
+        throw redirect({ to: "/connexion" });
+      }
       return { user: data.session.user };
     } catch (error) {
       if (error && typeof error === "object" && "to" in error) throw error;

@@ -3,6 +3,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Section } from "@/components/site-blocks";
 
+const OWNER_EMAIL = "contact@purespacenett.com";
+
 export const Route = createFileRoute("/connexion")({
   staticData: { sitemap: false },
   head: () => ({
@@ -42,6 +44,11 @@ function LoginPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (email.trim().toLowerCase() !== OWNER_EMAIL) {
+      setError("Cette interface est réservée au compte propriétaire du site.");
+      setInfo(null);
+      return;
+    }
     setLoading(true);
     setError(null);
     setInfo(null);
@@ -68,7 +75,9 @@ function LoginPage() {
         return;
       }
 
-      const { error } = await withTimeout(supabase.auth.signInWithPassword({ email, password }));
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password }),
+      );
 
       if (error) {
         setError(
@@ -76,6 +85,12 @@ function LoginPage() {
             ? "E-mail ou mot de passe incorrect."
             : "Connexion impossible : " + error.message,
         );
+        return;
+      }
+
+      if (data.user?.email?.toLowerCase() !== OWNER_EMAIL) {
+        await supabase.auth.signOut();
+        setError("Cette interface est réservée au compte propriétaire du site.");
         return;
       }
 
