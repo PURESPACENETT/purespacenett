@@ -18,7 +18,6 @@ export type ReviewSubmission = {
   service_type: string | null;
   rating: number;
   message: string;
-  email: string | null;
   status: string;
   created_at: string;
   source: "site" | "google";
@@ -94,7 +93,7 @@ export const listReviewSubmissions = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("review_submissions")
-      .select("id, author_name, city, service_type, rating, message, email, status, created_at, source, source_url")
+      .select("id, author_name, city, service_type, rating, message, status, created_at, source, source_url")
       .order("created_at", { ascending: false })
       .limit(500);
 

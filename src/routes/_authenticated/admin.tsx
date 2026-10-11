@@ -951,7 +951,6 @@ function ReviewsTab({
                 <span className="text-xs text-muted-foreground">
                   {dateFmt.format(new Date(review.created_at))}
                   {review.service_type ? ` · ${review.service_type}` : ""}
-                  {review.email ? ` · ${review.email}` : ""}
                 </span>
               </div>
               <p className="mt-4 whitespace-pre-line rounded-lg bg-secondary/60 p-4 text-sm">

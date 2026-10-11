@@ -100,6 +100,7 @@ Deno.serve(async (request: Request) => {
     const reviews: GoogleReview[] = [];
     const pageTokens = new Set<string>();
     let pageToken: string | undefined;
+    let paginationComplete = false;
     for (let page = 0; page < 100; page++) {
       const url = new URL(baseUrl);
       url.searchParams.set("pageSize", "50");
@@ -114,9 +115,17 @@ Deno.serve(async (request: Request) => {
       const body = await response.json();
       if (Array.isArray(body.reviews)) reviews.push(...body.reviews as GoogleReview[]);
       const next = typeof body.nextPageToken === "string" ? body.nextPageToken : "";
-      if (!next || pageTokens.has(next)) break;
+      if (!next) {
+        paginationComplete = true;
+        break;
+      }
+      if (pageTokens.has(next)) throw new Error("La pagination Google a renvoyé un curseur en boucle.");
       pageTokens.add(next);
       pageToken = next;
+    }
+    if (!paginationComplete) {
+      await markFailure("Synchronisation incomplète : le nombre maximal de pages Google a été dépassé.");
+      return Response.json({ error: "Synchronisation incomplète : pagination Google trop volumineuse." }, { status: 502, headers });
     }
 
     const unique = new Map<string, GoogleReview>();
