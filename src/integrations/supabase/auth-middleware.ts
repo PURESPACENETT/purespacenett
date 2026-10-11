@@ -4,6 +4,8 @@ import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './types'
 
+const OWNER_EMAIL = 'contact@purespacenett.com'
+
 
 
 
@@ -96,6 +98,10 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: Invalid token');
     }
 
+    if (data.user.email?.toLowerCase() !== OWNER_EMAIL) {
+      throw new Error('Accès réservé au propriétaire du site.');
+    }
+
     if (!data.user.id) {
       throw new Error('Unauthorized: No user ID found in token');
     }
@@ -106,10 +112,10 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
         userId: data.user.id,
         user: data.user,
         claims: {
-          sub: data.user.id,
-          email: data.user.email,
           ...data.user.app_metadata,
           ...data.user.user_metadata,
+          sub: data.user.id,
+          email: data.user.email,
         },
       },
     });

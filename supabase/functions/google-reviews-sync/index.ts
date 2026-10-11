@@ -1,172 +1,171 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+const OWNER_EMAIL = "contact@purespacenett.com";
+const ALLOWED_ORIGINS = new Set([
+  "https://purespacenett.com",
+  "https://www.purespacenett.com",
+  "http://localhost:3000",
+]);
+const corsHeaders = (origin: string | null) => ({
+  "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://purespacenett.com",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Vary": "Origin",
+});
+
 type GoogleReview = {
-  name?: string;
   reviewId?: string;
-  reviewer?: { displayName?: string };
+  name?: string;
+  reviewer?: { displayName?: string; profilePhotoUrl?: string; isAnonymous?: boolean };
   starRating?: string;
   comment?: string;
   createTime?: string;
   updateTime?: string;
 };
 
-const RATING: Record<string, number> = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
+const stars: Record<string, number> = {
+  ONE: 1,
+  TWO: 2,
+  THREE: 3,
+  FOUR: 4,
+  FIVE: 5,
+};
 
-function getSecretKey() {
-  const raw = Deno.env.get("SUPABASE_SECRET_KEYS");
-  if (raw) return JSON.parse(raw).default as string;
-  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (legacy) return legacy;
-  throw new Error("Clé secrète Supabase absente");
-}
+Deno.serve(async (request: Request) => {
+  const origin = request.headers.get("origin");
+  const headers = { ...corsHeaders(origin), "Content-Type": "application/json" };
+  if (request.method === "OPTIONS") return new Response("ok", { headers });
+  if (request.method !== "POST") return Response.json({ error: "Méthode non autorisée." }, { status: 405, headers });
 
-const supabaseAdmin = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  getSecretKey(),
-  { auth: { persistSession: false, autoRefreshToken: false } },
-);
+  const authHeader = request.headers.get("Authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!token) return Response.json({ error: "Connexion requise." }, { status: 401, headers });
 
-function getConfig() {
-  const raw = Deno.env.get("GOOGLE_BUSINESS_PROFILE");
-  if (!raw) throw new Error("Secret GOOGLE_BUSINESS_PROFILE manquant");
-  const config = JSON.parse(raw) as {
-    client_id: string;
-    client_secret: string;
-    refresh_token: string;
-    account_id: string;
-    location_id: string;
-    review_url?: string;
-  };
-  for (const key of ["client_id", "client_secret", "refresh_token", "account_id", "location_id"]) {
-    if (!config[key as keyof typeof config]) throw new Error(`Configuration Google incomplète : ${key}`);
-  }
-  return config;
-}
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !anonKey || !serviceRoleKey)
+    return Response.json({ error: "Service de synchronisation indisponible." }, { status: 503, headers });
 
-async function getAccessToken(config: ReturnType<typeof getConfig>) {
-  const body = new URLSearchParams({
-    client_id: config.client_id,
-    client_secret: config.client_secret,
-    refresh_token: config.refresh_token,
-    grant_type: "refresh_token",
-  });
-  const response = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-  if (!response.ok) throw new Error(`OAuth Google: ${response.status} ${(await response.text()).slice(0, 500)}`);
-  const token = await response.json() as { access_token?: string };
-  if (!token.access_token) throw new Error("Google n'a pas fourni de jeton d'accès");
-  return token.access_token;
-}
+  const authClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+  const { data: authData, error: authError } = await authClient.auth.getUser(token);
+  if (authError || authData.user?.email?.toLowerCase() !== OWNER_EMAIL)
+    return Response.json({ error: "Accès réservé au propriétaire du site." }, { status: 403, headers });
 
-async function listReviews(accessToken: string, accountId: string, locationId: string) {
-  const reviews: GoogleReview[] = [];
-  let pageToken = "";
-  for (let page = 0; page < 20; page += 1) {
-    const params = new URLSearchParams({ pageSize: "50", orderBy: "updateTime desc" });
-    if (pageToken) params.set("pageToken", pageToken);
-    const url = `https://mybusiness.googleapis.com/v4/accounts/${encodeURIComponent(accountId)}/locations/${encodeURIComponent(locationId)}/reviews?${params}`;
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-    if (!response.ok) throw new Error(`Google Reviews API: ${response.status} ${(await response.text()).slice(0, 500)}`);
-    const payload = await response.json() as { reviews?: GoogleReview[]; nextPageToken?: string };
-    reviews.push(...(payload.reviews ?? []));
-    pageToken = payload.nextPageToken ?? "";
-    if (!pageToken) break;
-  }
-  return reviews;
-}
-
-async function sync() {
-  const config = getConfig();
-  const accessToken = await getAccessToken(config);
-  const reviews = await listReviews(accessToken, config.account_id, config.location_id);
-  let imported = 0;
-
-  for (const review of reviews) {
-    const googleReviewId = review.reviewId ?? review.name?.split("/").pop();
-    const rating = review.starRating ? RATING[review.starRating] : undefined;
-    if (!googleReviewId || !rating) continue;
-
-    const payload = {
-      author_name: review.reviewer?.displayName?.trim() || "Client Google",
-      city: null,
-      service_type: null,
-      rating,
-      message: review.comment?.trim() || "Avis Google laissé avec une note.",
-      source: "google",
-      source_url: config.review_url ?? null,
-      google_review_id: googleReviewId,
-      google_review_name: review.name ?? null,
-      google_create_time: review.createTime ?? null,
-      google_update_time: review.updateTime ?? null,
-      google_raw: review,
-      created_at: review.createTime ?? new Date().toISOString(),
-    };
-
-    const { data: existing, error: findError } = await supabaseAdmin
-      .from("review_submissions")
-      .select("id")
-      .eq("google_review_id", googleReviewId)
-      .maybeSingle();
-    if (findError) throw new Error(`Lecture avis Google: ${findError.message}`);
-
-    if (existing) {
-      const { error } = await supabaseAdmin.from("review_submissions").update({
-        author_name: payload.author_name,
-        rating: payload.rating,
-        message: payload.message,
-        source_url: payload.source_url,
-        google_review_name: payload.google_review_name,
-        google_create_time: payload.google_create_time,
-        google_update_time: payload.google_update_time,
-        google_raw: payload.google_raw,
-      }).eq("id", existing.id);
-      if (error) throw new Error(`Mise à jour avis Google: ${error.message}`);
-    } else {
-      const { error } = await supabaseAdmin.from("review_submissions").insert({ ...payload, status: "nouveau" });
-      if (error) throw new Error(`Import avis Google: ${error.message}`);
-    }
-    imported += 1;
-  }
-
-  const now = new Date().toISOString();
-  const { error: stateError } = await supabaseAdmin.from("google_review_sync_state").upsert({
-    id: 1,
-    account_id: config.account_id,
-    location_id: config.location_id,
-    last_sync_at: now,
-    last_success_at: now,
-    last_error: null,
-    imported_count: imported,
-    updated_at: now,
-  });
-  if (stateError) throw new Error(`Mise à jour état synchronisation Google: ${stateError.message}`);
-
-  return { ok: true, fetched: reviews.length, imported };
-}
-
-Deno.serve(async (req) => {
-  if (req.method !== "POST") return Response.json({ error: "Méthode non autorisée" }, { status: 405 });
-  const expected = Deno.env.get("GOOGLE_REVIEW_SYNC_SECRET");
-  if (!expected || req.headers.get("x-google-sync-secret") !== expected) {
-    return Response.json({ error: "Non autorisé" }, { status: 401 });
-  }
-
-  try {
-    return Response.json(await sync());
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Erreur inconnue";
-    const { error: stateError } = await supabaseAdmin.from("google_review_sync_state").upsert({
+  const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
+  const markFailure = async (message: string) => {
+    await admin.from("google_review_sync_state").upsert({
       id: 1,
       last_sync_at: new Date().toISOString(),
-      last_error: message.slice(0, 1000),
+      last_error: message,
       updated_at: new Date().toISOString(),
+    }, { onConflict: "id" });
+  };
+
+  try {
+    const { data: config, error: configError } = await admin.rpc("get_google_review_config");
+    if (configError || !config || typeof config !== "object") {
+      await markFailure("Configuration OAuth Google Business Profile absente.");
+      return Response.json({ error: "Configuration OAuth Google Business Profile absente." }, { status: 409, headers });
+    }
+    const credentials = config as Record<string, unknown>;
+    const required = ["client_id", "client_secret", "refresh_token", "account_id", "location_id"];
+    if (required.some((key) => typeof credentials[key] !== "string" || !credentials[key])) {
+      await markFailure("Configuration OAuth Google Business Profile incomplète.");
+      return Response.json({ error: "Configuration OAuth Google Business Profile incomplète." }, { status: 409, headers });
+    }
+
+    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: credentials.client_id as string,
+        client_secret: credentials.client_secret as string,
+        refresh_token: credentials.refresh_token as string,
+        grant_type: "refresh_token",
+      }),
     });
-    if (stateError) console.error(`Échec de journalisation de la synchronisation Google: ${stateError.message}`);
-    console.error(message);
-    return Response.json({ ok: false, error: message }, { status: 502 });
+    if (!tokenResponse.ok) {
+      await markFailure("Échec de l’authentification OAuth Google. Vérifiez les identifiants et autorisations.");
+      return Response.json({ error: "Échec de l’authentification OAuth Google." }, { status: 502, headers });
+    }
+    const tokenBody = await tokenResponse.json();
+    const accessToken = tokenBody.access_token as string | undefined;
+    if (!accessToken) throw new Error("Jeton d’accès Google manquant.");
+
+    const accountId = encodeURIComponent(credentials.account_id as string);
+    const locationId = encodeURIComponent(credentials.location_id as string);
+    const baseUrl = `https://mybusiness.googleapis.com/v4/accounts/${accountId}/locations/${locationId}/reviews`;
+    const reviews: GoogleReview[] = [];
+    const pageTokens = new Set<string>();
+    let pageToken: string | undefined;
+    for (let page = 0; page < 100; page++) {
+      const url = new URL(baseUrl);
+      url.searchParams.set("pageSize", "50");
+      if (pageToken) url.searchParams.set("pageToken", pageToken);
+      const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+      if (!response.ok) {
+        await markFailure(response.status === 403
+          ? "Accès Google refusé. Vérifiez que l’établissement est vérifié et que l’API est autorisée."
+          : `Échec de lecture des avis Google (HTTP ${response.status}).`);
+        return Response.json({ error: "Lecture des avis Google impossible. Vérifiez l’accès Business Profile." }, { status: 502, headers });
+      }
+      const body = await response.json();
+      if (Array.isArray(body.reviews)) reviews.push(...body.reviews as GoogleReview[]);
+      const next = typeof body.nextPageToken === "string" ? body.nextPageToken : "";
+      if (!next || pageTokens.has(next)) break;
+      pageTokens.add(next);
+      pageToken = next;
+    }
+
+    const unique = new Map<string, GoogleReview>();
+    for (const review of reviews) {
+      const id = review.reviewId || review.name;
+      if (id) unique.set(id, review);
+    }
+    const rows = [...unique].flatMap(([id, review]) => {
+      const rating = stars[review.starRating ?? ""];
+      if (!rating || !review.createTime) return [];
+      const name = review.reviewer?.displayName?.trim() || "Avis Google sans nom public";
+      return {
+        google_review_id: id,
+        google_review_name: review.name ?? null,
+        author_name: name,
+        rating,
+        message: review.comment ?? "",
+        created_at: review.createTime,
+        google_create_time: review.createTime ?? null,
+        google_update_time: review.updateTime ?? null,
+        source: "google",
+        source_url: null,
+      };
+    });
+
+    if (rows.length) {
+      const { error } = await admin.from("review_submissions").upsert(rows, {
+        onConflict: "google_review_id",
+        ignoreDuplicates: false,
+      });
+      if (error) throw new Error("Enregistrement des avis synchronisés impossible.");
+    }
+    const now = new Date().toISOString();
+    const { error: stateError } = await admin.from("google_review_sync_state").upsert({
+      id: 1,
+      account_id: credentials.account_id,
+      location_id: credentials.location_id,
+      last_sync_at: now,
+      last_success_at: now,
+      last_error: null,
+      imported_count: rows.length,
+      updated_at: now,
+    }, { onConflict: "id" });
+    if (stateError) throw new Error("État de synchronisation impossible à enregistrer.");
+
+    return Response.json({ ok: true, imported: rows.length, syncedAt: now }, { headers });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Erreur de synchronisation.";
+    await markFailure(message);
+    return Response.json({ error: "La synchronisation Google a échoué. Consultez l’état dans l’administration." }, { status: 500, headers });
   }
 });
