@@ -29,16 +29,6 @@ export function initAnalytics() {
 
   if (!initialized) {
     initialized = true;
-    // Load the Google tag so Tag Assistant can detect it, while withholding
-    // analytics and advertising storage until the visitor makes a choice.
-    push("consent", "default", {
-      analytics_storage: "denied",
-      ad_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-      wait_for_update: 500,
-    });
-
     // Load the Ads destination as the primary tag when available so Google Ads
     // and Tag Assistant can identify the website tag directly. The same
     // gtag.js instance still configures GA4 below; do not load a second tag.
