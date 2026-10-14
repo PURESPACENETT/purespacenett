@@ -48,7 +48,9 @@ function createSupabaseClient() {
       fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
     },
     auth: {
-        persistSession: true,
+      flowType: 'pkce',
+      detectSessionInUrl: true,
+      persistSession: true,
       autoRefreshToken: true,
     },
   });
