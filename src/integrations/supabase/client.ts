@@ -48,7 +48,9 @@ function createSupabaseClient() {
       fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
     },
     auth: {
-        persistSession: true,
+      flowType: 'pkce',
+      detectSessionInUrl: true,
+      persistSession: true,
       autoRefreshToken: true,
     },
   });
@@ -64,4 +66,5 @@ export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>,
     return Reflect.get(_supabase, prop, receiver);
   },
 });
+
 
