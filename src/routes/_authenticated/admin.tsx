@@ -229,7 +229,25 @@ function AdminPage() {
       const { data, error } = await supabase.functions.invoke("google-reviews-sync", {
         method: "POST",
       });
-      if (error) throw new Error(data?.error ?? "Synchronisation Google impossible.");
+      if (error) {
+        const response = (error as Error & { context?: unknown }).context;
+        if (response instanceof Response) {
+          let payload: unknown;
+          try {
+            payload = await response.clone().json();
+          } catch {
+            payload = undefined;
+          }
+          if (
+            payload &&
+            typeof payload === "object" &&
+            "error" in payload &&
+            typeof payload.error === "string"
+          )
+            throw new Error(payload.error);
+        }
+        throw new Error(data?.error ?? "Synchronisation Google impossible.");
+      }
       if (data?.error) throw new Error(data.error);
       return data as { ok: true; imported: number };
     },

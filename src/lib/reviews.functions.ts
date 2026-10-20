@@ -62,7 +62,10 @@ export const getGoogleReviewSyncState = createServerFn({ method: "GET" })
     const [{ data: config, error: configError }, { data: state, error: stateError }] =
       await Promise.all([
         rpc("get_google_review_config"),
-        context.supabase
+        // Owner access is already enforced by requireSupabaseAuth above. Use the
+        // server-only client here so state visibility does not depend on a
+        // second, potentially stale RLS role assignment.
+        supabaseAdmin
           .from("google_review_sync_state")
           .select("last_sync_at, last_success_at, last_error, imported_count")
           .eq("id", 1)
