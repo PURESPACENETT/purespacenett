@@ -280,12 +280,16 @@ export type Database = {
           estimate_min: number
           frequency: string | null
           full_name: string
+          gbraid: string | null
+          gclid: string | null
           id: string
+          landing_page: string | null
           last_contacted_at: string | null
           message: string | null
           phone: string
           postal_code: string | null
           property_type: string | null
+          referrer: string | null
           review_requested_at: string | null
           rooms: number | null
           score: number
@@ -297,6 +301,12 @@ export type Database = {
           surface: string | null
           surface_m2: number | null
           updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          wbraid: string | null
         }
         Insert: {
           address?: string | null
@@ -316,12 +326,16 @@ export type Database = {
           estimate_min?: number
           frequency?: string | null
           full_name: string
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
+          landing_page?: string | null
           last_contacted_at?: string | null
           message?: string | null
           phone: string
           postal_code?: string | null
           property_type?: string | null
+          referrer?: string | null
           review_requested_at?: string | null
           rooms?: number | null
           score?: number
@@ -333,6 +347,12 @@ export type Database = {
           surface?: string | null
           surface_m2?: number | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          wbraid?: string | null
         }
         Update: {
           address?: string | null
@@ -352,12 +372,16 @@ export type Database = {
           estimate_min?: number
           frequency?: string | null
           full_name?: string
+          gbraid?: string | null
+          gclid?: string | null
           id?: string
+          landing_page?: string | null
           last_contacted_at?: string | null
           message?: string | null
           phone?: string
           postal_code?: string | null
           property_type?: string | null
+          referrer?: string | null
           review_requested_at?: string | null
           rooms?: number | null
           score?: number
@@ -369,6 +393,12 @@ export type Database = {
           surface?: string | null
           surface_m2?: number | null
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          wbraid?: string | null
         }
         Relationships: []
       }
