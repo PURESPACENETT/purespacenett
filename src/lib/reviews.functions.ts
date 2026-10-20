@@ -56,7 +56,7 @@ export const getGoogleReviewSyncState = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<GoogleReviewSyncState> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const rpc = supabaseAdmin.rpc as unknown as (
+    const rpc = supabaseAdmin.rpc.bind(supabaseAdmin) as unknown as (
       fn: string,
     ) => Promise<{ data: unknown; error: { message: string } | null }>;
     const [{ data: config, error: configError }, { data: state, error: stateError }] =
