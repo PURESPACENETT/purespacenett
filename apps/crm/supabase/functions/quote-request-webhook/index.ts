@@ -35,6 +35,12 @@ function isString(value: unknown, min = 0, max = 2000) {
   return typeof value === "string" && value.trim().length >= min && value.length <= max;
 }
 
+function optionalText(value: unknown, max: number, field: string) {
+  if (value === undefined || value === null || value === "") return null;
+  if (!isString(value, 0, max)) throw new Error(`${field} invalide`);
+  return String(value).trim() || null;
+}
+
 function isUuid(value: unknown) {
   return typeof value === "string" &&
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(value);
@@ -56,6 +62,18 @@ function normalize(body: Record<string, unknown>) {
   const phone = body.phone;
   const message = body.message ?? "";
   const sourceExternalId = body.sourceExternalId ?? body.source_external_id;
+  const attribution = {
+    gclid: optionalText(body.gclid, 200, "gclid"),
+    gbraid: optionalText(body.gbraid, 200, "gbraid"),
+    wbraid: optionalText(body.wbraid, 200, "wbraid"),
+    utm_source: optionalText(body.utm_source, 100, "utm_source"),
+    utm_medium: optionalText(body.utm_medium, 100, "utm_medium"),
+    utm_campaign: optionalText(body.utm_campaign, 200, "utm_campaign"),
+    utm_content: optionalText(body.utm_content, 200, "utm_content"),
+    utm_term: optionalText(body.utm_term, 200, "utm_term"),
+    landing_page: optionalText(body.landing_page, 500, "landing_page"),
+    referrer: optionalText(body.referrer, 1000, "referrer"),
+  };
 
   const validClientTypes = ["entreprise", "sous_traitance", "particulier"];
   const validPropertyTypes = ["bureaux", "commerce", "immeuble", "chantier", "logement", "autre"];
@@ -119,6 +137,8 @@ function normalize(body: Record<string, unknown>) {
     phone: String(phone).trim(),
     message: String(message).trim() || null,
     source_external_id: sourceExternalId ? String(sourceExternalId) : null,
+    source_system: sourceExternalId ? "purespacenett_site" : null,
+    ...attribution,
     estimate_min: 0,
     estimate_max: 0,
     score,

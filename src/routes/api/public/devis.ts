@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { checkRateLimit, requestKey } from "@/lib/rate-limit";
+import { retryTransient } from "@/lib/retry-transient";
 
 const MAX_PHOTOS = 5;
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
@@ -253,15 +254,19 @@ export const Route = createFileRoute("/api/public/devis")({
           let crmAccepted = false;
           for (const [index, crmSecret] of crmSecrets.entries()) {
             try {
-              const response = await fetch(crmUrl, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "x-quote-webhook-secret": crmSecret,
-                },
-                body: JSON.stringify(crmPayload),
-                signal: AbortSignal.timeout(10000),
-              });
+              const response = await retryTransient(
+                () => fetch(crmUrl, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-quote-webhook-secret": crmSecret,
+                  },
+                  body: JSON.stringify(crmPayload),
+                  signal: AbortSignal.timeout(3500),
+                }),
+                (result) => result.status >= 500,
+                { attempts: 3, initialDelayMs: 200 },
+              );
 
               if (response.ok) {
                 crmAccepted = true;

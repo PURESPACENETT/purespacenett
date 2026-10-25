@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { checkRateLimit, requestKey } from "@/lib/rate-limit";
+import { retryTransient } from "@/lib/retry-transient";
 
 const noStore = { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" };
 
 const schema = z.object({
   contactName: z.string().trim().min(2).max(120),
+  sourceExternalId: z.string().uuid().optional(),
   companyName: z.string().trim().min(2).max(160),
   email: z.string().trim().email().max(255),
   phone: z.string().trim().min(6).max(30),
@@ -17,6 +19,16 @@ const schema = z.object({
   postalCode: z.string().trim().min(4).max(10),
   desiredDate: z.string().trim().max(20).optional().default(""),
   message: z.string().trim().max(1500).optional().default(""),
+  gclid: z.string().trim().max(200).optional(),
+  gbraid: z.string().trim().max(200).optional(),
+  wbraid: z.string().trim().max(200).optional(),
+  utm_source: z.string().trim().max(100).optional(),
+  utm_medium: z.string().trim().max(100).optional(),
+  utm_campaign: z.string().trim().max(200).optional(),
+  utm_content: z.string().trim().max(200).optional(),
+  utm_term: z.string().trim().max(200).optional(),
+  landing_page: z.string().trim().max(500).optional(),
+  referrer: z.string().trim().max(1000).optional(),
   consent: z.literal(true),
 });
 
@@ -62,6 +74,7 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
         const data = parsed.data;
         const payload = {
           clientType: "sous_traitance",
+          sourceExternalId: data.sourceExternalId,
           propertyType: data.propertyType,
           surfaceM2: data.surfaceM2,
           frequency: data.frequency,
@@ -73,6 +86,16 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
           companyName: data.companyName,
           email: data.email,
           phone: data.phone,
+          gclid: data.gclid,
+          gbraid: data.gbraid,
+          wbraid: data.wbraid,
+          utm_source: data.utm_source,
+          utm_medium: data.utm_medium,
+          utm_campaign: data.utm_campaign,
+          utm_content: data.utm_content,
+          utm_term: data.utm_term,
+          landing_page: data.landing_page,
+          referrer: data.referrer,
           message: [
             "Source : site PURE SPACE NETT — demande de sous-traitance.",
             data.message,
@@ -80,24 +103,28 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
         };
 
         try {
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-b2b-lead-secret": secret,
-            },
-            body: JSON.stringify(payload),
-            signal: AbortSignal.timeout(10000),
-          });
+          const response = await retryTransient(
+            () => fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-b2b-lead-secret": secret,
+              },
+              body: JSON.stringify(payload),
+              signal: AbortSignal.timeout(3500),
+            }),
+            (result) => result.status >= 500,
+            { attempts: 3, initialDelayMs: 200 },
+          );
 
           if (!response.ok) {
-            console.error("B2B CRM bridge rejected lead", response.status);
+            console.error("B2B CRM bridge rejected lead", { status: response.status });
             return Response.json({ error: "Transmission au CRM impossible" }, { status: 502, headers: noStore });
           }
 
           return Response.json({ ok: true }, { headers: noStore });
         } catch (error) {
-          console.error("B2B CRM bridge failed", error);
+          console.error("B2B CRM bridge failed", error instanceof Error ? error.name : "unknown_error");
           return Response.json({ error: "Transmission au CRM impossible" }, { status: 502, headers: noStore });
         }
       },
