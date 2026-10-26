@@ -2,5 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "tanstack-start",
   "installCommand": "bun install",
-  "buildCommand": "bun run build"
+  "buildCommand": "bun run build",
+  "rewrites": [
+    {
+      "source": "/__l5e/assets-v1/:path*",
+      "destination": "https://id-preview--8bf96a43-3de9-43df-afd6-ecb75b34138a.lovable.app/__l5e/assets-v1/:path*"
+    }
+  ]
 }
