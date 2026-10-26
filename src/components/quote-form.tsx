@@ -78,11 +78,19 @@ export function QuoteForm() {
   const requestIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    try {
+      const savedForm = sessionStorage.getItem("purespacenett_quote_form_v1");
+      if (savedForm) setForm({ ...emptyForm, ...(JSON.parse(savedForm) as Partial<typeof emptyForm>) });
+    } catch { /* ignore invalid session data */ }
     trackEvent("formulaire_devis_vu");
   }, []);
 
   const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [key]: value };
+      try { sessionStorage.setItem("purespacenett_quote_form_v1", JSON.stringify(next)); } catch { /* best effort */ }
+      return next;
+    });
 
   const mailtoFallback = () => {
     const body = [
@@ -156,7 +164,7 @@ export function QuoteForm() {
       trackEvent("devis_confirmation_affichee", { source: "page_devis" });
       setStatus("sent");
       requestIdRef.current = null;
-      try { sessionStorage.removeItem("purespacenett_quote_request_id_v1"); } catch { /* best effort */ }
+      try { sessionStorage.removeItem("purespacenett_quote_request_id_v1"); sessionStorage.removeItem("purespacenett_quote_form_v1"); } catch { /* best effort */ }
       setForm(emptyForm);
       setPhotos([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
