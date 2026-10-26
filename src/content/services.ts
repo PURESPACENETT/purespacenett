@@ -213,7 +213,7 @@ export const services: Service[] = [
     h1: "Ménage pour état des lieux de sortie",
     title: "Ménage état des lieux 93 et Paris | PURE SPACE NETT",
     description:
-      "Ménage complet avant état des lieux de sortie ou d'entrée en Île-de-France : cuisine, sanitaires, vitres, placards. Restitution sans retenue sur le dépôt.",
+      "Nettoyage approfondi avant état des lieux d’entrée ou de sortie en Île-de-France : cuisine, sanitaires, vitres, placards et sols. Devis adapté à l’état du logement.",
     intro:
       "Un état des lieux se joue sur les détails : joints, four, hotte, placards, vitres. Nous reprenons chaque point regardé par l'agent ou le propriétaire.",
     audience: "Locataires, propriétaires, agences immobilières, locations courte durée",
