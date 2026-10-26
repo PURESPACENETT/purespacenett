@@ -122,3 +122,12 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 - La variable existe dans l'environnement Vercel `production`, mais son ciblage ne comprend pas `preview`. Le formulaire ne peut donc pas atteindre Supabase depuis cette preview.
 - J'ai tenté de réutiliser la valeur de production via les outils Vercel; la valeur sensible n'est pas récupérable par le connecteur, donc aucune copie de secret n'a été effectuée. Je n'ai pas élargi la clé de service à toutes les previews, afin de ne pas augmenter le périmètre d'exposition.
 - Action nécessaire : créer dans Vercel une variable `SUPABASE_SERVICE_ROLE_KEY` ciblée uniquement sur `Preview` et la branche `fix/performance-devis`, avec la valeur actuelle déjà utilisée en production. Puis redéployer la preview et refaire les POST.
+
+
+## Reprise du 26/10/2026 — test POST réel en preview
+- Le POST a été exécuté sur une preview protégée, avec un payload synthétique de test.
+- Résultat : HTTP 500 avant validation du formulaire. Les runtime logs identifient explicitement l'absence de `SUPABASE_SERVICE_ROLE_KEY` dans l'environnement preview; le contrôle de limitation de débit échoue avant le traitement du payload.
+- Aucun résultat de soumission valide, aucune ligne de test ni confirmation CRM/e-mail ne sont revendiqués.
+- Les variables Supabase serveur sont configurées en production mais absentes de l'environnement preview. Le projet Supabase actuellement identifié est le même que celui utilisé en production; copier le secret de service dans la preview permettrait d'écrire dans les données de production. Pour cette raison, aucun secret de production n'a été copié et aucun POST valide n'a été tenté.
+- Tests validés : GET / et /devis HTTP 200; GET /api/public/devis HTTP 405 avec Allow: POST; logo et photo principale HTTP 200 avec signature de fichier JPEG/PNG.
+- Conclusion : chaîne E2E bloquée par l'absence d'un environnement de données isolé pour la préproduction. Ne pas fusionner/promouvoir tant que l'environnement isolé n'est pas prêt et que la livraison CRM/e-mail n'est pas prouvée.
