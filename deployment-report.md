@@ -43,3 +43,7 @@ Ne pas fusionner ni promouvoir avant preuve de livraison bout en bout.
 
 ## Cause racine confirmée
 Les logs runtime montrent que le POST échoue parce que `SUPABASE_SERVICE_ROLE_KEY` est absent de l'environnement Vercel Preview. Cette variable n'est configurée que pour Production. Le connecteur Vercel ne révèle pas sa valeur sensible; je n'ai pas élargi son ciblage à toutes les previews. Ajouter cette variable à Preview uniquement pour la branche `fix/performance-devis`, redéployer et reprendre les tests E2E avant fusion.
+
+
+## Reprise de l'audit — blocage E2E
+Le test POST en preview est revenu HTTP 500; les runtime logs montrent que `SUPABASE_SERVICE_ROLE_KEY` manque dans l'environnement preview. Le projet Supabase référencé par la configuration de l'application est le projet actuellement utilisé par la production. Pour éviter toute écriture de données de test dans le CRM/base de production, aucun secret serveur de production n'a été copié en preview et aucune demande valide n'a été soumise. L'accueil et /devis répondent HTTP 200, l'API répond HTTP 405 en GET (POST uniquement) et les deux images de contrôle renvoient HTTP 200. La promotion reste bloquée jusqu'à disponibilité d'un environnement Supabase isolé, validation de la soumission complète et confirmation e-mail.
