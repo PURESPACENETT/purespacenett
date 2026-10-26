@@ -106,3 +106,7 @@ La lecture des journaux runtime sur 24 h a été refusée par l'API Vercel Hobby
 - Commit `6e22389cfee91f217dbaa7c151eb0867dc195f4d` : CI GitHub Actions réussie, jobs qualité et lint/build verts; Vercel preview `READY`.
 - Smoke GET : accueil HTTP 200, `/devis` HTTP 200, GET API HTTP 405 attendu, logo HTTP 200.
 - Une tentative POST depuis un client non authentifié a été bloquée par la protection Vercel (HTTP 302) avant l'application. La chaîne complète n'est donc pas validée.
+
+
+## Test E2E repris le 26/10/2026
+Le POST synthétique sur la preview a échoué avant le traitement métier, car `SUPABASE_SERVICE_ROLE_KEY` n'est pas défini en environnement preview. Cette preview utilise actuellement la même référence de projet Supabase que la production; l'ajout de la clé de service risquerait donc d'écrire les données de test dans la base réelle. Aucun secret de production n'a été copié, aucune demande valide n'a été soumise, et aucun succès CRM/e-mail n'est revendiqué. La fusion et la promotion restent bloquées pour éviter une régression de production.
