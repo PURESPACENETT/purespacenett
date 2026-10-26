@@ -65,3 +65,13 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 | Lighthouse | Bloqué | Connecteur d'audit refuse le plan (`plan_denied`) |
 
 - GitHub Actions CI : job `quality` terminé avec succès; installation, lint et build sont tous en succès sur le commit courant de la PR. Les tests dynamiques du formulaire, CRM et e-mail restent séparés de ce contrôle de build.
+
+## Contrôles complémentaires — 26/10/2026
+
+- CI GitHub Actions sur le commit de tête de PR : SUCCESS.
+- Preview Vercel du commit de tête : READY.
+- Accueil : HTTP 200.
+- `/devis` : HTTP 200.
+- Image principale de copropriété : HTTP 200, PNG valide.
+- La lecture détaillée des journaux runtime sur 24 h est indisponible avec la rétention Vercel Hobby; ce contrôle reste limité.
+- Avis Supabase relevés : protection contre les mots de passe compromis désactivée (WARN); une table de rate limit sans politique RLS (INFO, probablement intentionnelle); 20 avertissements de performance RLS à revoir.
