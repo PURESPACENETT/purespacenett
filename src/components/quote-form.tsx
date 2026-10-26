@@ -75,6 +75,7 @@ export function QuoteForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const startedRef = useRef(false);
   const submitLockRef = useRef(false);
+  const requestIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     trackEvent("formulaire_devis_vu");
@@ -117,6 +118,14 @@ export function QuoteForm() {
     setError(null);
     try {
       const body = new FormData();
+      if (!requestIdRef.current) {
+        try {
+          const saved = sessionStorage.getItem("purespacenett_quote_request_id_v1");
+          requestIdRef.current = saved && /^[0-9a-f-]{36}$/i.test(saved) ? saved : crypto.randomUUID();
+          sessionStorage.setItem("purespacenett_quote_request_id_v1", requestIdRef.current);
+        } catch { requestIdRef.current = crypto.randomUUID(); }
+      }
+      body.append("requestId", requestIdRef.current);
       Object.entries(form).forEach(([key, value]) => body.append(key, String(value)));
       photos.forEach((photo) => body.append("photos", photo));
       const attribution = getMarketingAttribution();
@@ -146,6 +155,8 @@ export function QuoteForm() {
       });
       trackEvent("devis_confirmation_affichee", { source: "page_devis" });
       setStatus("sent");
+      requestIdRef.current = null;
+      try { sessionStorage.removeItem("purespacenett_quote_request_id_v1"); } catch { /* best effort */ }
       setForm(emptyForm);
       setPhotos([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
