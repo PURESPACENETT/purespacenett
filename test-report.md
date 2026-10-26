@@ -115,3 +115,10 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 - Deux soumissions avec le même UUID ont reçu une page d'erreur générique Vercel HTTP 500, sans réponse JSON de l'API.
 - La requête SQL de contrôle confirme `matching_test_requests = 0` : aucune demande de test n'a été enregistrée, aucun e-mail n'a été confirmé envoyé.
 - Les journaux runtime disponibles n'ont retourné aucune entrée pour ce déploiement / cette fenêtre. La cause du 500 reste donc indéterminée et bloque le test E2E.
+
+
+## Cause identifiée du HTTP 500 (26/10/2026)
+- Les journaux runtime de la preview montrent explicitement `Missing Supabase environment variable(s): SUPABASE_SERVICE_ROLE_KEY` lors du POST `/api/public/devis` et du contrôle de limitation de débit.
+- La variable existe dans l'environnement Vercel `production`, mais son ciblage ne comprend pas `preview`. Le formulaire ne peut donc pas atteindre Supabase depuis cette preview.
+- J'ai tenté de réutiliser la valeur de production via les outils Vercel; la valeur sensible n'est pas récupérable par le connecteur, donc aucune copie de secret n'a été effectuée. Je n'ai pas élargi la clé de service à toutes les previews, afin de ne pas augmenter le périmètre d'exposition.
+- Action nécessaire : créer dans Vercel une variable `SUPABASE_SERVICE_ROLE_KEY` ciblée uniquement sur `Preview` et la branche `fix/performance-devis`, avec la valeur actuelle déjà utilisée en production. Puis redéployer la preview et refaire les POST.
