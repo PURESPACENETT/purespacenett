@@ -131,6 +131,7 @@ export const Route = createFileRoute("/api/public/devis")({
           }
         }
         const leadId = data.requestId;
+        let attemptNumber = 1;
         let { data: inserted, error } = await supabaseAdmin
           .from("quote_requests")
           .insert({
@@ -173,13 +174,14 @@ export const Route = createFileRoute("/api/public/devis")({
           // Rejeu du même identifiant : réutiliser la demande existante et relancer les livraisons.
           const { data: existing, error: existingError } = await supabaseAdmin
             .from("quote_requests")
-            .select("id")
+            .select("id, delivery_attempts")
             .eq("request_id", leadId)
             .maybeSingle();
           if (!existingError && existing) {
             // Une demande déjà persistée ne doit pas être créée une seconde fois.
             // Les étapes CRM/e-mail ci-dessous sont idempotentes grâce à cet identifiant.
             inserted = existing;
+            attemptNumber = (existing.delivery_attempts ?? 0) + 1;
           } else {
             console.error("Recherche de demande idempotente impossible", existingError?.message);
             return Response.json({ error: "Demande déjà reçue, vérification en cours. Réessayez dans quelques instants." }, { status: 503, headers: { ...noStore, "Retry-After": "10" } });
@@ -192,10 +194,15 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
-        await supabaseAdmin.from("quote_requests").update({ delivery_attempts: 1, last_delivery_attempt_at: new Date().toISOString(), last_delivery_error: null }).eq("id", inserted.id);
+        await supabaseAdmin.from("quote_requests").update({ delivery_attempts: attemptNumber, last_delivery_attempt_at: new Date().toISOString(), last_delivery_error: null }).eq("id", inserted.id);
 
         let crmDeliveryStatus: "pending" | "sent" | "error" = "error";
         let emailDeliveryStatus: "pending" | "sent" | "error" = "error";
+        if (!inserted?.id) {
+          console.error("Identifiant de demande absent après enregistrement");
+          return Response.json({ error: "Impossible de confirmer l’enregistrement de la demande." }, { status: 500, headers: noStore });
+        }
+
         const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
           "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
 
@@ -350,7 +357,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }).eq("id", inserted.id);
 
         if (deliveryErrors.length) {
-          return Response.json({ error: "Votre demande est enregistrée, mais sa transmission est en cours de vérification. Ne renvoyez pas le formulaire ; contactez-nous si vous ne recevez pas de confirmation." }, { status: 503, headers: { ...noStore, "Retry-After": "30" } });
+          return Response.json({ error: "Votre demande est enregistrée, mais sa transmission n’est pas confirmée. Réessayez dans quelques instants : votre demande ne sera pas créée en double." }, { status: 503, headers: { ...noStore, "Retry-After": "30" } });
         }
         return Response.json({ ok: true, requestId: inserted.id }, { headers: noStore });
       },
