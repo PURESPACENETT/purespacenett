@@ -263,6 +263,15 @@ export type Database = {
       }
       quote_requests: {
         Row: {
+          crm_delivered_at: string | null
+          crm_delivery_status: string
+          delivery_attempts: number
+          email_delivered_at: string | null
+          email_delivery_status: string
+          last_delivery_attempt_at: string | null
+          last_delivery_error: string | null
+          request_id: string | null
+
           address: string | null
           ai_generated_at: string | null
           ai_key_points: string[]
@@ -309,6 +318,15 @@ export type Database = {
           wbraid: string | null
         }
         Insert: {
+          crm_delivered_at?: string | null
+          crm_delivery_status?: string
+          delivery_attempts?: number
+          email_delivered_at?: string | null
+          email_delivery_status?: string
+          last_delivery_attempt_at?: string | null
+          last_delivery_error?: string | null
+          request_id?: string | null
+
           address?: string | null
           ai_generated_at?: string | null
           ai_key_points?: string[]
@@ -355,6 +373,15 @@ export type Database = {
           wbraid?: string | null
         }
         Update: {
+          crm_delivered_at?: string | null
+          crm_delivery_status?: string
+          delivery_attempts?: number
+          email_delivered_at?: string | null
+          email_delivery_status?: string
+          last_delivery_attempt_at?: string | null
+          last_delivery_error?: string | null
+          request_id?: string | null
+
           address?: string | null
           ai_generated_at?: string | null
           ai_key_points?: string[]
