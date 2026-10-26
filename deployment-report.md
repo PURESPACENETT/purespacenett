@@ -33,3 +33,9 @@ Ne pas fusionner ni promouvoir avant preuve de livraison bout en bout.
 - GET accueil et `/devis` : HTTP 200; GET API : HTTP 405 attendu; logo : HTTP 200.
 - Le test POST a été bloqué par Vercel Authentication (HTTP 302) depuis le client sandbox. Aucun enregistrement de test n'a été créé par cet essai.
 - Aucun déploiement de production effectué.
+
+
+## Tentative E2E complémentaire
+- Après une autorisation temporaire limitée à l'alias de preview, deux POST ont renvoyé une page générique Vercel HTTP 500, sans corps JSON applicatif.
+- La clé de test n'existe pas dans `quote_requests`; aucune demande ou notification n'est confirmée.
+- L'override de protection a été révoqué immédiatement. Les logs runtime consultables n'ont pas révélé de cause; investigation nécessaire avant fusion.
