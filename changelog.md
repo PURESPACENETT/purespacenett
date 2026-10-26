@@ -28,3 +28,5 @@
 - Le build Vercel de preview pour le commit `fcf27bd246b6c280e2fce142ad867347d968d52b` est terminé avec succès.
 - Tests HTTP sur la preview mise à jour : accueil 200, `/devis` 200, GET API devis 405 avec Allow: POST, logo 200 image/jpeg, photo principale 200 image/png.
 - Aucun POST de demande n'a été envoyé : le test CRM/e-mail de bout en bout reste à faire dans un environnement de test adapté.
+
+- GitHub Actions CI sur le commit de la branche : installation réussie, lint réussi, build réussi (job `quality`).
