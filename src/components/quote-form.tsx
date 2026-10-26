@@ -181,12 +181,13 @@ export function QuoteForm() {
       className="rounded-2xl border border-border bg-card p-6 shadow-card"
     >
       <div className="mb-6 rounded-xl border border-primary/10 bg-primary/5 p-4">
-        <p className="text-sm font-semibold">Votre demande en 3 étapes</p>
+        <p className="text-sm font-semibold">Décrivez votre besoin pour recevoir un devis adapté</p>
         <ol className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
           <li><span className="font-semibold text-foreground">1.</span> Vos coordonnées</li>
           <li><span className="font-semibold text-foreground">2.</span> Le besoin à chiffrer</li>
           <li><span className="font-semibold text-foreground">3.</span> Envoi de la demande</li>
         </ol>
+        <p className="mt-2 text-xs text-muted-foreground">Indiquez la surface, le type de nettoyage et l’état des lieux. Vous pouvez joindre des photos pour faciliter notre première évaluation.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={labelCls}>
