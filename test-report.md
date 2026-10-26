@@ -29,3 +29,22 @@ Branche : `fix/performance-devis`
 - Exécuter les tests fonctionnels sur préproduction avec identifiants de test, et vérifier le CRM et l'e-mail.
 - Lancer lint, build et tests dans CI.
 - N'autoriser la mise en production qu'après réussite des tests critiques et revue du diff.
+
+## Résultats complémentaires après accès Vercel (26/10/2026)
+
+| Test | Résultat | Détail |
+|---|---|---|
+| Accueil production | PASS HTTP | HTTP 200 |
+| Page /devis production | PASS HTTP | HTTP 200 |
+| 6 images sur production | FAIL | Les six URL `/__l5e/assets-v1/...` répondent HTTP 404 |
+| 6 images sur preview corrigée | PASS HTTP | Les six URL répondent HTTP 200; signatures JPEG/PNG cohérentes |
+| Accueil preview corrigée | PASS HTTP | HTTP 200 |
+| Page /devis preview corrigée | PASS HTTP | HTTP 200 |
+| GET /api/public/devis | PASS | HTTP 405 attendu, `Allow: POST`, no-store et noindex |
+| Erreurs runtime Vercel, dernières 24 h | PASS | Aucune erreur retournée sur cette période |
+| Erreurs runtime historiques | À vérifier | 40 occurrences anciennes de `SUPABASE_PUBLISHABLE_KEY` manquante, dernière observée le 20/10 |
+| Lighthouse mobile/desktop | Bloqué | Outil refusé par le plan (`plan_denied`); aucune mesure n'est inventée |
+| Soumission POST réelle | Non testée | Aucun faux prospect n'a été envoyé à la base/CRM/e-mail de production |
+| CRM et notification e-mail | Non validés | Nécessitent un scénario contrôlé en préproduction et vérification effective de la destination |
+
+La règle de réécriture d'images est validée sur le déploiement de preview. La production n'est pas corrigée tant que cette modification n'est pas intégrée et promue après validation du reste du parcours.
