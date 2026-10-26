@@ -25,6 +25,7 @@ const allServices = [
   "menage-etat-des-lieux",
   "nettoyage-canapes-tapis",
   "nettoyage-interieur-vehicule",
+  "nettoyage-logement-degrade",
 ];
 
 export const zones: Zone[] = [
