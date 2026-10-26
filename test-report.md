@@ -48,3 +48,18 @@ Branche : `fix/performance-devis`
 | CRM et notification e-mail | Non validés | Nécessitent un scénario contrôlé en préproduction et vérification effective de la destination |
 
 La règle de réécriture d'images est validée sur le déploiement de preview. La production n'est pas corrigée tant que cette modification n'est pas intégrée et promue après validation du reste du parcours.
+
+## Vérifications du formulaire et de la preview après le dernier commit
+
+| Test | Résultat | Détail |
+|---|---|---|
+| Build Vercel preview après changements formulaire | PASS | Build terminé; déploiement `dpl_2sgQDM8rVNjeWPTnbNxCLKDf32Lw` READY |
+| Accueil preview | PASS | HTTP 200 |
+| /devis preview | PASS | HTTP 200 |
+| GET /api/public/devis | PASS | HTTP 405 attendu, `Allow: POST` |
+| Logo preview | PASS | HTTP 200, `image/jpeg` |
+| Photo principale preview | PASS | HTTP 200, `image/png` |
+| Verrou double clic | Vérification statique | Ref `submitLockRef` ajouté; pas de test navigateur interactif disponible |
+| Téléphone / surface | Vérification statique | Validation client/serveur ajoutée; POST de test non envoyé |
+| Création CRM et notification Resend | Non testé | Ne pas confondre la réponse HTTP 200 d'une page avec la réussite d'une soumission |
+| Lighthouse | Bloqué | Connecteur d'audit refuse le plan (`plan_denied`) |
