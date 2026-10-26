@@ -83,7 +83,7 @@ function Index() {
               {[
                 ["Rapide", "Délai de réponse"],
                 ["6 j/7", "Disponibilité"],
-                ["9", "Prestations"],
+                ["10", "Prestations"],
                 ["IDF", "Zone couverte"],
               ].map(([value, label]) => (
                 <div key={label} className="rounded-xl border border-border bg-card p-3">
