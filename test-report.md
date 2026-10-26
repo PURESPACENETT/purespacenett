@@ -102,3 +102,9 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 - Vercel preview `purespacenett-ekixy4fue-purespacenett.vercel.app` : **READY** sur le commit `6e22389cfee91f217dbaa7c151eb0867dc195f4d`.
 - Smoke GET : `/` HTTP 200, `/devis` HTTP 200, `GET /api/public/devis` HTTP 405 attendu, logo HTTP 200.
 - Test POST réel tenté deux fois avec un identifiant de test stable : bloqué avant d'atteindre l'application, car Vercel renvoie HTTP 302 « Protected by Vercel Authentication » à un client non authentifié. Aucune soumission n'a donc été créée par cet essai; CRM/e-mail non testés. La protection preview n'a pas été désactivée pour contourner ce contrôle.
+
+
+## Dernière CI après mise à jour des rapports
+- Commit `0f35004c84db8496e54d76fef671158deb730f18` : CI run `40377783487` **SUCCESS**; les deux jobs ont terminé, lint et build sont verts.
+- Preview Vercel correspondante : `purespacenett-7liiz55jm-purespacenett.vercel.app`, état READY; `/devis` répond HTTP 200 et contient le formulaire.
+- L'envoi POST reste bloqué par Vercel Authentication dans le client de test. Le contrôle Supabase confirme zéro ligne pour l'UUID synthétique de test.
