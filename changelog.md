@@ -30,3 +30,13 @@
 - Aucun POST de demande n'a été envoyé : le test CRM/e-mail de bout en bout reste à faire dans un environnement de test adapté.
 
 - GitHub Actions CI sur le commit de la branche : installation réussie, lint réussi, build réussi (job `quality`).
+
+
+## 2026-10-26 — fiabilité des demandes de devis
+- Ajout de `request_id` UUID et index unique pour l'idempotence des soumissions.
+- Ajout des colonnes de statut de livraison CRM/e-mail, compteur de tentatives, dernière erreur et dates de livraison.
+- API : réutilisation de la demande existante lors d'une répétition du même identifiant; tentatives CRM et e-mail à nouveau effectuées avec la même clé d'idempotence d'e-mail; réponse d'erreur non-2xx si une livraison échoue.
+- Formulaire : clé de demande stable conservée dans `sessionStorage`; champs du formulaire restaurés après rechargement; les champs restent présents après échec pour permettre une reprise.
+- Types Supabase générés synchronisés avec les nouvelles colonnes.
+- Migration additive appliquée au projet Supabase et ajoutée au dépôt.
+- Aucun test POST réel ni déploiement de production n'a été déclaré comme effectué. Lighthouse explicitement exclu du périmètre.
