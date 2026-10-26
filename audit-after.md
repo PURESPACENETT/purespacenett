@@ -84,3 +84,19 @@ GitHub Actions a validé l'installation, le lint et le build sur le commit de la
 
 ### Limites de journalisation
 La lecture des journaux runtime sur 24 h a été refusée par l'API Vercel Hobby pour rétention insuffisante. Le rapport « aucune erreur runtime » provient du regroupement d'erreurs sur la période demandée, et non d'une lecture exhaustive des logs. Ne pas présenter les logs 24 h comme disponibles sur ce plan.
+
+
+## Fiabilité du formulaire — corrections complémentaires du 26/10/2026
+
+- Ajout d'un identifiant UUID stable de demande transmis par le formulaire et conservé en session pour permettre les tentatives de reprise sans créer une nouvelle ligne.
+- Persistance des champs du formulaire dans la session du navigateur afin de restaurer les informations après rechargement/interruption.
+- Ajout en base de données des états durables `crm_delivery_status`, `email_delivery_status`, du nombre de tentatives, de l'erreur de livraison et des horodatages de succès.
+- Ajout d'un index unique partiel sur `request_id`.
+- L'API n'annonce plus un succès si la tentative de livraison CRM ou e-mail échoue; elle renvoie une erreur explicite tout en conservant la demande enregistrée pour reprise.
+- Migration additive appliquée à Supabase et fichier de migration versionné dans le dépôt.
+
+### Limites et statut
+- Le retry est déclenché par une nouvelle soumission de la même demande avec le même identifiant; aucun worker automatique planifié n'a été configuré.
+- Les tests réels POST et le suivi CRM/e-mail n'ont pas encore pu être exécutés par les outils disponibles; ne pas considérer la chaîne comme validée de bout en bout.
+- Les scores Lighthouse sont exclus du périmètre à la demande du propriétaire; aucune mesure n'est rapportée.
+- Le réglage Supabase Auth « protection des mots de passe compromis » reste désactivé, car le connecteur disponible ne permet pas de le modifier.
