@@ -17,3 +17,14 @@
 - Tester réellement le formulaire en préproduction, notamment CRM, e-mail, anti-doublons, validation, mobile et clavier.
 - Vérifier les variables Supabase et le flux CRM/e-mail dans le déploiement courant.
 - Exécuter lint/build/tests automatisés et ne promouvoir qu'après validation des tests critiques.
+
+## Formulaire — améliorations de validation côté branche
+
+- Ajout d'un verrou synchrone côté client pour ignorer les soumissions rapides concurrentes.
+- Le formulaire affiche désormais le message d'erreur français renvoyé par l'API quand il est disponible, tout en conservant les données saisies pour permettre une nouvelle tentative.
+- Ajout des attributs d'autocomplétion et de saisie mobile pour le nom, l'e-mail, le téléphone et l'adresse.
+- Ajout d'une validation serveur du format du téléphone et d'une surface numérique comprise entre 1 et 100 000 m².
+- Suppression de la promesse non garantie « votre demande arrive directement dans la boîte e-mail » au profit d'une formulation neutre.
+- Le build Vercel de preview pour le commit `fcf27bd246b6c280e2fce142ad867347d968d52b` est terminé avec succès.
+- Tests HTTP sur la preview mise à jour : accueil 200, `/devis` 200, GET API devis 405 avec Allow: POST, logo 200 image/jpeg, photo principale 200 image/png.
+- Aucun POST de demande n'a été envoyé : le test CRM/e-mail de bout en bout reste à faire dans un environnement de test adapté.
