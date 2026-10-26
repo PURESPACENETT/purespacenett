@@ -95,3 +95,10 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 | Lighthouse | Exclu à la demande | aucun score ni métrique publié |
 
 **Statut global des tests : partiel.** La CI GitHub sur le dernier commit doit être vérifiée avant toute fusion. L'absence de test POST réel interdit de conclure que la chaîne complète est validée.
+
+
+## Vérification finale du commit 6e22389c (26/10/2026)
+- GitHub Actions CI run `40377572363` : **SUCCESS**; jobs `quality` et `Lint and build` terminés avec succès, étapes Lint et Build vertes.
+- Vercel preview `purespacenett-ekixy4fue-purespacenett.vercel.app` : **READY** sur le commit `6e22389cfee91f217dbaa7c151eb0867dc195f4d`.
+- Smoke GET : `/` HTTP 200, `/devis` HTTP 200, `GET /api/public/devis` HTTP 405 attendu, logo HTTP 200.
+- Test POST réel tenté deux fois avec un identifiant de test stable : bloqué avant d'atteindre l'application, car Vercel renvoie HTTP 302 « Protected by Vercel Authentication » à un client non authentifié. Aucune soumission n'a donc été créée par cet essai; CRM/e-mail non testés. La protection preview n'a pas été désactivée pour contourner ce contrôle.
