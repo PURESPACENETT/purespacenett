@@ -67,3 +67,20 @@ Le connecteur Lighthouse disponible a refusé l'exécution avec `plan_denied`. A
 ## CI
 
 GitHub Actions a validé l'installation, le lint et le build sur le commit de la PR. Ce résultat confirme la compilation, pas la validation de bout en bout du formulaire, du CRM, de l'e-mail ni les scores Lighthouse.
+
+## Contrôles complémentaires — 26/10/2026
+
+### Dernière preview et CI
+- Le commit de tête de la PR `74f6a2d833e7992be0f541d612cf8e274366a115` dispose d'une preview Vercel `purespacenett-6y5lbt1pj-purespacenett.vercel.app` à l'état READY.
+- GitHub Actions CI sur ce commit : conclusion SUCCESS.
+- La page d'accueil et `/devis` répondent HTTP 200 sur cette preview.
+- L'image principale de copropriété répond HTTP 200 et renvoie un contenu PNG valide.
+- Aucun déploiement n'a été promu en production.
+
+### Avis Supabase à traiter
+- Sécurité : avertissement `auth_leaked_password_protection` — la protection contre les mots de passe compromis est désactivée. Activer la protection contre les mots de passe divulgués dans les paramètres Auth après validation du comportement d'inscription/connexion.
+- Information : `rls_enabled_no_policy` pour `public.rate_limit_buckets`. Cette table est destinée au rate limiting côté serveur. Avant d'ajouter une politique, vérifier que seuls les rôles serveur nécessaires doivent y accéder; l'absence de politique peut être intentionnelle et plus restrictive.
+- Performance : 20 avertissements `auth_rls_initplan` concernant l'évaluation répétée de fonctions `auth.*` dans les politiques RLS. Une optimisation est possible en encapsulant les appels dans `(select auth.uid())` ou `(select auth.<fonction>())`, mais chaque politique doit être revue pour préserver exactement les règles d'accès.
+
+### Limites de journalisation
+La lecture des journaux runtime sur 24 h a été refusée par l'API Vercel Hobby pour rétention insuffisante. Le rapport « aucune erreur runtime » provient du regroupement d'erreurs sur la période demandée, et non d'une lecture exhaustive des logs. Ne pas présenter les logs 24 h comme disponibles sur ce plan.
