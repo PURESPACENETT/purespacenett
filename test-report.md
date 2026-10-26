@@ -75,3 +75,23 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 - Image principale de copropriété : HTTP 200, PNG valide.
 - La lecture détaillée des journaux runtime sur 24 h est indisponible avec la rétention Vercel Hobby; ce contrôle reste limité.
 - Avis Supabase relevés : protection contre les mots de passe compromis désactivée (WARN); une table de rate limit sans politique RLS (INFO, probablement intentionnelle); 20 avertissements de performance RLS à revoir.
+
+
+## Tests complémentaires — fiabilité/idempotence (26/10/2026)
+
+| Contrôle | Résultat | Preuve / limite |
+|---|---|---|
+| Build Vercel de preview | READY sur commit `a0f1c39a168582b94df042bfad50d526596730c1` | Vercel deployment READY |
+| Schéma Supabase | PASS | Colonnes de livraison et `request_id` visibles dans `information_schema.columns` |
+| Index d'idempotence | Ajouté | `quote_requests_request_id_uidx`, unique partiel |
+| Validation des champs serveur | Présente | Schéma Zod existant + UUID `requestId` obligatoire |
+| Double clic client | Protection client existante | `submitLockRef`; test navigateur réel non exécuté |
+| Répétition même demande | Code ajouté | même UUID, conflit unique récupère la ligne et relance les livraisons |
+| Échec CRM/e-mail | Code ajouté | statut durable `error` et réponse HTTP 503; test de panne réel non exécuté |
+| Notification e-mail | Non validée de bout en bout | pas de soumission de test confirmée dans la boîte destinataire |
+| CRM | Non validé de bout en bout | la fonction webhook actuelle déduplique dans `quote_requests`; aucune preuve d'une transmission à un système externe distinct |
+| Mobile / desktop | Non testé de bout en bout | aucune session navigateur interactive contrôlée disponible |
+| Erreur réseau / reprise | Partiellement couverte par le code | reprise manuelle avec identifiant stable; aucun worker automatique configuré |
+| Lighthouse | Exclu à la demande | aucun score ni métrique publié |
+
+**Statut global des tests : partiel.** La CI GitHub sur le dernier commit doit être vérifiée avant toute fusion. L'absence de test POST réel interdit de conclure que la chaîne complète est validée.
