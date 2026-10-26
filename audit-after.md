@@ -100,3 +100,9 @@ La lecture des journaux runtime sur 24 h a été refusée par l'API Vercel Hobby
 - Les tests réels POST et le suivi CRM/e-mail n'ont pas encore pu être exécutés par les outils disponibles; ne pas considérer la chaîne comme validée de bout en bout.
 - Les scores Lighthouse sont exclus du périmètre à la demande du propriétaire; aucune mesure n'est rapportée.
 - Le réglage Supabase Auth « protection des mots de passe compromis » reste désactivé, car le connecteur disponible ne permet pas de le modifier.
+
+
+## Dernier état de préproduction (26/10/2026)
+- Commit `6e22389cfee91f217dbaa7c151eb0867dc195f4d` : CI GitHub Actions réussie, jobs qualité et lint/build verts; Vercel preview `READY`.
+- Smoke GET : accueil HTTP 200, `/devis` HTTP 200, GET API HTTP 405 attendu, logo HTTP 200.
+- Une tentative POST depuis un client non authentifié a été bloquée par la protection Vercel (HTTP 302) avant l'application. La chaîne complète n'est donc pas validée.
