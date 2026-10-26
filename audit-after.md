@@ -55,3 +55,11 @@ Le connecteur Lighthouse disponible a refusé l'exécution avec `plan_denied`. A
 ## Décision de déploiement
 
 **Ne pas promouvoir en production à ce stade.** La correction d'image est validée sur la preview, mais les tests de formulaire, de synchronisation CRM, de notification e-mail, d'anti-doublons et de performance restent incomplets.
+## Vérification après changements formulaire (preview)
+
+- Build Vercel : terminé avec succès sur le commit `fcf27bd246b6c280e2fce142ad867347d968d52b`.
+- Les pages `/` et `/devis` répondent HTTP 200.
+- `GET /api/public/devis` répond HTTP 405 avec `Allow: POST`, conformément au contrat de l'endpoint.
+- Logo et photo principale répondent HTTP 200 avec les types `image/jpeg` et `image/png`.
+- La validation téléphone/surface, le verrou de soumission rapide et les messages d'erreur sont présents dans le code, mais restent à valider par tests navigateur/POST.
+- Le CRM et l'e-mail ne sont pas encore validés de bout en bout; aucun faux prospect n'a été créé en production.
