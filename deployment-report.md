@@ -39,3 +39,7 @@ Ne pas fusionner ni promouvoir avant preuve de livraison bout en bout.
 - Après une autorisation temporaire limitée à l'alias de preview, deux POST ont renvoyé une page générique Vercel HTTP 500, sans corps JSON applicatif.
 - La clé de test n'existe pas dans `quote_requests`; aucune demande ou notification n'est confirmée.
 - L'override de protection a été révoqué immédiatement. Les logs runtime consultables n'ont pas révélé de cause; investigation nécessaire avant fusion.
+
+
+## Cause racine confirmée
+Les logs runtime montrent que le POST échoue parce que `SUPABASE_SERVICE_ROLE_KEY` est absent de l'environnement Vercel Preview. Cette variable n'est configurée que pour Production. Le connecteur Vercel ne révèle pas sa valeur sensible; je n'ai pas élargi son ciblage à toutes les previews. Ajouter cette variable à Preview uniquement pour la branche `fix/performance-devis`, redéployer et reprendre les tests E2E avant fusion.
