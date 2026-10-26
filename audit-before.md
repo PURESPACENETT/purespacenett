@@ -68,3 +68,19 @@ La photo principale avant/après est préchargée et marquée `fetchPriority="hi
 - L'accès Vercel au projet a retourné 403 pour l'équipe `team_Aytss4fobEBcvMooNB9GiBLA`; une demande d'autorisation à durée limitée a été générée et doit être approuvée par le propriétaire.
 - Aucun secret n'a été affiché ni modifié.
 - Aucun déploiement ni changement de production n'a été effectué.
+
+
+## Résultats complémentaires après autorisation Vercel (26/10/2026)
+
+- Les pages de production `/` et `/devis` répondent HTTP 200.
+- Les six URL d'images testées directement sur la production répondent HTTP 404 et renvoient la page HTML de l'application au lieu du fichier image. Cause confirmée : la route de livraison `/__l5e/assets-v1/*` n'est pas configurée sur le déploiement Vercel de production.
+- La page de devis et les images ont été testées dans une preview Vercel après ajout d'une règle de réécriture vers le projet Lovable d'origine.
+- Dans la preview corrigée, les six URL d'images répondent HTTP 200 et renvoient les signatures de fichiers attendues (JPEG/PNG), avec des longueurs de réponse cohérentes avec les fichiers déclarés.
+- L'endpoint `GET /api/public/devis` répond HTTP 405, `Allow: POST`, `Cache-Control: no-store` et `X-Robots-Tag: noindex, nofollow`, comportement attendu pour un endpoint de soumission POST.
+- `/devis` dans la preview répond HTTP 200.
+- Vercel Runtime Errors : aucune erreur sur les dernières 24 heures. Des erreurs historiques (9–20 octobre) signalaient une variable `SUPABASE_PUBLISHABLE_KEY` absente; elles doivent être vérifiées sur le déploiement courant avant de conclure.
+- La tentative Lighthouse via l'outil HYPD est refusée avec `plan_denied`; les scores et métriques Core Web Vitals restent non mesurés.
+
+## État des changements après diagnostic
+
+La règle de réécriture a été ajoutée uniquement à la branche `fix/performance-devis`. Le déploiement Vercel correspondant est une preview `READY`, non promue en production. Les images sont donc corrigées et validées dans la preview; la production reste à 404 jusqu'à validation et déploiement contrôlé.
