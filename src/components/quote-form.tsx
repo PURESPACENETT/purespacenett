@@ -74,6 +74,7 @@ export function QuoteForm() {
   const [photos, setPhotos] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const startedRef = useRef(false);
+  const submitLockRef = useRef(false);
 
   useEffect(() => {
     trackEvent("formulaire_devis_vu");
@@ -110,7 +111,8 @@ export function QuoteForm() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.consent) return;
+    if (!form.consent || submitLockRef.current) return;
+    submitLockRef.current = true;
     setStatus("sending");
     setError(null);
     try {
@@ -126,7 +128,16 @@ export function QuoteForm() {
         method: "POST",
         body,
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        let message = "L'envoi a échoué. Vérifiez vos informations puis réessayez.";
+        try {
+          const payload = await res.json() as { error?: unknown };
+          if (typeof payload.error === "string" && payload.error.trim()) message = payload.error;
+        } catch {
+          // La réponse peut ne pas contenir de JSON exploitable.
+        }
+        throw new Error(message);
+      }
       trackLeadGenerated("quote", { source: "formulaire_devis", prestation: form.serviceType, type_de_bien: form.propertyType, frequence: form.frequency, gclid: getMarketingAttribution().gclid ?? undefined });
       trackEvent("devis_envoye", {
         prestation: form.serviceType,
@@ -138,10 +149,12 @@ export function QuoteForm() {
       setForm(emptyForm);
       setPhotos([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch {
+    } catch (submitError) {
       trackEvent("devis_echec_envoi", { prestation: form.serviceType });
       setStatus("error");
-      setError("Vous pouvez réessayer ou nous contacter directement.");
+      setError(submitError instanceof Error ? submitError.message : "L'envoi a échoué. Vous pouvez réessayer ou nous contacter directement.");
+    } finally {
+      submitLockRef.current = false;
     }
   };
 
@@ -196,6 +209,7 @@ export function QuoteForm() {
             required
             maxLength={100}
             placeholder="Jean Dupont"
+            autoComplete="name"
             value={form.fullName}
             onChange={(e) => set("fullName", e.target.value)}
           />
@@ -230,6 +244,8 @@ export function QuoteForm() {
           <input
             className={field}
             type="email"
+            autoComplete="email"
+            inputMode="email"
             required
             maxLength={255}
             placeholder="jean.dupont@example.com"
@@ -242,6 +258,10 @@ export function QuoteForm() {
           <input
             className={field}
             type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            pattern="^[+]?[0-9\s().-]{6,30}$"
+            title="Saisissez un numéro de téléphone valide."
             required
             maxLength={30}
             placeholder="06 12 34 56 78"
@@ -255,6 +275,7 @@ export function QuoteForm() {
             className={field}
             maxLength={200}
             placeholder="123 Rue de Paris, 75001 Paris"
+            autoComplete="street-address"
             value={form.address}
             onChange={(e) => set("address", e.target.value)}
           />
@@ -266,6 +287,7 @@ export function QuoteForm() {
             required
             maxLength={120}
             placeholder="Paris"
+            autoComplete="address-level2"
             value={form.city}
             onChange={(e) => set("city", e.target.value)}
           />
@@ -468,7 +490,7 @@ export function QuoteForm() {
         </div>
       ) : (
         <p className="mt-3 text-xs text-muted-foreground">
-          Votre demande arrive directement dans la boîte {business.email}. Nous revenons vers vous après étude de votre besoin.
+          Après envoi, nous traitons votre demande et revenons vers vous après étude de votre besoin.
         </p>
       )}
 
