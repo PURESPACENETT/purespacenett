@@ -25,3 +25,11 @@ Non applicables : aucune promotion de production n'a eu lieu.
 
 ## Décision
 Ne pas fusionner ni promouvoir avant preuve de livraison bout en bout.
+
+## Dernière préproduction
+- Commit testé : `6e22389cfee91f217dbaa7c151eb0867dc195f4d`.
+- GitHub Actions : run `40377572363` SUCCESS; lint et build réussis.
+- Vercel : preview `purespacenett-ekixy4fue-purespacenett.vercel.app` READY.
+- GET accueil et `/devis` : HTTP 200; GET API : HTTP 405 attendu; logo : HTTP 200.
+- Le test POST a été bloqué par Vercel Authentication (HTTP 302) depuis le client sandbox. Aucun enregistrement de test n'a été créé par cet essai.
+- Aucun déploiement de production effectué.
