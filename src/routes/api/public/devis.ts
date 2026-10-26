@@ -17,6 +17,7 @@ const ALLOWED_PHOTO_TYPES = new Set(Object.keys(PHOTO_EXTENSIONS));
 const noStore = { "Cache-Control": "no-store" };
 
 const schema = z.object({
+  requestId: z.string().uuid(),
   fullName: z.string().trim().min(2).max(100),
   clientType: z.enum(["entreprise", "sous_traitance", "particulier"]),
   companyName: z.string().trim().max(160).optional().default(""),
@@ -81,7 +82,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
 
         const payload = Object.fromEntries(
-          ["fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company", "gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "landing_page", "referrer"]
+          ["requestId", "fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company", "gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "landing_page", "referrer"]
             .map((key) => [key, formData.get(key) ?? ""]),
         );
         (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
@@ -129,11 +130,12 @@ export const Route = createFileRoute("/api/public/devis")({
             photoUrls.push(signed.signedUrl);
           }
         }
-        const leadId = crypto.randomUUID();
-        const { data: inserted, error } = await supabaseAdmin
+        const leadId = data.requestId;
+        let { data: inserted, error } = await supabaseAdmin
           .from("quote_requests")
           .insert({
             id: leadId,
+            request_id: leadId,
             source_external_id: leadId,
             full_name: data.fullName,
             email: data.email,
@@ -167,7 +169,22 @@ export const Route = createFileRoute("/api/public/devis")({
           .select("id")
           .single();
 
-        if (error) {
+        if (error?.code === "23505") {
+          // Rejeu du même identifiant : réutiliser la demande existante et relancer les livraisons.
+          const { data: existing, error: existingError } = await supabaseAdmin
+            .from("quote_requests")
+            .select("id")
+            .eq("request_id", leadId)
+            .maybeSingle();
+          if (!existingError && existing) {
+            // Une demande déjà persistée ne doit pas être créée une seconde fois.
+            // Les étapes CRM/e-mail ci-dessous sont idempotentes grâce à cet identifiant.
+            inserted = existing;
+          } else {
+            console.error("Recherche de demande idempotente impossible", existingError?.message);
+            return Response.json({ error: "Demande déjà reçue, vérification en cours. Réessayez dans quelques instants." }, { status: 503, headers: { ...noStore, "Retry-After": "10" } });
+          }
+        } else if (error) {
           console.error("Enregistrement du devis impossible", error.message);
           if (uploadedPhotoPaths.length > 0) {
             await supabaseAdmin.storage.from(bucket).remove(uploadedPhotoPaths);
@@ -175,6 +192,10 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
+        await supabaseAdmin.from("quote_requests").update({ delivery_attempts: 1, last_delivery_attempt_at: new Date().toISOString(), last_delivery_error: null }).eq("id", inserted.id);
+
+        let crmDeliveryStatus: "pending" | "sent" | "error" = "error";
+        let emailDeliveryStatus: "pending" | "sent" | "error" = "error";
         const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
           "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
 
@@ -265,6 +286,7 @@ export const Route = createFileRoute("/api/public/devis")({
 
               if (response.ok) {
                 crmAccepted = true;
+                crmDeliveryStatus = "sent";
                 break;
               }
 
@@ -283,15 +305,17 @@ export const Route = createFileRoute("/api/public/devis")({
           }
 
           if (!crmAccepted) {
+            crmDeliveryStatus = "error";
             console.error("CRM quote bridge did not accept the lead");
           }
         } else {
+          crmDeliveryStatus = "error";
           console.warn("CRM quote bridge is not configured");
         }
 
         try {
           const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-          await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
+          const emailResult = await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
             templateData: {
               fullName: data.fullName,
               email: data.email,
@@ -307,11 +331,28 @@ export const Route = createFileRoute("/api/public/devis")({
             idempotencyKey: `nouvelle-demande-devis-${inserted?.id ?? data.email}`,
             replyTo: data.email,
           });
+          emailDeliveryStatus = emailResult.sent ? "sent" : "error";
         } catch (mailError) {
+          emailDeliveryStatus = "error";
           console.error("Notification e-mail du devis impossible", mailError);
         }
 
-        return Response.json({ ok: true }, { headers: noStore });
+        const deliveryErrors = [
+          crmDeliveryStatus !== "sent" ? "crm" : null,
+          emailDeliveryStatus !== "sent" ? "email" : null,
+        ].filter(Boolean);
+        await supabaseAdmin.from("quote_requests").update({
+          crm_delivery_status: crmDeliveryStatus,
+          email_delivery_status: emailDeliveryStatus,
+          last_delivery_error: deliveryErrors.length ? deliveryErrors.join(",") : null,
+          ...(crmDeliveryStatus === "sent" ? { crm_delivered_at: new Date().toISOString() } : {}),
+          ...(emailDeliveryStatus === "sent" ? { email_delivered_at: new Date().toISOString() } : {}),
+        }).eq("id", inserted.id);
+
+        if (deliveryErrors.length) {
+          return Response.json({ error: "Votre demande est enregistrée, mais sa transmission est en cours de vérification. Ne renvoyez pas le formulaire ; contactez-nous si vous ne recevez pas de confirmation." }, { status: 503, headers: { ...noStore, "Retry-After": "30" } });
+        }
+        return Response.json({ ok: true, requestId: inserted.id }, { headers: noStore });
       },
     },
   },
