@@ -108,3 +108,10 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 - Commit `0f35004c84db8496e54d76fef671158deb730f18` : CI run `40377783487` **SUCCESS**; les deux jobs ont terminé, lint et build sont verts.
 - Preview Vercel correspondante : `purespacenett-7liiz55jm-purespacenett.vercel.app`, état READY; `/devis` répond HTTP 200 et contient le formulaire.
 - L'envoi POST reste bloqué par Vercel Authentication dans le client de test. Le contrôle Supabase confirme zéro ligne pour l'UUID synthétique de test.
+
+
+## Tentative de POST après autorisation temporaire de preview
+- L'override de protection a été créé uniquement pour l'alias de préproduction puis révoqué immédiatement après le test.
+- Deux soumissions avec le même UUID ont reçu une page d'erreur générique Vercel HTTP 500, sans réponse JSON de l'API.
+- La requête SQL de contrôle confirme `matching_test_requests = 0` : aucune demande de test n'a été enregistrée, aucun e-mail n'a été confirmé envoyé.
+- Les journaux runtime disponibles n'ont retourné aucune entrée pour ce déploiement / cette fenêtre. La cause du 500 reste donc indéterminée et bloque le test E2E.
