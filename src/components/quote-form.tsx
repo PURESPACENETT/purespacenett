@@ -43,6 +43,9 @@ export const frequencies = [
   "Mensuel",
 ] as const;
 
+const FORM_STORAGE_KEY = "purespacenett_quote_form_v1";
+const REQUEST_STORAGE_KEY = "purespacenett_quote_request_id_v1";
+
 const emptyForm = {
   fullName: "",
   clientType: "particulier",
@@ -75,10 +78,34 @@ export function QuoteForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const startedRef = useRef(false);
   const submitLockRef = useRef(false);
+  const requestIdRef = useRef<string | null>(null);
+  const persistenceReadyRef = useRef(false);
 
   useEffect(() => {
+    try {
+      const savedForm = sessionStorage.getItem(FORM_STORAGE_KEY);
+      const savedRequestId = sessionStorage.getItem(REQUEST_STORAGE_KEY);
+      if (savedForm) {
+        const parsed = JSON.parse(savedForm) as Partial<typeof emptyForm>;
+        setForm({ ...emptyForm, ...parsed, consent: Boolean(parsed.consent) });
+      }
+      if (savedRequestId && /^[0-9a-f-]{36}$/i.test(savedRequestId)) requestIdRef.current = savedRequestId;
+    } catch {
+      sessionStorage.removeItem(FORM_STORAGE_KEY);
+      sessionStorage.removeItem(REQUEST_STORAGE_KEY);
+    }
+    persistenceReadyRef.current = true;
     trackEvent("formulaire_devis_vu");
   }, []);
+
+  useEffect(() => {
+    if (!persistenceReadyRef.current) return;
+    try {
+      sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(form));
+    } catch {
+      // Le stockage de session est un confort ; l’envoi reste disponible sans lui.
+    }
+  }, [form]);
 
   const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -117,6 +144,11 @@ export function QuoteForm() {
     setError(null);
     try {
       const body = new FormData();
+      if (!requestIdRef.current) {
+        requestIdRef.current = crypto.randomUUID();
+        try { sessionStorage.setItem(REQUEST_STORAGE_KEY, requestIdRef.current); } catch { /* best effort */ }
+      }
+      body.append("requestId", requestIdRef.current);
       Object.entries(form).forEach(([key, value]) => body.append(key, String(value)));
       photos.forEach((photo) => body.append("photos", photo));
       const attribution = getMarketingAttribution();
@@ -146,6 +178,11 @@ export function QuoteForm() {
       });
       trackEvent("devis_confirmation_affichee", { source: "page_devis" });
       setStatus("sent");
+      requestIdRef.current = null;
+      try {
+        sessionStorage.removeItem(REQUEST_STORAGE_KEY);
+        sessionStorage.removeItem(FORM_STORAGE_KEY);
+      } catch { /* best effort */ }
       setForm(emptyForm);
       setPhotos([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
