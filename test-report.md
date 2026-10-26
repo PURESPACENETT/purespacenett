@@ -63,3 +63,5 @@ La règle de réécriture d'images est validée sur le déploiement de preview. 
 | Téléphone / surface | Vérification statique | Validation client/serveur ajoutée; POST de test non envoyé |
 | Création CRM et notification Resend | Non testé | Ne pas confondre la réponse HTTP 200 d'une page avec la réussite d'une soumission |
 | Lighthouse | Bloqué | Connecteur d'audit refuse le plan (`plan_denied`) |
+
+- GitHub Actions CI : job `quality` terminé avec succès; installation, lint et build sont tous en succès sur le commit courant de la PR. Les tests dynamiques du formulaire, CRM et e-mail restent séparés de ce contrôle de build.
