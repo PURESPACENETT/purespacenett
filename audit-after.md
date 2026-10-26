@@ -63,3 +63,7 @@ Le connecteur Lighthouse disponible a refusé l'exécution avec `plan_denied`. A
 - Logo et photo principale répondent HTTP 200 avec les types `image/jpeg` et `image/png`.
 - La validation téléphone/surface, le verrou de soumission rapide et les messages d'erreur sont présents dans le code, mais restent à valider par tests navigateur/POST.
 - Le CRM et l'e-mail ne sont pas encore validés de bout en bout; aucun faux prospect n'a été créé en production.
+
+## CI
+
+GitHub Actions a validé l'installation, le lint et le build sur le commit de la PR. Ce résultat confirme la compilation, pas la validation de bout en bout du formulaire, du CRM, de l'e-mail ni les scores Lighthouse.
