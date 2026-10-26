@@ -132,7 +132,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
         const leadId = data.requestId;
         let attemptNumber = 1;
-        let { data: inserted, error } = await supabaseAdmin
+        const { data: insertedResult, error } = await supabaseAdmin
           .from("quote_requests")
           .insert({
             id: leadId,
@@ -170,6 +170,7 @@ export const Route = createFileRoute("/api/public/devis")({
           .select("id")
           .single();
 
+        let inserted = insertedResult;
         if (error?.code === "23505") {
           const { data: existing, error: existingError } = await supabaseAdmin
             .from("quote_requests")
