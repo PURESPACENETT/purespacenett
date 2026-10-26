@@ -10,9 +10,9 @@ import { siteImages } from "@/lib/site-images";
 import { LocalInfo, LocalMap } from "@/components/local-info";
 import { DeferredReviews } from "@/components/deferred-reviews";
 
-const title = "Entreprise de nettoyage Île-de-France | PURE SPACE NETT";
+const title = "Entreprise de nettoyage Paris et 93 | PURE SPACE NETT";
 const description =
-  "PURE SPACE NETT, entreprise de nettoyage au Pré-Saint-Gervais : bureaux, copropriétés, fin de chantier, vitres, remise en état dans le 93, Paris et toute l'Île-de-France. Devis gratuit, après étude de votre demande.";
+  "PURE SPACE NETT accompagne particuliers et professionnels à Paris et en Seine-Saint-Denis : bureaux, copropriétés, commerces, fin de chantier et remise en état. Devis personnalisé.";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
@@ -43,8 +43,8 @@ const arguments_ = [
   },
   {
     icon: ShieldCheck,
-    title: "Équipes formées et assurées",
-    text: "Le même agent d'un mois sur l'autre, une responsabilité civile professionnelle à jour.",
+    title: "Un interlocuteur direct",
+    text: "Un échange avec la personne qui organise et suit votre prestation, avec une assurance professionnelle adaptée.",
   },
   {
     icon: Building2,
@@ -53,8 +53,8 @@ const arguments_ = [
   },
   {
     icon: Sparkles,
-    title: "Produits professionnels",
-    text: "Dosage maîtrisé, microfibres codées par couleur, gammes éco-responsables sur demande.",
+    title: "Des méthodes adaptées",
+    text: "Le matériel et les produits sont choisis selon les surfaces, leur état et les contraintes du site.",
   },
 ];
 
@@ -66,12 +66,12 @@ function Index() {
           <div>
             <Eyebrow>Le Pré-Saint-Gervais · Seine-Saint-Denis · Paris</Eyebrow>
             <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] sm:text-5xl">
-              Entreprise de nettoyage professionnel en Île-de-France
+              Entreprise de nettoyage à Paris et en Seine-Saint-Denis
             </h1>
             <p className="mt-5 max-w-xl text-base text-muted-foreground">
-              Bureaux, copropriétés, commerces, fin de chantier, vitres, remise en état, textiles et
-              véhicules. Basés au Pré-Saint-Gervais, nous intervenons dans le 93 et l'est parisien
-              en priorité, et partout en Île-de-France.
+              Pour les particuliers et les professionnels : entretien de bureaux, copropriétés et
+              commerces, nettoyage après travaux et remise en état. Basés au Pré-Saint-Gervais,
+              nous intervenons à Paris, dans le 93 et selon les prestations dans toute l'Île-de-France.
             </p>
             <div className="mt-8">
               <CallButtons subject="page d'accueil" />
@@ -128,7 +128,7 @@ function Index() {
       <Section>
         <Eyebrow>Nos prestations</Eyebrow>
         <h2 className="mt-3 font-display text-3xl font-bold">
-          Neuf prestations de nettoyage, une seule entreprise
+          Des prestations adaptées à chaque besoin
         </h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           Chaque prestation a sa page dédiée : contenu détaillé, déroulé de l'intervention et
@@ -150,6 +150,33 @@ function Index() {
               </span>
             </Link>
           ))}
+        </div>
+      </Section>
+
+      <Section className="pt-0">
+        <div className="grid gap-8 rounded-3xl border border-primary/15 bg-primary/5 p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+          <div>
+            <Eyebrow>Interventions spécialisées</Eyebrow>
+            <h2 className="mt-3 font-display text-2xl font-bold">Nettoyage de logements très dégradés</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Logement fortement encrassé, appartement resté longtemps inoccupé ou remise en état
+              importante : nous étudions votre situation avec discrétion et sans jugement. Après
+              évaluation de l'état des lieux, des surfaces et des contraintes, nous vous proposons
+              un devis adapté aux moyens nécessaires.
+            </p>
+            <Link to="/services/nettoyage-logement-degrade" className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+              Présenter ma situation <ArrowRight className="size-4" />
+            </Link>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <h3 className="font-display text-base font-semibold">Une évaluation avant intervention</h3>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+              <li>État général et superficie du logement</li>
+              <li>Nature des salissures et des surfaces</li>
+              <li>Accès, encombrement et équipements nécessaires</li>
+              <li>Contraintes particulières à prendre en compte</li>
+            </ul>
+          </div>
         </div>
       </Section>
 
