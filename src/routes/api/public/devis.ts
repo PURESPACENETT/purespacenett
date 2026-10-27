@@ -210,6 +210,7 @@ export const Route = createFileRoute("/api/public/devis")({
             "Nettoyage de vitres et vitrines": "vitrerie",
             "Nettoyage fin de chantier": "fin_de_chantier",
             "Remise en état après sinistre ou dégradation": "remise_en_etat",
+            "Nettoyage de logement très encrassé": "remise_en_etat",
             "Désinfection et sanitaires": "desinfection",
           };
           const frequencyMap: Record<string, string> = {
