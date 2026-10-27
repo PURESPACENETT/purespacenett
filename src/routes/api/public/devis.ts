@@ -300,6 +300,7 @@ export const Route = createFileRoute("/api/public/devis")({
 
               if (response.ok) {
                 crmAccepted = true;
+                crmDeliveryError = "";
                 break;
               }
 
