@@ -201,13 +201,18 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
-        const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
-          "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
+        const isPreview = process.env["VERCEL_ENV"] === "preview";
+        const crmUrl = isPreview
+          ? ""
+          : process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
+            "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
 
         // Le secret partagé de production est stocké dans Supabase Vault.
         // On le lit en priorité pour éviter qu'un ancien FUNNEL_QUOTE_WEBHOOK_SECRET
         // ne provoque des 401 alors que le bridge utilise le secret Vault actuel.
-        const configuredEnvSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
+        const configuredEnvSecret = isPreview
+          ? ""
+          : process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
         let vaultSecret = "";
         try {
           const { data: bridgeSecret, error: bridgeSecretError } =
@@ -312,30 +317,36 @@ export const Route = createFileRoute("/api/public/devis")({
           if (!crmAccepted) {
             console.error("CRM quote bridge did not accept the lead");
           }
+        } else if (isPreview) {
+          console.info("CRM quote bridge skipped in preview");
         } else {
           console.warn("CRM quote bridge is not configured");
         }
 
-        try {
-          const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-          await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
-            templateData: {
-              fullName: data.fullName,
-              email: data.email,
-              phone: data.phone,
-              address: data.address,
-              propertyType: data.propertyType,
-              surface: data.surface,
-              serviceType: data.serviceType,
-              frequency: data.frequency,
-              message: data.message,
-              photoUrls,
-            },
-            idempotencyKey: `nouvelle-demande-devis-${inserted?.id ?? data.email}`,
-            replyTo: data.email,
-          });
-        } catch (mailError) {
-          console.error("Notification e-mail du devis impossible", mailError);
+        if (isPreview) {
+          console.info("Quote notification email skipped in preview");
+        } else {
+          try {
+            const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+            await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
+              templateData: {
+                fullName: data.fullName,
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                propertyType: data.propertyType,
+                surface: data.surface,
+                serviceType: data.serviceType,
+                frequency: data.frequency,
+                message: data.message,
+                photoUrls,
+              },
+              idempotencyKey: `nouvelle-demande-devis-${inserted?.id ?? data.email}`,
+              replyTo: data.email,
+            });
+          } catch (mailError) {
+            console.error("Notification e-mail du devis impossible", mailError);
+          }
         }
 
         return Response.json({ ok: true }, { headers: noStore });
