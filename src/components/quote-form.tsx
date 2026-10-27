@@ -26,6 +26,7 @@ export const serviceTypes = [
   "Nettoyage de vitres et vitrines",
   "Nettoyage fin de chantier",
   "Remise en état après sinistre ou dégradation",
+  "Nettoyage de logement très encrassé",
   "Nettoyage avant / après déménagement (état des lieux)",
   "Nettoyage de canapés, fauteuils et matelas",
   "Nettoyage de tapis et moquettes",
@@ -69,6 +70,7 @@ const labelCls = "block text-sm font-medium";
 
 export function QuoteForm() {
   const [form, setForm] = useState(emptyForm);
+  const [requestId, setRequestId] = useState(() => crypto.randomUUID());
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
@@ -79,8 +81,10 @@ export function QuoteForm() {
     trackEvent("formulaire_devis_vu");
   }, []);
 
-  const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) =>
+  const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) => {
+    if (status === "error") setRequestId(crypto.randomUUID());
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const mailtoFallback = () => {
     const body = [
@@ -110,11 +114,12 @@ export function QuoteForm() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.consent) return;
+    if (status === "sending" || !form.consent) return;
     setStatus("sending");
     setError(null);
     try {
       const body = new FormData();
+      body.append("requestId", requestId);
       Object.entries(form).forEach(([key, value]) => body.append(key, String(value)));
       photos.forEach((photo) => body.append("photos", photo));
       const attribution = getMarketingAttribution();
@@ -135,6 +140,7 @@ export function QuoteForm() {
       });
       trackEvent("devis_confirmation_affichee", { source: "page_devis" });
       setStatus("sent");
+      setRequestId(crypto.randomUUID());
       setForm(emptyForm);
       setPhotos([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -181,12 +187,13 @@ export function QuoteForm() {
       className="rounded-2xl border border-border bg-card p-6 shadow-card"
     >
       <div className="mb-6 rounded-xl border border-primary/10 bg-primary/5 p-4">
-        <p className="text-sm font-semibold">Votre demande en 3 étapes</p>
+        <p className="text-sm font-semibold">Décrivez votre besoin pour recevoir un devis adapté</p>
         <ol className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
           <li><span className="font-semibold text-foreground">1.</span> Vos coordonnées</li>
           <li><span className="font-semibold text-foreground">2.</span> Le besoin à chiffrer</li>
           <li><span className="font-semibold text-foreground">3.</span> Envoi de la demande</li>
         </ol>
+        <p className="mt-2 text-xs text-muted-foreground">Indiquez la surface, le type de nettoyage et l’état des lieux. Vous pouvez joindre des photos pour faciliter notre première évaluation.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={labelCls}>

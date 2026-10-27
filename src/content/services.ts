@@ -31,8 +31,8 @@ export const services: Service[] = [
       "Prestation cadrée par un cahier des charges et un référent unique",
     ],
     details: [
-      "Nous établissons avec vous un plan de nettoyage précis : fréquence, horaires, zones prioritaires, points de contrôle. Vous gardez le même agent d'un mois sur l'autre, ce qui change tout sur la qualité.",
-      "Nos équipes utilisent des produits professionnels et des microfibres codées par couleur pour éviter toute contamination croisée entre sanitaires, cuisine et espaces de travail.",
+      "Nous définissons avec vous un plan de nettoyage précis : fréquence, horaires, zones prioritaires et points de contrôle. Les modalités de suivi sont précisées dans le devis ou le cahier des charges.",
+      "Le matériel et les produits sont choisis selon les surfaces et les consignes du site. Lorsque plusieurs zones nécessitent des protocoles distincts, les textiles et accessoires sont organisés pour limiter les risques de contamination croisée.",
     ],
     faq: [
       {
@@ -128,7 +128,7 @@ export const services: Service[] = [
     ],
     details: [
       "Pour les vitrines de commerce, un passage hebdomadaire ou bimensuel suffit généralement à garder une devanture nette malgré la pollution urbaine.",
-      "Nous travaillons en hauteur accessible depuis le sol grâce aux perches à eau pure, sans installation lourde ni nacelle dans la majorité des cas.",
+      "Lorsque la configuration le permet, les vitres accessibles depuis le sol peuvent être nettoyées à l’aide de perches adaptées. Les surfaces nécessitant un accès spécifique font l’objet d’une évaluation préalable.",
     ],
     faq: [
       {
@@ -213,9 +213,9 @@ export const services: Service[] = [
     h1: "Ménage pour état des lieux de sortie",
     title: "Ménage état des lieux 93 et Paris | PURE SPACE NETT",
     description:
-      "Ménage complet avant état des lieux de sortie ou d'entrée en Île-de-France : cuisine, sanitaires, vitres, placards. Restitution sans retenue sur le dépôt.",
+      "Nettoyage approfondi avant état des lieux d’entrée ou de sortie en Île-de-France : cuisine, sanitaires, vitres, placards et sols. Devis adapté à l’état du logement.",
     intro:
-      "Un état des lieux se joue sur les détails : joints, four, hotte, placards, vitres. Nous reprenons chaque point regardé par l'agent ou le propriétaire.",
+      "Avant un état des lieux, les détails comptent : joints, four, hotte, placards, vitres et sols. Nous définissons les zones à nettoyer selon votre logement et le niveau de prestation demandé.",
     audience: "Locataires, propriétaires, agences immobilières, locations courte durée",
     bullets: [
       "Cuisine dégraissée, four et hotte compris",
@@ -247,13 +247,13 @@ export const services: Service[] = [
     description:
       "Nettoyage en profondeur de canapés, fauteuils, tapis et moquettes par injection-extraction, à domicile ou en entreprise en Île-de-France.",
     intro:
-      "Le textile garde les taches, les odeurs et les acariens. L'injection-extraction décolle la saleté en profondeur et l'aspire, sans détremper le tissu.",
+      "Le textile garde les taches, les odeurs et les acariens. L’injection-extraction permet de décoller et d’aspirer une partie des salissures en profondeur. La méthode est adaptée au textile après vérification de sa compatibilité.",
     audience: "Particuliers, bureaux, hôtels, salles d'attente",
     bullets: [
       "Canapés, fauteuils, chaises et têtes de lit",
       "Tapis, moquettes et sols textiles de bureaux",
       "Traitement des taches et des odeurs",
-      "Séchage rapide, remise en service dans la journée",
+      "Conseils de séchage adaptés au textile et aux conditions d’aération.",
     ],
     details: [
       "Nous testons d'abord le tissu sur une zone discrète, puis appliquons un détachant adapté avant l'extraction. Les tissus fragiles sont traités en méthode à faible humidité.",
@@ -262,11 +262,52 @@ export const services: Service[] = [
     faq: [
       {
         q: "Combien de temps de séchage ?",
-        a: "Comptez 3 à 6 heures selon l'épaisseur du textile et l'aération de la pièce.",
+        a: "Le temps de séchage varie selon la matière, l’humidité résiduelle, la température et l’aération. Il est précisé après examen du textile et de la méthode retenue.",
       },
       {
         q: "Les taches anciennes partent-elles ?",
         a: "Souvent fortement atténuées ; nous vous disons honnêtement ce qui est atteignable avant d'intervenir.",
+      },
+    ],
+  },
+  {
+    slug: "nettoyage-logement-degrade",
+    name: "Nettoyage de logements très encrassés",
+    navName: "Logements très encrassés",
+    h1: "Nettoyage de logements très encrassés à Paris et dans le 93",
+    title: "Nettoyage logement très encrassé Paris et 93 | PURE SPACE NETT",
+    description:
+      "Nettoyage approfondi de logements très encrassés à Paris et en Seine-Saint-Denis. Évaluation préalable, intervention discrète et devis personnalisé.",
+    intro:
+      "Logement fortement encrassé, appartement resté longtemps inoccupé ou remise en état importante : PURE SPACE NETT étudie votre situation avec discrétion et sans jugement.",
+    audience: "Particuliers, propriétaires, bailleurs, agences et professionnels de l'immobilier",
+    bullets: [
+      "Évaluation préalable de l'état du logement et des surfaces",
+      "Nettoyage approfondi des pièces, sols, cuisines et sanitaires",
+      "Choix des méthodes et équipements selon les salissures",
+      "Organisation de l'intervention selon l'accès et les contraintes du site",
+    ],
+    details: [
+      "Chaque situation est différente. Avant de chiffrer l'intervention, nous prenons en compte la superficie, le niveau d'encrassement, l'encombrement, la nature des salissures et les conditions d'accès. Des photos peuvent faciliter une première évaluation, sans remplacer une visite lorsque celle-ci est nécessaire.",
+      "Le périmètre de la prestation est défini avec vous avant le démarrage. Les opérations nécessitant une compétence spécialisée ou une gestion particulière des déchets sont identifiées séparément et ne sont pas présumées incluses dans un nettoyage classique.",
+      "Notre approche est discrète et respectueuse. Le devis précise les zones concernées, les moyens nécessaires et les éventuelles limites liées à l'état des matériaux ou aux risques constatés.",
+    ],
+    faq: [
+      {
+        q: "Pouvez-vous étudier un logement très encrassé ou longtemps inoccupé ?",
+        a: "Oui. Nous étudions la superficie, l'état des lieux, les accès et les moyens nécessaires avant de confirmer le périmètre d'intervention.",
+      },
+      {
+        q: "Dois-je envoyer des photos ?",
+        a: "Les photos sont utiles pour une première appréciation et peuvent être jointes à votre demande. Une visite peut rester nécessaire pour établir un devis fiable.",
+      },
+      {
+        q: "Le devis peut-il être établi sans visite ?",
+        a: "Cela dépend de la situation. Lorsque les photos et les informations ne suffisent pas à évaluer correctement le travail, une visite préalable est proposée.",
+      },
+      {
+        q: "Intervenez-vous avec discrétion ?",
+        a: "Oui. Les échanges et l'organisation de l'intervention sont traités avec respect et sans jugement.",
       },
     ],
   },

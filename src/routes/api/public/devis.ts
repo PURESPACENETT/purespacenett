@@ -17,6 +17,7 @@ const ALLOWED_PHOTO_TYPES = new Set(Object.keys(PHOTO_EXTENSIONS));
 const noStore = { "Cache-Control": "no-store" };
 
 const schema = z.object({
+  requestId: z.string().uuid(),
   fullName: z.string().trim().min(2).max(100),
   clientType: z.enum(["entreprise", "sous_traitance", "particulier"]),
   companyName: z.string().trim().max(160).optional().default(""),
@@ -81,7 +82,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
 
         const payload = Object.fromEntries(
-          ["fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company", "gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "landing_page", "referrer"]
+          ["requestId", "fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company", "gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "landing_page", "referrer"]
             .map((key) => [key, formData.get(key) ?? ""]),
         );
         (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
@@ -129,11 +130,26 @@ export const Route = createFileRoute("/api/public/devis")({
             photoUrls.push(signed.signedUrl);
           }
         }
+        const { data: existingRequest, error: lookupError } = await supabaseAdmin
+          .from("quote_requests")
+          .select("id")
+          .eq("request_id", data.requestId)
+          .maybeSingle();
+
+        if (lookupError) {
+          console.error("Vérification d'idempotence impossible", lookupError.message);
+          return Response.json({ error: "Vérification de la demande impossible" }, { status: 500, headers: noStore });
+        }
+        if (existingRequest) {
+          return Response.json({ ok: true, duplicate: true }, { headers: noStore });
+        }
+
         const leadId = crypto.randomUUID();
         const { data: inserted, error } = await supabaseAdmin
           .from("quote_requests")
           .insert({
             id: leadId,
+            request_id: data.requestId,
             source_external_id: leadId,
             full_name: data.fullName,
             email: data.email,
@@ -168,6 +184,16 @@ export const Route = createFileRoute("/api/public/devis")({
           .single();
 
         if (error) {
+          if (error.code === "23505") {
+            const { data: duplicateRequest, error: duplicateLookupError } = await supabaseAdmin
+              .from("quote_requests")
+              .select("id")
+              .eq("request_id", data.requestId)
+              .maybeSingle();
+            if (!duplicateLookupError && duplicateRequest) {
+              return Response.json({ ok: true, duplicate: true }, { headers: noStore });
+            }
+          }
           console.error("Enregistrement du devis impossible", error.message);
           if (uploadedPhotoPaths.length > 0) {
             await supabaseAdmin.storage.from(bucket).remove(uploadedPhotoPaths);
@@ -175,13 +201,18 @@ export const Route = createFileRoute("/api/public/devis")({
           return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers: noStore });
         }
 
-        const crmUrl = process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
-          "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
+        const isPreview = process.env["VERCEL_ENV"] === "preview";
+        const crmUrl = isPreview
+          ? ""
+          : process.env["FUNNEL_QUOTE_WEBHOOK_URL"]?.trim() ||
+            "https://dgppmlkpvmvjkhsghtji.supabase.co/functions/v1/quote-request-webhook";
 
         // Le secret partagé de production est stocké dans Supabase Vault.
         // On le lit en priorité pour éviter qu'un ancien FUNNEL_QUOTE_WEBHOOK_SECRET
         // ne provoque des 401 alors que le bridge utilise le secret Vault actuel.
-        const configuredEnvSecret = process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
+        const configuredEnvSecret = isPreview
+          ? ""
+          : process.env["FUNNEL_QUOTE_WEBHOOK_SECRET"]?.trim() ?? "";
         let vaultSecret = "";
         try {
           const { data: bridgeSecret, error: bridgeSecretError } =
@@ -210,6 +241,7 @@ export const Route = createFileRoute("/api/public/devis")({
             "Nettoyage de vitres et vitrines": "vitrerie",
             "Nettoyage fin de chantier": "fin_de_chantier",
             "Remise en état après sinistre ou dégradation": "remise_en_etat",
+            "Nettoyage de logement très encrassé": "remise_en_etat",
             "Désinfection et sanitaires": "desinfection",
           };
           const frequencyMap: Record<string, string> = {
@@ -285,30 +317,36 @@ export const Route = createFileRoute("/api/public/devis")({
           if (!crmAccepted) {
             console.error("CRM quote bridge did not accept the lead");
           }
+        } else if (isPreview) {
+          console.info("CRM quote bridge skipped in preview");
         } else {
           console.warn("CRM quote bridge is not configured");
         }
 
-        try {
-          const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-          await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
-            templateData: {
-              fullName: data.fullName,
-              email: data.email,
-              phone: data.phone,
-              address: data.address,
-              propertyType: data.propertyType,
-              surface: data.surface,
-              serviceType: data.serviceType,
-              frequency: data.frequency,
-              message: data.message,
-              photoUrls,
-            },
-            idempotencyKey: `nouvelle-demande-devis-${inserted?.id ?? data.email}`,
-            replyTo: data.email,
-          });
-        } catch (mailError) {
-          console.error("Notification e-mail du devis impossible", mailError);
+        if (isPreview) {
+          console.info("Quote notification email skipped in preview");
+        } else {
+          try {
+            const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+            await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
+              templateData: {
+                fullName: data.fullName,
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                propertyType: data.propertyType,
+                surface: data.surface,
+                serviceType: data.serviceType,
+                frequency: data.frequency,
+                message: data.message,
+                photoUrls,
+              },
+              idempotencyKey: `nouvelle-demande-devis-${inserted?.id ?? data.email}`,
+              replyTo: data.email,
+            });
+          } catch (mailError) {
+            console.error("Notification e-mail du devis impossible", mailError);
+          }
         }
 
         return Response.json({ ok: true }, { headers: noStore });

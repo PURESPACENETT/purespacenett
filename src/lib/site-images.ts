@@ -1,17 +1,10 @@
-import logoAsset from "@/assets/pure-space-nett-logo.jpg.asset.json";
-import bureauxAsset from "@/assets/bureaux-lumineux.jpg.asset.json";
-import avantApresAsset from "@/assets/copropriete-avant-apres.png.asset.json";
-import couloirAsset from "@/assets/couloir-residence-apres-nettoyage.jpg.asset.json";
-import solBrillantAsset from "@/assets/sol-residence-brillant.jpg.asset.json";
-import solNettoyeAsset from "@/assets/sol-residence-nettoye.jpg.asset.json";
-
 export const siteImages = {
-  logo: logoAsset.url,
-  bureaux: bureauxAsset.url,
-  avantApres: avantApresAsset.url,
-  couloir: couloirAsset.url,
-  solBrillant: solBrillantAsset.url,
-  solNettoye: solNettoyeAsset.url,
+  logo: "/assets/pure-space-nett-logo.webp",
+  bureaux: "/assets/bureaux-lumineux.webp",
+  avantApres: "/assets/copropriete-avant-apres.webp",
+  couloir: "/assets/couloir-residence-apres-nettoyage.webp",
+  solBrillant: "/assets/sol-residence-brillant.webp",
+  solNettoye: "/assets/sol-residence-nettoye.webp",
 } as const;
 
 const chantierImages = [
