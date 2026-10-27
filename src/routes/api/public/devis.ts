@@ -224,6 +224,9 @@ export const Route = createFileRoute("/api/public/devis")({
 
         const crmSecrets = [...new Set([vaultSecret, configuredEnvSecret].filter(Boolean))];
 
+        let crmDeliveryStatus: "sent" | "error" = "error";
+        let crmDeliveryError = "";
+
         if (crmUrl && crmSecrets.length > 0) {
           const propertyTypeMap: Record<string, string> = {
             Maison: "logement",
@@ -302,6 +305,7 @@ export const Route = createFileRoute("/api/public/devis")({
 
               // Un 401 signifie généralement que le secret partagé n'est plus celui
               // attendu par le bridge. Si un second secret configuré existe, on l'essaie.
+              crmDeliveryError = `CRM HTTP ${response.status}`;
               console.error("CRM quote bridge rejected request", {
                 status: response.status,
                 secretSource: index === 0 && vaultSecret ? "vault" : "environment",
@@ -309,26 +313,34 @@ export const Route = createFileRoute("/api/public/devis")({
 
               if (response.status !== 401) break;
             } catch (crmError) {
+              crmDeliveryError = crmError instanceof Error ? crmError.message.slice(0, 400) : "CRM network error";
               console.error("CRM quote bridge failed", crmError);
               break;
             }
           }
 
-          if (!crmAccepted) {
+          if (crmAccepted) {
+            crmDeliveryStatus = "sent";
+          } else {
+            crmDeliveryError ||= "CRM webhook not accepted";
             console.error("CRM quote bridge did not accept the lead");
           }
         } else if (isPreview) {
           console.info("CRM quote bridge skipped in preview");
         } else {
+          crmDeliveryError = "CRM webhook or shared secret is not configured";
           console.warn("CRM quote bridge is not configured");
         }
+
+        let emailDeliveryStatus: "sent" | "error" = "error";
+        let emailDeliveryError = "";
 
         if (isPreview) {
           console.info("Quote notification email skipped in preview");
         } else {
           try {
             const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-            await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
+            const emailResult = await sendTemplateEmail("nouvelle-demande-devis", "contact@purespacenett.com", {
               templateData: {
                 fullName: data.fullName,
                 email: data.email,
@@ -344,8 +356,35 @@ export const Route = createFileRoute("/api/public/devis")({
               idempotencyKey: `nouvelle-demande-devis-${inserted?.id ?? data.email}`,
               replyTo: data.email,
             });
+            if (emailResult.sent) {
+              emailDeliveryStatus = "sent";
+            } else {
+              emailDeliveryError = emailResult.reason;
+            }
           } catch (mailError) {
+            emailDeliveryError = mailError instanceof Error ? mailError.message.slice(0, 400) : "Email provider error";
             console.error("Notification e-mail du devis impossible", mailError);
+          }
+        }
+
+        if (!isPreview) {
+          const deliveryErrors = [crmDeliveryError, emailDeliveryError].filter(Boolean);
+          const now = new Date().toISOString();
+          const { error: trackingError } = await supabaseAdmin
+            .from("quote_requests")
+            .update({
+              crm_delivery_status: crmDeliveryStatus,
+              email_delivery_status: emailDeliveryStatus,
+              crm_delivered_at: crmDeliveryStatus === "sent" ? now : null,
+              email_delivered_at: emailDeliveryStatus === "sent" ? now : null,
+              delivery_attempts: 1,
+              last_delivery_attempt_at: now,
+              last_delivery_error: deliveryErrors.length > 0 ? deliveryErrors.join(" | ").slice(0, 1000) : null,
+            })
+            .eq("id", inserted.id);
+
+          if (trackingError) {
+            console.error("Mise à jour du suivi de livraison impossible", trackingError.message);
           }
         }
 
