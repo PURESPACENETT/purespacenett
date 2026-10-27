@@ -15,10 +15,10 @@ export default defineConfig({
   ],
   define: {
     "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-      "https://dgppmlkpvmvjkhsghtji.supabase.co",
+      process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "",
     ),
     "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-      "sb_publishable_Uqxxo1jp4wENhs7XKC53Wg_2RGn3dRw",
+      process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "",
     ),
   },
 });
