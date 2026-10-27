@@ -17,6 +17,7 @@ const ALLOWED_PHOTO_TYPES = new Set(Object.keys(PHOTO_EXTENSIONS));
 const noStore = { "Cache-Control": "no-store" };
 
 const schema = z.object({
+  requestId: z.string().uuid(),
   fullName: z.string().trim().min(2).max(100),
   clientType: z.enum(["entreprise", "sous_traitance", "particulier"]),
   companyName: z.string().trim().max(160).optional().default(""),
@@ -81,7 +82,7 @@ export const Route = createFileRoute("/api/public/devis")({
         }
 
         const payload = Object.fromEntries(
-          ["fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company", "gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "landing_page", "referrer"]
+          ["requestId", "fullName", "clientType", "companyName", "email", "phone", "address", "city", "postalCode", "propertyType", "surface", "serviceType", "frequency", "desiredDate", "message", "company", "gclid", "gbraid", "wbraid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "landing_page", "referrer"]
             .map((key) => [key, formData.get(key) ?? ""]),
         );
         (payload as Record<string, unknown>)["consent"] = formData.get("consent") === "true";
@@ -129,11 +130,26 @@ export const Route = createFileRoute("/api/public/devis")({
             photoUrls.push(signed.signedUrl);
           }
         }
+        const { data: existingRequest, error: lookupError } = await supabaseAdmin
+          .from("quote_requests")
+          .select("id")
+          .eq("request_id", data.requestId)
+          .maybeSingle();
+
+        if (lookupError) {
+          console.error("Vérification d'idempotence impossible", lookupError.message);
+          return Response.json({ error: "Vérification de la demande impossible" }, { status: 500, headers: noStore });
+        }
+        if (existingRequest) {
+          return Response.json({ ok: true, duplicate: true }, { headers: noStore });
+        }
+
         const leadId = crypto.randomUUID();
         const { data: inserted, error } = await supabaseAdmin
           .from("quote_requests")
           .insert({
             id: leadId,
+            request_id: data.requestId,
             source_external_id: leadId,
             full_name: data.fullName,
             email: data.email,
@@ -168,6 +184,16 @@ export const Route = createFileRoute("/api/public/devis")({
           .single();
 
         if (error) {
+          if (error.code === "23505") {
+            const { data: duplicateRequest, error: duplicateLookupError } = await supabaseAdmin
+              .from("quote_requests")
+              .select("id")
+              .eq("request_id", data.requestId)
+              .maybeSingle();
+            if (!duplicateLookupError && duplicateRequest) {
+              return Response.json({ ok: true, duplicate: true }, { headers: noStore });
+            }
+          }
           console.error("Enregistrement du devis impossible", error.message);
           if (uploadedPhotoPaths.length > 0) {
             await supabaseAdmin.storage.from(bucket).remove(uploadedPhotoPaths);
