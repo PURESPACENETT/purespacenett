@@ -70,6 +70,7 @@ const labelCls = "block text-sm font-medium";
 
 export function QuoteForm() {
   const [form, setForm] = useState(emptyForm);
+  const [requestId, setRequestId] = useState(() => crypto.randomUUID());
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
@@ -80,8 +81,10 @@ export function QuoteForm() {
     trackEvent("formulaire_devis_vu");
   }, []);
 
-  const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) =>
+  const set = <K extends keyof typeof emptyForm>(key: K, value: (typeof emptyForm)[K]) => {
+    if (status === "error") setRequestId(crypto.randomUUID());
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const mailtoFallback = () => {
     const body = [
@@ -116,6 +119,7 @@ export function QuoteForm() {
     setError(null);
     try {
       const body = new FormData();
+      body.append("requestId", requestId);
       Object.entries(form).forEach(([key, value]) => body.append(key, String(value)));
       photos.forEach((photo) => body.append("photos", photo));
       const attribution = getMarketingAttribution();
@@ -136,6 +140,7 @@ export function QuoteForm() {
       });
       trackEvent("devis_confirmation_affichee", { source: "page_devis" });
       setStatus("sent");
+      setRequestId(crypto.randomUUID());
       setForm(emptyForm);
       setPhotos([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
