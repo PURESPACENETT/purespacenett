@@ -26,6 +26,7 @@ export const serviceTypes = [
   "Nettoyage de vitres et vitrines",
   "Nettoyage fin de chantier",
   "Remise en état après sinistre ou dégradation",
+  "Nettoyage de logement très encrassé",
   "Nettoyage avant / après déménagement (état des lieux)",
   "Nettoyage de canapés, fauteuils et matelas",
   "Nettoyage de tapis et moquettes",
@@ -110,7 +111,7 @@ export function QuoteForm() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.consent) return;
+    if (status === "sending" || !form.consent) return;
     setStatus("sending");
     setError(null);
     try {
