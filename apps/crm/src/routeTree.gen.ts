@@ -99,12 +99,11 @@ const AuthenticatedAppLinkedinRoute =
     path: '/linkedin',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppMetaAdsRoute =
-  AuthenticatedAppMetaAdsRouteImport.update({
-    id: '/meta-ads',
-    path: '/meta-ads',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
+const AuthenticatedAppMetaAdsRoute = AuthenticatedAppMetaAdsRouteImport.update({
+  id: '/meta-ads',
+  path: '/meta-ads',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppPipelineRoute =
   AuthenticatedAppPipelineRouteImport.update({
     id: '/pipeline',
@@ -157,6 +156,7 @@ const ApiPublicHooksQuoteRequestRoute =
     path: '/api/public/hooks/quote-request',
     getParentRoute: () => rootRouteImport,
   } as any)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute

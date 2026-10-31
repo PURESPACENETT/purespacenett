@@ -210,8 +210,13 @@ async function prepareRows(rows: any[]): Promise<number> {
   return prepared;
 }
 
-/** Sends up to SEND_LIMIT reviewed-ready messages and flags them as contacted. */
+/** Sends queued outreach only when explicitly enabled, then flags messages as contacted. */
 async function sendPreparedOutreach() {
+  if (process.env["AUTO_PROSPECTION_EMAIL_ENABLED"] !== "true") {
+    console.info("Automatic prospect outreach is disabled; prepared emails remain queued for human review.");
+    return [];
+  }
+
   const { data: ready } = await supabaseAdmin
     .from("prospects")
     .select("id, company_name, city, email, outreach_subject, outreach_body, outreach_generated_at, outreach_sent_at, do_not_contact")

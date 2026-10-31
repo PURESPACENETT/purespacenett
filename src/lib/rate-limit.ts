@@ -76,9 +76,16 @@ export async function checkRateLimit(
 }
 
 export function requestKey(request: Request, scope: string): string {
+  // Vercel appends the connecting address to X-Forwarded-For. Use the last
+  // hop so a caller-supplied leftmost address cannot rotate the rate-limit key.
+  const forwarded = request.headers
+    .get("x-forwarded-for")
+    ?.split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .at(-1);
   const cloudflareIp = request.headers.get("cf-connecting-ip")?.trim();
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const realIp = request.headers.get("x-real-ip")?.trim();
-  const ip = cloudflareIp || forwarded || realIp || "unknown";
+  const ip = forwarded || cloudflareIp || realIp || "unknown";
   return scope + ":" + ip;
 }

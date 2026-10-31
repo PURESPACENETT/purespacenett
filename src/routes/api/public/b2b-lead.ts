@@ -5,6 +5,7 @@ import { checkRateLimit, requestKey } from "@/lib/rate-limit";
 const noStore = { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" };
 
 const schema = z.object({
+  requestId: z.string().uuid(),
   contactName: z.string().trim().min(2).max(120),
   companyName: z.string().trim().min(2).max(160),
   email: z.string().trim().email().max(255),
@@ -52,15 +53,106 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
           return Response.json({ error: "Formulaire incomplet ou invalide" }, { status: 400, headers: noStore });
         }
 
-        const url = process.env["FUNNEL_B2B_WEBHOOK_URL"]?.trim();
-        const secret = process.env["FUNNEL_B2B_WEBHOOK_SECRET"]?.trim();
-        if (!url || !secret) {
-          console.error("B2B CRM bridge is not configured");
-          return Response.json({ error: "Canal B2B temporairement indisponible" }, { status: 503, headers: noStore });
+        const data = parsed.data;
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: existing, error: lookupError } = await supabaseAdmin
+          .from("quote_requests")
+          .select("id,delivery_attempts")
+          .eq("request_id", data.requestId)
+          .maybeSingle();
+
+        if (lookupError) {
+          console.error("B2B request idempotency lookup failed", lookupError.message);
+          return Response.json({ error: "Enregistrement de la demande impossible" }, { status: 500, headers: noStore });
         }
 
-        const data = parsed.data;
+        let leadId = existing?.id;
+        let deliveryAttempts = existing?.delivery_attempts ?? 0;
+        if (!leadId) {
+          leadId = crypto.randomUUID();
+          const { data: inserted, error: insertError } = await supabaseAdmin
+            .from("quote_requests")
+            .insert({
+              id: leadId,
+              request_id: data.requestId,
+              source_system: "purespacenett_b2b",
+              source_external_id: leadId,
+              full_name: data.contactName,
+              client_type: "sous_traitance",
+              property_type: data.propertyType,
+              surface: String(data.surfaceM2),
+              surface_m2: data.surfaceM2,
+              service_type: data.services[0] ?? null,
+              services: data.services,
+              frequency: data.frequency,
+              city: data.city,
+              postal_code: data.postalCode,
+              desired_date: data.desiredDate || null,
+              contact_name: data.contactName,
+              company_name: data.companyName,
+              email: data.email.trim().toLowerCase(),
+              phone: data.phone,
+              message: [
+                "Source : site PURE SPACE NETT — demande de sous-traitance.",
+                data.message,
+              ].filter(Boolean).join("\n\n"),
+              crm_delivery_status: "pending",
+              email_delivery_status: "pending",
+              delivery_attempts: 0,
+            })
+            .select("id,delivery_attempts")
+            .single();
+
+          if (insertError) {
+            if (insertError.code === "23505") {
+              const { data: duplicate } = await supabaseAdmin
+                .from("quote_requests")
+                .select("id,delivery_attempts")
+                .eq("request_id", data.requestId)
+                .maybeSingle();
+              if (duplicate) {
+                leadId = duplicate.id;
+                deliveryAttempts = duplicate.delivery_attempts ?? 0;
+              } else {
+                console.error("B2B idempotent insert conflict without matching request");
+                return Response.json({ error: "Enregistrement de la demande impossible" }, { status: 500, headers: noStore });
+              }
+            } else {
+              console.error("B2B request persistence failed", insertError.message);
+              return Response.json({ error: "Enregistrement de la demande impossible" }, { status: 500, headers: noStore });
+            }
+          } else if (inserted) {
+            leadId = inserted.id;
+            deliveryAttempts = inserted.delivery_attempts ?? 0;
+          }
+        }
+
+        const url = process.env["FUNNEL_B2B_WEBHOOK_URL"]?.trim();
+        const secret = process.env["FUNNEL_B2B_WEBHOOK_SECRET"]?.trim();
+        const attemptAt = new Date().toISOString();
+        const attemptNumber = deliveryAttempts + 1;
+        const updateDelivery = async (status: "sent" | "error", errorMessage: string | null = null) => {
+          const { error } = await supabaseAdmin
+            .from("quote_requests")
+            .update({
+              crm_delivery_status: status,
+              crm_delivered_at: status === "sent" ? attemptAt : null,
+              delivery_attempts: attemptNumber,
+              last_delivery_attempt_at: attemptAt,
+              last_delivery_error: errorMessage,
+            })
+            .eq("id", leadId);
+          if (error) console.error("B2B delivery tracking failed", error.message);
+        };
+
+        if (!url || !secret) {
+          console.error("B2B CRM bridge is not configured; request remains stored locally");
+          await updateDelivery("error", "CRM bridge is not configured");
+          return Response.json({ error: "Votre demande est enregistrée, mais le CRM est temporairement indisponible. Réessayez plus tard.", saved: true }, { status: 503, headers: noStore });
+        }
+
         const payload = {
+          sourceExternalId: leadId,
           clientType: "sous_traitance",
           propertyType: data.propertyType,
           surfaceM2: data.surfaceM2,
@@ -92,13 +184,16 @@ export const Route = createFileRoute("/api/public/b2b-lead")({
 
           if (!response.ok) {
             console.error("B2B CRM bridge rejected lead", response.status);
-            return Response.json({ error: "Transmission au CRM impossible" }, { status: 502, headers: noStore });
+            await updateDelivery("error", `CRM HTTP ${response.status}`);
+            return Response.json({ error: "Votre demande est enregistrée, mais le CRM ne l'a pas encore reçue. Réessayez." , saved: true }, { status: 502, headers: noStore });
           }
 
+          await updateDelivery("sent");
           return Response.json({ ok: true }, { headers: noStore });
         } catch (error) {
           console.error("B2B CRM bridge failed", error);
-          return Response.json({ error: "Transmission au CRM impossible" }, { status: 502, headers: noStore });
+          await updateDelivery("error", "CRM network request failed");
+          return Response.json({ error: "Votre demande est enregistrée, mais la transmission au CRM a échoué. Réessayez." , saved: true }, { status: 502, headers: noStore });
         }
       },
     },

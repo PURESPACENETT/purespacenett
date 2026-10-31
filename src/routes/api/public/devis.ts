@@ -97,6 +97,20 @@ export const Route = createFileRoute("/api/public/devis")({
         const photoUrls: string[] = [];
         const uploadedPhotoPaths: string[] = [];
 
+        const { data: existingRequest, error: lookupError } = await supabaseAdmin
+          .from("quote_requests")
+          .select("id")
+          .eq("request_id", data.requestId)
+          .maybeSingle();
+
+        if (lookupError) {
+          console.error("Vérification d'idempotence impossible", lookupError.message);
+          return Response.json({ error: "Vérification de la demande impossible" }, { status: 500, headers: noStore });
+        }
+        if (existingRequest) {
+          return Response.json({ ok: true, duplicate: true }, { headers: noStore });
+        }
+
         if (photos.length > 0) {
           // Le stockage privé "quote-photos" est déjà provisionné (privé, 5 Mo, types image autorisés).
           for (const photo of photos) {
@@ -130,20 +144,6 @@ export const Route = createFileRoute("/api/public/devis")({
             photoUrls.push(signed.signedUrl);
           }
         }
-        const { data: existingRequest, error: lookupError } = await supabaseAdmin
-          .from("quote_requests")
-          .select("id")
-          .eq("request_id", data.requestId)
-          .maybeSingle();
-
-        if (lookupError) {
-          console.error("Vérification d'idempotence impossible", lookupError.message);
-          return Response.json({ error: "Vérification de la demande impossible" }, { status: 500, headers: noStore });
-        }
-        if (existingRequest) {
-          return Response.json({ ok: true, duplicate: true }, { headers: noStore });
-        }
-
         const leadId = crypto.randomUUID();
         const { data: inserted, error } = await supabaseAdmin
           .from("quote_requests")
@@ -154,6 +154,7 @@ export const Route = createFileRoute("/api/public/devis")({
             full_name: data.fullName,
             email: data.email,
             phone: data.phone,
+            photo_paths: uploadedPhotoPaths,
             address: data.address || null,
             property_type: data.propertyType || null,
             surface: data.surface || null,
@@ -168,7 +169,7 @@ export const Route = createFileRoute("/api/public/devis")({
             desired_date: data.desiredDate || null,
             contact_name: data.fullName,
             company_name: data.companyName || null,
-            source_system: "website",
+            source_system: "purespacenett_site",
             gclid: data.gclid || null,
             gbraid: data.gbraid || null,
             wbraid: data.wbraid || null,
@@ -250,8 +251,8 @@ export const Route = createFileRoute("/api/public/devis")({
           const frequencyMap: Record<string, string> = {
             "Une seule fois": "ponctuel",
             Hebdomadaire: "hebdomadaire",
-            "Bi-mensuel": "plusieurs_semaine",
-            Mensuel: "hebdomadaire",
+            "Toutes les deux semaines": "toutes_les_deux_semaines",
+            Mensuel: "mensuel",
           };
           const crmPayload = {
             sourceExternalId: inserted.id,

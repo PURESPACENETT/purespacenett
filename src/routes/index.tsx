@@ -164,7 +164,11 @@ function Index() {
               évaluation de l'état des lieux, des surfaces et des contraintes, nous vous proposons
               un devis adapté aux moyens nécessaires.
             </p>
-            <Link to="/services/nettoyage-logement-degrade" className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground">
+            <Link
+              to="/services/$slug"
+              params={{ slug: "nettoyage-logement-degrade" }}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+            >
               Présenter ma situation <ArrowRight className="size-4" />
             </Link>
           </div>

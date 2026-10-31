@@ -29,6 +29,7 @@ const frequencies = [
 const field = "mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-ring/40";
 
 export function B2BLeadForm() {
+  const [requestId, setRequestId] = useState(() => crypto.randomUUID());
   const [form, setForm] = useState({
     contactName: "", companyName: "", email: "", phone: "", propertyType: "bureaux",
     surfaceM2: "", frequency: "ponctuel", services: ["nettoyage_courant"] as string[],
@@ -69,14 +70,15 @@ export function B2BLeadForm() {
       const response = await fetch("/api/public/b2b-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, website: "", surfaceM2: Number(form.surfaceM2), desiredDate: form.desiredDate || "" }),
+        body: JSON.stringify({ ...form, requestId, website: "", surfaceM2: Number(form.surfaceM2), desiredDate: form.desiredDate || "" }),
       });
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        const data = await response.json().catch(() => null);
         throw new Error(data?.error || "Transmission impossible");
       }
       trackLeadGenerated("b2b", { source: "sous_traitance_b2b", type: "partenariat" });
       trackEvent("lead_b2b_envoye", { source: "page_sous_traitance" });
+      setRequestId(crypto.randomUUID());
       setStatus("sent");
     } catch (e) {
       trackEvent("lead_b2b_echec", { source: "page_sous_traitance" });

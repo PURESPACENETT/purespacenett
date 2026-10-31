@@ -146,7 +146,7 @@ function RequestDetailPage() {
             {request.company_name || request.contact_name}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {labelOf(CLIENT_TYPES, request.client_type)} · reçue le{" "}
+            {labelOf(CLIENT_TYPES, request.client_type ?? "") || "Type client à préciser"} · reçue le{" "}
             {new Date(request.created_at).toLocaleDateString("fr-FR")}
           </p>
         </div>
@@ -235,13 +235,13 @@ function RequestDetailPage() {
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="text-base text-foreground">Le besoin</h2>
             <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field label="Type de lieu" value={labelOf(PROPERTY_TYPES, request.property_type)} />
-              <Field label="Surface" value={`${request.surface_m2} m²`} />
+              <Field label="Type de lieu" value={labelOf(PROPERTY_TYPES, request.property_type ?? "") || "À préciser"} />
+              <Field label="Surface" value={request.surface_m2 != null ? `${request.surface_m2} m²` : "À préciser"} />
               <Field
                 label="Pièces / étages"
                 value={request.rooms != null ? String(request.rooms) : "—"}
               />
-              <Field label="Fréquence" value={labelOf(FREQUENCIES, request.frequency)} />
+              <Field label="Fréquence" value={labelOf(FREQUENCIES, request.frequency ?? "") || "À préciser"} />
               <Field
                 label="Prestations"
                 value={request.services.map((s: string) => labelOf(SERVICES, s)).join(", ")}
@@ -261,6 +261,20 @@ function RequestDetailPage() {
               </p>
             )}
           </section>
+
+          {(data?.photoUrls.length ?? 0) > 0 && (
+            <section className="rounded-xl border border-border bg-card p-5">
+              <h2 className="text-base text-foreground">Photos de la demande</h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {data?.photoUrls.map((url, index) => (
+                  <a key={url} href={url} target="_blank" rel="noreferrer" className="overflow-hidden rounded-lg border border-border">
+                    <img src={url} alt={`Photo de la demande ${index + 1}`} className="h-48 w-full object-cover" />
+                  </a>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">Les photos sont conservées pendant 12 mois.</p>
+            </section>
+          )}
 
           <section className="rounded-xl border border-border bg-card p-5">
             <h2 className="text-base text-foreground">Notes de suivi</h2>

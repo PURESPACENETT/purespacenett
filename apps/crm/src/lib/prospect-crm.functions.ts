@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseStaff } from "@/integrations/supabase/staff-middleware";
 import { logProspectActivity } from "./prospect-activity.server";
 import { PROSPECT_STATUS_VALUES } from "./prospects-shared";
 
@@ -11,7 +11,7 @@ const taskTypeEnum = z.enum(["appeler", "email", "relance", "rdv", "visite", "de
 const priorityEnum = z.enum(["basse", "normale", "haute", "urgente"]);
 
 export const listProspectCrm = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
     const [{ data: prospects, error: prospectsError }, { data: tasks, error: tasksError }, { data: activities, error: activitiesError }] =
       await Promise.all([
@@ -47,7 +47,7 @@ export const listProspectCrm = createServerFn({ method: "GET" })
   });
 
 export const listTodayProspectTasks = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
     const start = new Date();
     start.setHours(0, 0, 0, 0);
@@ -80,7 +80,7 @@ export const listTodayProspectTasks = createServerFn({ method: "GET" })
   });
 
 export const getProspectCrmDetail = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const [{ data: prospect, error: prospectError }, { data: tasks, error: tasksError }, { data: activities, error: activitiesError }] =
@@ -109,7 +109,7 @@ export const getProspectCrmDetail = createServerFn({ method: "GET" })
   });
 
 export const createProspectTask = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z.object({
       prospectId: z.string().uuid(),
@@ -148,7 +148,7 @@ export const createProspectTask = createServerFn({ method: "POST" })
   });
 
 export const completeProspectTask = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: task, error: readError } = await context.supabase
@@ -181,7 +181,7 @@ export const completeProspectTask = createServerFn({ method: "POST" })
   });
 
 export const deleteProspectTask = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("prospect_tasks").delete().eq("id", data.id);
@@ -190,7 +190,7 @@ export const deleteProspectTask = createServerFn({ method: "POST" })
   });
 
 export const addProspectNote = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z.object({
       prospectId: z.string().uuid(),
@@ -209,7 +209,7 @@ export const addProspectNote = createServerFn({ method: "POST" })
   });
 
 export const updateProspectOpportunityType = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z.object({ id: z.string().uuid(), opportunityType: opportunityEnum.nullable() }).parse(input),
   )
@@ -223,7 +223,7 @@ export const updateProspectOpportunityType = createServerFn({ method: "POST" })
   });
 
 export const setProspectDoNotContact = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z.object({
       id: z.string().uuid(),
@@ -257,7 +257,7 @@ export const setProspectDoNotContact = createServerFn({ method: "POST" })
   });
 
 export const updateProspectLossReason = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z.object({ id: z.string().uuid(), lossReason: z.string().trim().max(500).nullable() }).parse(input),
   )

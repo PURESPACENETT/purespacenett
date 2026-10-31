@@ -127,7 +127,7 @@ export const services: Service[] = [
       "Matériel à eau pure et perches télescopiques",
     ],
     details: [
-      "Pour les vitrines de commerce, un passage hebdomadaire ou bimensuel suffit généralement à garder une devanture nette malgré la pollution urbaine.",
+      "Pour les vitrines de commerce, un passage hebdomadaire ou toutes les deux semaines suffit généralement à garder une devanture nette malgré la pollution urbaine.",
       "Lorsque la configuration le permet, les vitres accessibles depuis le sol peuvent être nettoyées à l’aide de perches adaptées. Les surfaces nécessitant un accès spécifique font l’objet d’une évaluation préalable.",
     ],
     faq: [

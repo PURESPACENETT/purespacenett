@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseStaff } from "@/integrations/supabase/staff-middleware";
 import {
   DEFAULT_PRICING,
   estimatePrice,
@@ -62,6 +62,7 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
     const { data: inserted, error } = await supabaseAdmin
       .from("quote_requests")
       .insert({
+        full_name: data.contactName,
         client_type: data.clientType,
         property_type: data.propertyType,
         surface_m2: data.surfaceM2,
@@ -120,7 +121,7 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
 
 /** Private: (re)generate the AI qualification of a request. */
 export const qualifyRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
@@ -130,6 +131,18 @@ export const qualifyRequest = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Demande introuvable");
+
+    if (
+      !row.client_type ||
+      !row.property_type ||
+      row.surface_m2 == null ||
+      !row.frequency ||
+      !row.city ||
+      !row.postal_code ||
+      !(row.contact_name || row.full_name)
+    ) {
+      throw new Error("Complétez les informations de la demande avant de la qualifier.");
+    }
 
     const { qualifyAndStore } = await import("./quote-ai.server");
     const ok = await qualifyAndStore(row.id, {
@@ -142,7 +155,7 @@ export const qualifyRequest = createServerFn({ method: "POST" })
       city: row.city,
       postalCode: row.postal_code,
       desiredDate: row.desired_date,
-      contactName: row.contact_name,
+      contactName: row.contact_name ?? row.full_name ?? "",
       companyName: row.company_name,
       message: row.message,
       estimateMin: Number(row.estimate_min),
@@ -178,7 +191,7 @@ export const previewEstimate = createServerFn({ method: "POST" })
   });
 
 export const listRequests = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("quote_requests")
@@ -189,7 +202,7 @@ export const listRequests = createServerFn({ method: "GET" })
   });
 
 export const getRequest = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: request, error } = await context.supabase
@@ -206,16 +219,31 @@ export const getRequest = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (notesError) throw new Error(notesError.message);
 
-    return { request, notes: notes ?? [] };
+    const photoPaths = request?.photo_paths ?? [];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const photoUrls = await Promise.all(
+      photoPaths.map(async (path) => {
+        const { data: photo, error: photoError } = await supabaseAdmin.storage
+          .from("quote-photos")
+          .createSignedUrl(path, 60 * 60);
+        if (photoError) {
+          console.error("Quote photo signing failed", photoError.message);
+          return null;
+        }
+        return photo.signedUrl;
+      }),
+    );
+
+    return { request, notes: notes ?? [], photoUrls: photoUrls.filter((url): url is string => Boolean(url)) };
   });
 
 export const updateRequestStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z
       .object({
         id: z.string().uuid(),
-        status: z.enum(["nouveau", "contacte", "devis_envoye", "gagne", "perdu"]),
+        status: z.enum(["nouveau", "contacte", "devis_envoye", "gagne", "perdu", "à relancer", "traité"]),
       })
       .parse(input),
   )
@@ -236,7 +264,7 @@ export const updateRequestStatus = createServerFn({ method: "POST" })
 
 /** Private: record actual signed/billed revenue and synchronize the Meta conversion event. */
 export const updateRequestRevenue = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z.object({
       id: z.string().uuid(),
@@ -289,7 +317,7 @@ export const updateRequestRevenue = createServerFn({ method: "POST" })
   });
 
 export const addNote = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z
       .object({ requestId: z.string().uuid(), body: z.string().trim().min(1).max(2000) })
@@ -306,7 +334,7 @@ export const addNote = createServerFn({ method: "POST" })
   });
 
 export const deleteRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("quote_requests").delete().eq("id", data.id);
@@ -315,7 +343,7 @@ export const deleteRequest = createServerFn({ method: "POST" })
   });
 
 export const getPricing = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("pricing_settings")
@@ -331,7 +359,7 @@ export const getPricing = createServerFn({ method: "GET" })
   });
 
 export const updatePricing = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z
       .object({

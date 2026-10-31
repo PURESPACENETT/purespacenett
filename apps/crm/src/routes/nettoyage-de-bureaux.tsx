@@ -37,7 +37,7 @@ const PAGE: LocalPageProps = {
     {
       question: "Proposez-vous des contrats réguliers ?",
       answer:
-        "Oui, la plupart de nos clients bureaux sont en contrat d'entretien régulier : quotidien, hebdomadaire ou bimensuel, avec une équipe dédiée.",
+        "Oui, la plupart de nos clients bureaux sont en contrat d'entretien régulier : quotidien, hebdomadaire ou toutes les deux semaines, avec une équipe dédiée.",
     },
     {
       question: "Travaillez-vous en sous-traitance ?",

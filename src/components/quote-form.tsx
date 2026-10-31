@@ -40,7 +40,7 @@ export const serviceTypes = [
 export const frequencies = [
   "Une seule fois",
   "Hebdomadaire",
-  "Bi-mensuel",
+  "Toutes les deux semaines",
   "Mensuel",
 ] as const;
 

@@ -22,7 +22,7 @@ function constantTimeEqual(left: string, right: string) {
   return difference === 0;
 }
 
-async function verifySignature(request: Request, rawBody: Uint8Array): Promise<"valid" | "missing" | "malformed" | "mismatch"> {
+async function verifySignature(request: Request, rawBody: ArrayBuffer): Promise<"valid" | "missing" | "malformed" | "mismatch"> {
   const signature = request.headers.get("x-hub-signature-256");
   if (!signature) return "missing";
   if (!/^sha256=[a-f0-9]{64}$/i.test(signature)) return "malformed";
@@ -107,7 +107,7 @@ Deno.serve(async (request) => {
 
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
-  const rawBody = new Uint8Array(await request.arrayBuffer());
+  const rawBody = await request.arrayBuffer();
   const signatureStatus = await verifySignature(request, rawBody);
   if (signatureStatus !== "valid") {
     // Deliberately log only a fixed classification. Never log the signature, app secret, or body.
@@ -157,7 +157,7 @@ Deno.serve(async (request) => {
             meta_campaign_id: lead.campaign_id ? String(lead.campaign_id) : (value.campaign_id ? String(value.campaign_id) : null),
             meta_adset_id: lead.adset_id ? String(lead.adset_id) : (value.adset_id ? String(value.adset_id) : (value.adgroup_id ? String(value.adgroup_id) : null)),
             meta_ad_id: lead.ad_id ? String(lead.ad_id) : (value.ad_id ? String(value.ad_id) : null),
-            lead_created_at: lead.created_time
+            lead_created_at: typeof lead.created_time === "string" || typeof lead.created_time === "number"
               ? new Date(lead.created_time).toISOString()
               : typeof value.created_time === "number"
                 ? new Date(value.created_time * 1000).toISOString()
