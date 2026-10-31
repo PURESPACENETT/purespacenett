@@ -16,7 +16,8 @@ permissions:
   contents: read
 
 jobs:
-  quality:
+  lint-and-build:
+    name: Lint and build
     runs-on: ubuntu-latest
 
     steps:
