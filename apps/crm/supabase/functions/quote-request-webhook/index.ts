@@ -124,7 +124,9 @@ function estimatePrice(
 type NormalizedQuote = ReturnType<typeof normalize>;
 
 async function enrichExistingQuote(
-  supabase: ReturnType<typeof createClient>,
+  // Deno's ReturnType<typeof createClient> erases its generic database schema
+  // to `never`; the concrete client is created with the runtime schema below.
+  supabase: any,
   id: string,
   data: NormalizedQuote,
 ) {
