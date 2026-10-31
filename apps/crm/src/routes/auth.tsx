@@ -29,15 +29,27 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
+  const [mode, setMode] = useState<"signin" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/app", replace: true });
-    });
+    let active = true;
+    void (async () => {
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+      if (!user) return;
+      const { data: role } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (active && role?.role === "admin") {
+        navigate({ to: "/app", replace: true });
+      }
+    })();
+    return () => { active = false; };
   }, [navigate]);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -51,18 +63,20 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Email de réinitialisation envoyé. Vérifiez votre boîte mail.");
         setMode("signin");
-      } else if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/app` },
-        });
-        if (error) throw error;
-        toast.success("Compte créé. Vérifiez votre boîte mail pour confirmer l'adresse.");
-        setMode("signin");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        const { data: userData } = await supabase.auth.getUser();
+        if (!userData.user) throw new Error("Connexion impossible");
+        const { data: role, error: roleError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userData.user.id)
+          .maybeSingle();
+        if (roleError || role?.role !== "admin") {
+          await supabase.auth.signOut();
+          throw new Error("Ce compte n'a pas d'accès CRM actif.");
+        }
         navigate({ to: "/app", replace: true });
       }
     } catch (error) {
@@ -83,9 +97,7 @@ function AuthPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           {mode === "signin"
             ? "Connectez-vous pour suivre vos demandes."
-            : mode === "signup"
-              ? "Créez votre accès."
-              : "Recevez un lien pour réinitialiser votre mot de passe."}
+            : "Recevez un lien pour réinitialiser votre mot de passe."}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -128,9 +140,7 @@ function AuthPage() {
               ? "..."
               : mode === "signin"
                 ? "Se connecter"
-                : mode === "signup"
-                  ? "Créer mon accès"
-                  : "Envoyer le lien"}
+              : "Envoyer le lien"}
           </Button>
         </form>
 
@@ -143,14 +153,6 @@ function AuthPage() {
             Retour à la connexion
           </button>
         )}
-
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-4 w-full text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-        >
-          {mode === "signin" ? "Pas encore d'accès ? Créer un compte" : "J'ai déjà un accès"}
-        </button>
 
         <Link
           to="/"

@@ -146,14 +146,14 @@ function RequestsPage() {
                       params={{ id: r.id }}
                       className="text-foreground underline-offset-4 hover:underline"
                     >
-                      {r.company_name || r.contact_name}
+                      {r.company_name || r.contact_name || r.full_name || "Demande sans nom"}
                     </Link>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {labelOf(CLIENT_TYPES, r.client_type)}
+                    {labelOf(CLIENT_TYPES, r.client_type ?? "") || "À préciser"}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {r.city} ({r.postal_code})
+                    {r.city || "Ville à préciser"} ({r.postal_code || "—"})
                   </TableCell>
                   <TableCell className="text-muted-foreground">{r.surface_m2} m²</TableCell>
                   <TableCell>

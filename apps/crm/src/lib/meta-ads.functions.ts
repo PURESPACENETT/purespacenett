@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseStaff } from "@/integrations/supabase/staff-middleware";
 
 type InsightRow = {
   date: string;
@@ -11,7 +11,7 @@ type InsightRow = {
 };
 
 export const listMetaAdsPerformance = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
     const metaDb = context.supabase as unknown as SupabaseClient;
     const end = new Date();

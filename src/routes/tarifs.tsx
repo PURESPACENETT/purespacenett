@@ -49,7 +49,7 @@ const grid = [
   {
     title: "Vitrerie",
     unit: "Au m² de vitrage ou au forfait",
-    text: "Vitrines de commerce en abonnement hebdomadaire ou bimensuel, baies vitrées au forfait.",
+    text: "Vitrines de commerce en abonnement hebdomadaire ou toutes les deux semaines, baies vitrées au forfait.",
   },
   {
     title: "Textiles et véhicules",

@@ -11,7 +11,7 @@ const quoteImportSchema = z.object({
   clientType: z.enum(["entreprise", "sous_traitance", "particulier"]),
   propertyType: z.string().trim().min(1).max(80),
   surfaceM2: z.coerce.number().int().min(1).max(200000),
-  frequency: z.enum(["ponctuel", "hebdomadaire", "plusieurs_semaine", "quotidien", "contrat_annuel"]),
+  frequency: z.enum(["ponctuel", "hebdomadaire", "plusieurs_semaine", "mensuel", "toutes_les_deux_semaines", "quotidien", "contrat_annuel"]),
   services: z.array(z.string().trim().min(1).max(120)).min(1).max(10),
   city: z.string().trim().min(1).max(120),
   postalCode: z.string().trim().min(4).max(10),
@@ -157,22 +157,6 @@ export const Route = createFileRoute("/api/public/hooks/quote-request")({
         }
 
         const data = parsed.data;
-        const { data: existing, error: lookupError } = await supabaseAdmin
-          .from("quote_requests")
-          .select("id")
-          .eq("source_system", "purespacenett_site")
-          .eq("source_external_id", data.sourceExternalId)
-          .maybeSingle();
-
-        if (lookupError) {
-          console.error("Quote import lookup failed", lookupError.message);
-          return Response.json({ error: "Vérification impossible" }, { status: 500, headers });
-        }
-
-        if (existing) {
-          return Response.json({ ok: true, id: existing.id, duplicate: true }, { status: 200, headers });
-        }
-
         const { data: pricingRow } = await supabaseAdmin
           .from("pricing_settings")
           .select("*")
@@ -197,51 +181,32 @@ export const Route = createFileRoute("/api/public/hooks/quote-request")({
           surfaceM2: data.surfaceM2,
           services: services as never,
         });
+        const quoteFields = {
+          full_name: data.contactName,
+          source_system: "purespacenett_site",
+          source_external_id: data.sourceExternalId,
+          client_type: data.clientType,
+          property_type: propertyType,
+          surface_m2: data.surfaceM2,
+          frequency: data.frequency,
+          services,
+          city: data.city,
+          postal_code: data.postalCode,
+          desired_date: data.desiredDate || null,
+          contact_name: data.contactName,
+          company_name: data.companyName || null,
+          email: data.email,
+          phone: data.phone,
+          message: data.message || null,
+          estimate_min: estimate.min,
+          estimate_max: estimate.max,
+          score,
+        };
 
-        const { data: inserted, error } = await supabaseAdmin
-          .from("quote_requests")
-          .insert({
-            source_system: "purespacenett_site",
-            source_external_id: data.sourceExternalId,
-            client_type: data.clientType,
-            property_type: propertyType,
-            surface_m2: data.surfaceM2,
-            frequency: data.frequency,
-            services,
-            city: data.city,
-            postal_code: data.postalCode,
-            desired_date: data.desiredDate || null,
-            contact_name: data.contactName,
-            company_name: data.companyName || null,
-            email: data.email,
-            phone: data.phone,
-            message: data.message || null,
-            estimate_min: estimate.min,
-            estimate_max: estimate.max,
-            score,
-          })
-          .select("id")
-          .single();
-
-        if (error) {
-          if (error.code === "23505") {
-            const { data: duplicate } = await supabaseAdmin
-              .from("quote_requests")
-              .select("id")
-              .eq("source_system", "purespacenett_site")
-              .eq("source_external_id", data.sourceExternalId)
-              .maybeSingle();
-            if (duplicate) {
-              return Response.json({ ok: true, id: duplicate.id, duplicate: true }, { status: 200, headers });
-            }
-          }
-          console.error("Quote import insert failed", error.message);
-          return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers });
-        }
-
-        try {
-          const { qualifyAndStore } = await import("@/lib/quote-ai.server");
-          await qualifyAndStore(inserted.id, {
+        const qualify = async (id: string) => {
+          try {
+            const { qualifyAndStore } = await import("@/lib/quote-ai.server");
+            await qualifyAndStore(id, {
             clientType: data.clientType,
             propertyType,
             surfaceM2: data.surfaceM2,
@@ -256,10 +221,69 @@ export const Route = createFileRoute("/api/public/hooks/quote-request")({
             message: data.message || null,
             estimateMin: estimate.min,
             estimateMax: estimate.max,
-          });
-        } catch (aiError) {
-          console.error("Imported quote AI qualification failed", aiError);
+            });
+          } catch (aiError) {
+            console.error("Imported quote AI qualification failed", aiError);
+          }
+        };
+
+        const { data: existing, error: lookupError } = await supabaseAdmin
+          .from("quote_requests")
+          .select("id,ai_generated_at,ai_summary")
+          .eq("source_system", "purespacenett_site")
+          .eq("source_external_id", data.sourceExternalId)
+          .maybeSingle();
+
+        if (lookupError) {
+          console.error("Quote import lookup failed", lookupError.message);
+          return Response.json({ error: "Vérification impossible" }, { status: 500, headers });
         }
+
+        if (existing) {
+          const { error: updateError } = await supabaseAdmin
+            .from("quote_requests")
+            .update(quoteFields)
+            .eq("id", existing.id);
+          if (updateError) {
+            console.error("Existing quote enrichment failed", updateError.message);
+            return Response.json({ error: "Complément de la demande impossible" }, { status: 500, headers });
+          }
+          if (!existing.ai_generated_at && !existing.ai_summary) await qualify(existing.id);
+          return Response.json({ ok: true, id: existing.id, duplicate: true, enriched: true, estimate, score }, { status: 200, headers });
+        }
+
+        const { data: inserted, error } = await supabaseAdmin
+          .from("quote_requests")
+          .insert(quoteFields)
+          .select("id")
+          .single();
+
+        if (error) {
+          if (error.code === "23505") {
+            const { data: duplicate } = await supabaseAdmin
+              .from("quote_requests")
+              .select("id,ai_generated_at,ai_summary")
+              .eq("source_system", "purespacenett_site")
+              .eq("source_external_id", data.sourceExternalId)
+              .maybeSingle();
+            if (duplicate) {
+              const { error: updateError } = await supabaseAdmin
+                .from("quote_requests")
+                .update(quoteFields)
+                .eq("id", duplicate.id);
+              if (updateError) {
+                console.error("Conflicting quote enrichment failed", updateError.message);
+                return Response.json({ error: "Complément de la demande impossible" }, { status: 500, headers });
+              }
+              if (!duplicate.ai_generated_at && !duplicate.ai_summary) await qualify(duplicate.id);
+              return Response.json({ ok: true, id: duplicate.id, duplicate: true, enriched: true, estimate, score }, { status: 200, headers });
+            }
+          }
+          console.error("Quote import insert failed", error.message);
+          return Response.json({ error: "Enregistrement impossible" }, { status: 500, headers });
+        }
+
+        await qualify(inserted.id);
 
         return Response.json(
           { ok: true, id: inserted.id, estimate, score },

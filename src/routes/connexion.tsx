@@ -35,11 +35,9 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs = 15000): Promise<T
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -74,7 +72,6 @@ function LoginPage() {
   const signInWithGoogle = async () => {
     setLoading(true);
     setError(null);
-    setInfo(null);
     try {
       const { error } = await withTimeout(
         supabase.auth.signInWithOAuth({
@@ -101,35 +98,12 @@ function LoginPage() {
     e.preventDefault();
     if (email.trim().toLowerCase() !== OWNER_EMAIL) {
       setError("Cette interface est réservée au compte propriétaire du site.");
-      setInfo(null);
       return;
     }
     setLoading(true);
     setError(null);
-    setInfo(null);
 
     try {
-      if (mode === "signup") {
-        const { error } = await withTimeout(
-          supabase.auth.signUp({
-            email,
-            password,
-            options: { emailRedirectTo: window.location.origin + "/connexion" },
-          }),
-        );
-
-        if (error) {
-          setError("Création impossible : " + error.message);
-          return;
-        }
-
-        setMode("signin");
-        setInfo(
-          "Compte créé. Ouvrez l'e-mail de confirmation que nous venons de vous envoyer, puis connectez-vous.",
-        );
-        return;
-      }
-
       const { data, error } = await withTimeout(
         supabase.auth.signInWithPassword({ email, password }),
       );
@@ -228,7 +202,7 @@ function LoginPage() {
             type="password"
             required
             minLength={8}
-            autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -238,23 +212,9 @@ function LoginPage() {
           disabled={loading}
           className="mt-6 w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
         >
-          {loading ? "Patientez…" : mode === "signup" ? "Créer mon compte" : "Se connecter"}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMode(mode === "signup" ? "signin" : "signup");
-            setError(null);
-            setInfo(null);
-          }}
-          className="mt-3 w-full text-xs text-muted-foreground underline underline-offset-4"
-        >
-          {mode === "signup"
-            ? "J'ai déjà un compte — me connecter"
-            : "Première visite ? Créer mon compte"}
+          {loading ? "Patientez…" : "Se connecter"}
         </button>
         {error && <p className="mt-3 text-xs text-destructive">{error}</p>}
-        {info && <p className="mt-3 text-xs text-primary">{info}</p>}
       </form>
     </Section>
   );

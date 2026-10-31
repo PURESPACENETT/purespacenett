@@ -347,30 +347,32 @@ export type Database = {
           ai_summary: string | null
           ai_urgency: string | null
           actual_revenue: number | null
-          city: string
-          client_type: Database["public"]["Enums"]["client_type"]
+          city: string | null
+          client_type: Database["public"]["Enums"]["client_type"] | null
           company_name: string | null
-          contact_name: string
+          contact_name: string | null
           created_at: string
+          full_name: string | null
           desired_date: string | null
           email: string
           estimate_max: number
           estimate_min: number
-          frequency: string
+          frequency: string | null
           id: string
           last_contacted_at: string | null
           message: string | null
           phone: string
-          postal_code: string
-          property_type: string
+          photo_paths: string[]
+          postal_code: string | null
+          property_type: string | null
           review_requested_at: string | null
           rooms: number | null
           score: number
           services: string[]
           source_external_id: string | null
           source_system: string | null
-          status: Database["public"]["Enums"]["request_status"]
-          surface_m2: number
+          status: string
+          surface_m2: number | null
           updated_at: string
         }
         Insert: {
@@ -380,30 +382,32 @@ export type Database = {
           ai_summary?: string | null
           ai_urgency?: string | null
           actual_revenue?: number | null
-          city: string
-          client_type: Database["public"]["Enums"]["client_type"]
+          city?: string | null
+          client_type?: Database["public"]["Enums"]["client_type"] | null
           company_name?: string | null
-          contact_name: string
+          contact_name?: string | null
           created_at?: string
+          full_name?: string | null
           desired_date?: string | null
           email: string
           estimate_max?: number
           estimate_min?: number
-          frequency: string
+          frequency?: string | null
           id?: string
           last_contacted_at?: string | null
           message?: string | null
           phone: string
-          postal_code: string
-          property_type: string
+          photo_paths?: string[]
+          postal_code?: string | null
+          property_type?: string | null
           review_requested_at?: string | null
           rooms?: number | null
           score?: number
           services?: string[]
           source_external_id?: string | null
           source_system?: string | null
-          status?: Database["public"]["Enums"]["request_status"]
-          surface_m2?: number
+          status?: string
+          surface_m2?: number | null
           updated_at?: string
         }
         Update: {
@@ -413,30 +417,32 @@ export type Database = {
           ai_summary?: string | null
           ai_urgency?: string | null
           actual_revenue?: number | null
-          city?: string
-          client_type?: Database["public"]["Enums"]["client_type"]
+          city?: string | null
+          client_type?: Database["public"]["Enums"]["client_type"] | null
           company_name?: string | null
-          contact_name?: string
+          contact_name?: string | null
           created_at?: string
+          full_name?: string | null
           desired_date?: string | null
           email?: string
           estimate_max?: number
           estimate_min?: number
-          frequency?: string
+          frequency?: string | null
           id?: string
           last_contacted_at?: string | null
           message?: string | null
           phone?: string
-          postal_code?: string
-          property_type?: string
+          photo_paths?: string[]
+          postal_code?: string | null
+          property_type?: string | null
           review_requested_at?: string | null
           rooms?: number | null
           score?: number
           services?: string[]
           source_external_id?: string | null
           source_system?: string | null
-          status?: Database["public"]["Enums"]["request_status"]
-          surface_m2?: number
+          status?: string
+          surface_m2?: number | null
           updated_at?: string
         }
         Relationships: []

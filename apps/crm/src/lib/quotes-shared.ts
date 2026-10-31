@@ -19,6 +19,8 @@ export const FREQUENCIES = [
   { value: "ponctuel", label: "Ponctuel (une seule fois)" },
   { value: "hebdomadaire", label: "1 fois par semaine" },
   { value: "plusieurs_semaine", label: "Plusieurs fois par semaine" },
+  { value: "mensuel", label: "Mensuel" },
+  { value: "toutes_les_deux_semaines", label: "Toutes les deux semaines" },
   { value: "quotidien", label: "Tous les jours" },
   { value: "contrat_annuel", label: "Contrat annuel" },
 ] as const;
@@ -37,6 +39,8 @@ export const STATUSES = [
   { value: "devis_envoye", label: "Devis envoyé" },
   { value: "gagne", label: "Gagné" },
   { value: "perdu", label: "Perdu" },
+  { value: "à relancer", label: "À relancer" },
+  { value: "traité", label: "Traité" },
 ] as const;
 
 export type StatusValue = (typeof STATUSES)[number]["value"];
@@ -57,6 +61,8 @@ export const quoteRequestSchema = z.object({
     "ponctuel",
     "hebdomadaire",
     "plusieurs_semaine",
+    "mensuel",
+    "toutes_les_deux_semaines",
     "quotidien",
     "contrat_annuel",
   ]),
@@ -276,7 +282,14 @@ export function estimatePrice(
   return { min: rounded, max: rounded };
 }
 
-const RECURRING = new Set(["hebdomadaire", "plusieurs_semaine", "quotidien", "contrat_annuel"]);
+const RECURRING = new Set([
+  "hebdomadaire",
+  "plusieurs_semaine",
+  "mensuel",
+  "toutes_les_deux_semaines",
+  "quotidien",
+  "contrat_annuel",
+]);
 
 export function scoreRequest(
   input: Pick<QuoteRequestInput, "clientType" | "frequency" | "surfaceM2" | "services">,

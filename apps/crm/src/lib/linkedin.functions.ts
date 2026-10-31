@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSupabaseStaff } from "@/integrations/supabase/staff-middleware";
 
 const statusEnum = z.enum(["a_contacter", "contacte", "interesse", "converti", "ecarte"]);
 
 export const listLinkedInContacts = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("linkedin_contacts")
@@ -18,7 +18,7 @@ export const listLinkedInContacts = createServerFn({ method: "GET" })
   });
 
 export const addLinkedInContact = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -51,7 +51,7 @@ export const addLinkedInContact = createServerFn({ method: "POST" })
 
 /** Moves a LinkedIn contact along the pipeline; alerts the owner on "Contacté". */
 export const updateLinkedInContactStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) =>
     z.object({ id: z.string().uuid(), status: statusEnum }).parse(input),
   )
@@ -97,7 +97,7 @@ export const updateLinkedInContactStatus = createServerFn({ method: "POST" })
   });
 
 export const deleteLinkedInContact = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSupabaseStaff])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase

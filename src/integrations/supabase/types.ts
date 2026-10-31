@@ -274,8 +274,13 @@ export type Database = {
           company_name: string | null
           contact_name: string | null
           created_at: string
+          crm_delivered_at: string | null
+          crm_delivery_status: string
+          delivery_attempts: number
           desired_date: string | null
           email: string
+          email_delivered_at: string | null
+          email_delivery_status: string
           estimate_max: number
           estimate_min: number
           frequency: string | null
@@ -284,11 +289,15 @@ export type Database = {
           gclid: string | null
           id: string
           landing_page: string | null
+          last_delivery_attempt_at: string | null
+          last_delivery_error: string | null
           last_contacted_at: string | null
           message: string | null
           phone: string
+          photo_paths: string[]
           postal_code: string | null
           property_type: string | null
+          request_id: string | null
           referrer: string | null
           review_requested_at: string | null
           rooms: number | null
@@ -320,8 +329,13 @@ export type Database = {
           company_name?: string | null
           contact_name?: string | null
           created_at?: string
+          crm_delivered_at?: string | null
+          crm_delivery_status?: string
+          delivery_attempts?: number
           desired_date?: string | null
           email: string
+          email_delivered_at?: string | null
+          email_delivery_status?: string
           estimate_max?: number
           estimate_min?: number
           frequency?: string | null
@@ -330,11 +344,15 @@ export type Database = {
           gclid?: string | null
           id?: string
           landing_page?: string | null
+          last_delivery_attempt_at?: string | null
+          last_delivery_error?: string | null
           last_contacted_at?: string | null
           message?: string | null
           phone: string
+          photo_paths?: string[]
           postal_code?: string | null
           property_type?: string | null
+          request_id?: string | null
           referrer?: string | null
           review_requested_at?: string | null
           rooms?: number | null
@@ -366,8 +384,13 @@ export type Database = {
           company_name?: string | null
           contact_name?: string | null
           created_at?: string
+          crm_delivered_at?: string | null
+          crm_delivery_status?: string
+          delivery_attempts?: number
           desired_date?: string | null
           email?: string
+          email_delivered_at?: string | null
+          email_delivery_status?: string
           estimate_max?: number
           estimate_min?: number
           frequency?: string | null
@@ -376,11 +399,15 @@ export type Database = {
           gclid?: string | null
           id?: string
           landing_page?: string | null
+          last_delivery_attempt_at?: string | null
+          last_delivery_error?: string | null
           last_contacted_at?: string | null
           message?: string | null
           phone?: string
+          photo_paths?: string[]
           postal_code?: string | null
           property_type?: string | null
+          request_id?: string | null
           referrer?: string | null
           review_requested_at?: string | null
           rooms?: number | null

@@ -40,6 +40,123 @@ function isUuid(value: unknown) {
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(value);
 }
 
+function isFrenchPublicHoliday(value?: string | null): boolean {
+  if (!value) return false;
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return false;
+  const monthDay = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  if (["01-01", "05-01", "05-08", "07-14", "08-15", "11-01", "11-11", "12-25"].includes(monthDay)) return true;
+
+  const year = date.getFullYear();
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  const easter = new Date(year, month - 1, day);
+  const daysAfterEaster = Math.round((date.getTime() - easter.getTime()) / 86_400_000);
+  return daysAfterEaster === 1 || daysAfterEaster === 39 || daysAfterEaster === 50;
+}
+
+function estimatePrice(
+  input: { surface_m2: number; property_type: string; frequency: string; services: string[]; desired_date: string | null },
+  settings: Record<string, unknown> | null,
+): { min: number; max: number } {
+  const minPrice = Number(settings?.min_price ?? 50);
+  const raw = settings?.service_surcharges && typeof settings.service_surcharges === "object"
+    ? settings.service_surcharges as Record<string, unknown>
+    : {};
+  const hourly = raw.hourly_rates && typeof raw.hourly_rates === "object" ? raw.hourly_rates as Record<string, number> : {};
+  const productivity = raw.productivity_m2_per_hour && typeof raw.productivity_m2_per_hour === "object"
+    ? raw.productivity_m2_per_hour as Record<string, number>
+    : {};
+  const perM2 = raw.per_m2_rates && typeof raw.per_m2_rates === "object" ? raw.per_m2_rates as Record<string, number> : {};
+  const textileRanges = raw.textile_ranges && typeof raw.textile_ranges === "object"
+    ? Object.values(raw.textile_ranges as Record<string, { min?: number; max?: number }>)
+    : [];
+  const has = (service: string) => input.services.includes(service);
+  const surface = Math.max(1, input.surface_m2);
+
+  if (has("vitrerie")) {
+    return {
+      min: Math.round(Math.max(minPrice, surface * Number(perM2.vitrerie_min ?? 5)) / 5) * 5,
+      max: Math.round(Math.max(minPrice, surface * Number(perM2.vitrerie_max ?? 9)) / 5) * 5,
+    };
+  }
+  if (has("textile")) {
+    const mins = textileRanges.map((range) => Number(range.min ?? 45));
+    const maxs = textileRanges.map((range) => Number(range.max ?? 160));
+    return {
+      min: Math.max(minPrice, mins.length ? Math.min(...mins) : 45),
+      max: Math.max(minPrice, maxs.length ? Math.max(...maxs) : 160),
+    };
+  }
+
+  const technical = has("fin_de_chantier") || has("remise_en_etat") || has("desinfection") || input.property_type === "chantier";
+  const complex = has("forte_salissure") || has("complexe");
+  const tier = complex ? "complexe" : technical ? "technique" : input.frequency === "ponctuel" ? "ponctuel" : "entretien";
+  const date = input.desired_date ? new Date(`${input.desired_date}T00:00:00`) : null;
+  const specialRate = isFrenchPublicHoliday(input.desired_date)
+    ? Number(hourly.ferie ?? 32)
+    : date && !Number.isNaN(date.getTime()) && date.getDay() === 0
+      ? Number(hourly.dimanche ?? 32)
+      : 0;
+  const defaultHourly: Record<string, number> = { entretien: 25, ponctuel: 30, technique: 35, complexe: 40 };
+  const hourlyRate = Math.max(Number(hourly[tier] ?? defaultHourly[tier] ?? 25), specialRate);
+  const productivityRate = complex
+    ? Number(productivity.complexe ?? 15)
+    : technical
+      ? Number(productivity.chantier ?? 15)
+      : Number(productivity.standard ?? 20);
+  const rounded = Math.round(Math.max(minPrice, surface * (hourlyRate / productivityRate)) / 5) * 5;
+  return { min: rounded, max: rounded };
+}
+
+type NormalizedQuote = ReturnType<typeof normalize>;
+
+async function enrichExistingQuote(
+  supabase: ReturnType<typeof createClient>,
+  id: string,
+  data: NormalizedQuote,
+) {
+  const { data: updated, error } = await supabase
+    .from("quote_requests")
+    .update({
+      full_name: data.full_name,
+      client_type: data.client_type,
+      property_type: data.property_type,
+      surface_m2: data.surface_m2,
+      rooms: data.rooms,
+      frequency: data.frequency,
+      services: data.services,
+      city: data.city,
+      postal_code: data.postal_code,
+      desired_date: data.desired_date,
+      contact_name: data.contact_name,
+      company_name: data.company_name,
+      email: data.email,
+      phone: data.phone,
+      message: data.message,
+      estimate_min: data.estimate_min,
+      estimate_max: data.estimate_max,
+      score: data.score,
+    })
+    .eq("id", id)
+    .select("id,status,created_at,estimate_min,estimate_max,score")
+    .single();
+  if (error) throw new Error("Unable to enrich existing quote request.");
+  return updated;
+}
+
 function normalize(body: Record<string, unknown>) {
   const clientType = body.clientType ?? body.client_type ?? "entreprise";
   const propertyType = body.propertyType ?? body.property_type ?? "autre";
@@ -59,7 +176,7 @@ function normalize(body: Record<string, unknown>) {
 
   const validClientTypes = ["entreprise", "sous_traitance", "particulier"];
   const validPropertyTypes = ["bureaux", "commerce", "immeuble", "chantier", "logement", "autre"];
-  const validFrequencies = ["ponctuel", "hebdomadaire", "plusieurs_semaine", "quotidien", "contrat_annuel"];
+  const validFrequencies = ["ponctuel", "hebdomadaire", "plusieurs_semaine", "mensuel", "toutes_les_deux_semaines", "quotidien", "contrat_annuel"];
   const validServices = ["nettoyage_courant", "vitrerie", "remise_en_etat", "fin_de_chantier", "desinfection"];
 
   if (!validClientTypes.includes(String(clientType))) throw new Error("clientType invalide");
@@ -96,11 +213,14 @@ function normalize(body: Record<string, unknown>) {
     ? services.map(String).filter((service) => validServices.includes(service))
     : [];
 
-  const score =
-    (String(clientType) === "entreprise" || String(clientType) === "sous_traitance" ? 20 : 10) +
-    Math.min(30, Math.round(surface / 100)) +
-    (String(frequency) === "quotidien" || String(frequency) === "contrat_annuel" ? 25 : 10) +
-    normalizedServices.length * 5;
+  let score = 20;
+  if (clientType === "entreprise") score += 25;
+  if (clientType === "sous_traitance") score += 20;
+  if (["hebdomadaire", "plusieurs_semaine", "mensuel", "toutes_les_deux_semaines", "quotidien", "contrat_annuel"].includes(String(frequency))) score += 25;
+  if (frequency === "contrat_annuel" || frequency === "quotidien") score += 10;
+  if (surface >= 200) score += 10;
+  if (surface >= 800) score += 10;
+  if (normalizedServices.length > 1) score += 5;
 
   return {
     full_name: String(contactName).trim(),
@@ -121,7 +241,7 @@ function normalize(body: Record<string, unknown>) {
     source_external_id: sourceExternalId ? String(sourceExternalId) : null,
     estimate_min: 0,
     estimate_max: 0,
-    score,
+    score: Math.min(100, score),
     status: "nouveau",
   };
 }
@@ -220,6 +340,15 @@ Deno.serve(async (request) => {
     }
 
     const data = normalize(body as Record<string, unknown>);
+    const { data: pricingRow, error: pricingError } = await supabase
+      .from("pricing_settings")
+      .select("min_price,service_surcharges")
+      .eq("id", "00000000-0000-0000-0000-000000000001")
+      .maybeSingle();
+    if (pricingError) console.error("Quote pricing lookup failed", pricingError.message);
+    const estimate = estimatePrice(data, pricingRow as Record<string, unknown> | null);
+    data.estimate_min = estimate.min;
+    data.estimate_max = estimate.max;
 
     if (data.source_external_id) {
       const { data: existing, error: existingError } = await supabase
@@ -234,7 +363,13 @@ Deno.serve(async (request) => {
       }
 
       if (existing) {
-        return json({ ok: true, duplicate: true, request: existing }, 200, origin);
+        try {
+          const enriched = await enrichExistingQuote(supabase, existing.id, data);
+          return json({ ok: true, duplicate: true, enriched: true, request: enriched }, 200, origin);
+        } catch (enrichmentError) {
+          console.error("quote_requests enrichment failed", enrichmentError);
+          return json({ ok: false, error: "Impossible de compléter la demande CRM" }, 500, origin);
+        }
       }
     }
 
@@ -253,7 +388,13 @@ Deno.serve(async (request) => {
           .maybeSingle();
 
         if (!existingError && existing) {
-          return json({ ok: true, duplicate: true, request: existing }, 200, origin);
+          try {
+            const enriched = await enrichExistingQuote(supabase, existing.id, data);
+            return json({ ok: true, duplicate: true, enriched: true, request: enriched }, 200, origin);
+          } catch (enrichmentError) {
+            console.error("quote_requests enrichment after conflict failed", enrichmentError);
+            return json({ ok: false, error: "Impossible de compléter la demande CRM" }, 500, origin);
+          }
         }
       }
 
