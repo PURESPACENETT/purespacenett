@@ -46,7 +46,7 @@ jobs:
           deno-version: v2.x
 
       - name: Check Google reviews function
-        run: deno check supabase/functions/google-reviews-sync/index.ts
+        run: deno check --config supabase/functions/google-reviews-sync/deno.json supabase/functions/google-reviews-sync/index.ts
 
       - name: Check Meta Ads function
         run: deno check --config supabase/functions/meta-ads-sync/deno.json supabase/functions/meta-ads-sync/index.ts
