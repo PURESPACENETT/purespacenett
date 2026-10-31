@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - "apps/crm/**"
+      - "supabase/migrations/**"
       - ".github/workflows/crm-ci.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/crm/**"
+      - "supabase/migrations/**"
       - ".github/workflows/crm-ci.yml"
   workflow_dispatch:
 
