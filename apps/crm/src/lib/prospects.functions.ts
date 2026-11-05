@@ -160,7 +160,7 @@ async function autoPrepare(
 /** Runs one bounded prospect search and stores the new companies found. */
 export const searchProspects = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => prospectSearchSchema.parse(input))
+  .validator((input: unknown) => prospectSearchSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { searchLocalBusinesses } = await import("./prospect-search.server");
     const { prospects: found, center } = await searchLocalBusinesses(
@@ -247,7 +247,7 @@ export const listProspects = createServerFn({ method: "GET" })
 
 export const updateProspectStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), status: statusEnum }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -281,7 +281,7 @@ export const updateProspectStatus = createServerFn({ method: "POST" })
 
 export const updateProspect = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => prospectPatchSchema.parse(input))
+  .validator((input: unknown) => prospectPatchSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error: readError } = await context.supabase
       .from("prospects")
@@ -317,7 +317,7 @@ export const updateProspect = createServerFn({ method: "POST" })
 /** Generates alternatives for review. Only saveOutreach persists a chosen draft. */
 export const generateOutreach = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error: readError } = await context.supabase
       .from("prospects")
@@ -346,7 +346,7 @@ export const generateOutreach = createServerFn({ method: "POST" })
 
 export const saveOutreach = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => outreachDraftSchema.parse(input))
+  .validator((input: unknown) => outreachDraftSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("prospects")
@@ -362,7 +362,7 @@ export const saveOutreach = createServerFn({ method: "POST" })
 /** Sends the reviewed outreach email. Nothing is ever sent without this call. */
 export const sendOutreach = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error: readError } = await context.supabase
       .from("prospects")
@@ -477,7 +477,7 @@ export const sendOutreach = createServerFn({ method: "POST" })
 /** Imports a pasted list: one company per line — Nom; email; téléphone; ville */
 export const importProspects = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ text: z.string().trim().min(2).max(20000) }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -559,7 +559,7 @@ export const importProspects = createServerFn({ method: "POST" })
 /** Reads the company website and returns every public address found. */
 export const scanProspectWebsite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error: readError } = await context.supabase
       .from("prospects")
@@ -598,7 +598,7 @@ export const scanProspectWebsite = createServerFn({ method: "POST" })
 /** Looks for a professional email on the website, and the contact to address via Clay. */
 export const findProspectEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error: readError } = await context.supabase
       .from("prospects")
@@ -667,7 +667,7 @@ export const findProspectEmail = createServerFn({ method: "POST" })
 
 export const deleteProspect = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("prospects").delete().eq("id", data.id);
     if (error) throw new Error(error.message);

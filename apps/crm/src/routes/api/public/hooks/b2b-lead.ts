@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { quoteRequestSchema } from "@/lib/quotes-shared";
 import { submitQuoteRequest } from "@/lib/quotes.functions";
+import { secretMatches } from "@/lib/secret-compare.server";
 
 const secretSchema = z.string().min(32).max(256);
 
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/api/public/hooks/b2b-lead")({
       POST: async ({ request }) => {
         const expected = process.env["B2B_LEAD_WEBHOOK_SECRET"] ?? "";
         const provided = request.headers.get("x-b2b-lead-secret") ?? "";
-        if (!expected || !secretSchema.safeParse(expected).success || !(await import("@/lib/secret-compare.server")).secretMatches(provided, [expected])) {
+        if (!expected || !secretSchema.safeParse(expected).success || !secretMatches(provided, [expected])) {
           return Response.json({ error: "unauthorized" }, { status: 401 });
         }
 

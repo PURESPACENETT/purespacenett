@@ -100,7 +100,7 @@ export const listTodayProspectTasks = createServerFn({ method: "GET" })
 
 export const getProspectCrmDetail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const [{ data: prospect, error: prospectError }, { data: tasks, error: tasksError }, { data: activities, error: activitiesError }] =
       await Promise.all([
@@ -129,7 +129,7 @@ export const getProspectCrmDetail = createServerFn({ method: "GET" })
 
 export const createProspectTask = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       prospectId: z.string().uuid(),
       title: z.string().trim().min(2).max(200),
@@ -168,7 +168,7 @@ export const createProspectTask = createServerFn({ method: "POST" })
 
 export const completeProspectTask = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: task, error: readError } = await context.supabase
       .from("prospect_tasks")
@@ -201,7 +201,7 @@ export const completeProspectTask = createServerFn({ method: "POST" })
 
 export const deleteProspectTask = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("prospect_tasks").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -210,7 +210,7 @@ export const deleteProspectTask = createServerFn({ method: "POST" })
 
 export const addProspectNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       prospectId: z.string().uuid(),
       body: z.string().trim().min(2).max(4000),
@@ -229,7 +229,7 @@ export const addProspectNote = createServerFn({ method: "POST" })
 
 export const updateProspectOpportunityType = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), opportunityType: opportunityEnum.nullable() }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -243,7 +243,7 @@ export const updateProspectOpportunityType = createServerFn({ method: "POST" })
 
 export const setProspectDoNotContact = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       id: z.string().uuid(),
       doNotContact: z.boolean(),
@@ -277,7 +277,7 @@ export const setProspectDoNotContact = createServerFn({ method: "POST" })
 
 export const updateProspectLossReason = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), lossReason: z.string().trim().max(500).nullable() }).parse(input),
   )
   .handler(async ({ data, context }) => {

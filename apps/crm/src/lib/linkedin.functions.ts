@@ -19,7 +19,7 @@ export const listLinkedInContacts = createServerFn({ method: "GET" })
 
 export const addLinkedInContact = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         fullName: z.string().trim().min(2).max(120),
@@ -52,7 +52,7 @@ export const addLinkedInContact = createServerFn({ method: "POST" })
 /** Moves a LinkedIn contact along the pipeline; alerts the owner on "Contacté". */
 export const updateLinkedInContactStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), status: statusEnum }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -98,7 +98,7 @@ export const updateLinkedInContactStatus = createServerFn({ method: "POST" })
 
 export const deleteLinkedInContact = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("linkedin_contacts")

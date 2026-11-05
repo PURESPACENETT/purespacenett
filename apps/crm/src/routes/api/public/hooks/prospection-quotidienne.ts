@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { providedCronSecret, secretMatches } from "@/lib/secret-compare.server";
 
 /**
  * Daily automatic prospecting round, triggered by the scheduler.
@@ -8,7 +9,6 @@ export const Route = createFileRoute("/api/public/hooks/prospection-quotidienne"
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { secretMatches, providedCronSecret } = await import("@/lib/secret-compare.server");
         const accepted = [
           process.env["PROSPECTION_CRON_SECRET"],
           process.env["CRON_SECRET"],

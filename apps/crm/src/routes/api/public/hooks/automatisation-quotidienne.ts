@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { providedCronSecret, secretMatches } from "@/lib/secret-compare.server";
 
 export const Route = createFileRoute("/api/public/hooks/automatisation-quotidienne")({
   server: {
@@ -13,7 +14,6 @@ export const Route = createFileRoute("/api/public/hooks/automatisation-quotidien
           },
         }),
       POST: async ({ request }) => {
-        const { secretMatches, providedCronSecret } = await import("@/lib/secret-compare.server");
         const accepted = [
           process.env["AUTOMATION_CRON_SECRET"],
           process.env["CRON_SECRET"],
