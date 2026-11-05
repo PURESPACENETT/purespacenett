@@ -15,9 +15,10 @@
 5. Ne jamais versionner de secrets ou de variables d'environnement réelles.
 6. Ne pas effectuer de migration destructive sans vérification explicite.
 7. Pour le CRM, travailler sous `apps/crm/` ; ne pas réintroduire l'ancien dépôt comme application parallèle.
-8. Ne pas utiliser Lovable comme outil de développement de référence pour ce projet. GitHub/Codex est le flux de développement retenu.
-9. Préserver l'historique Git déjà publié : pas de force push, rebase ou réécriture de commits publiés.
-10. Lorsqu'une décision métier manque et peut changer le comportement attendu, la faire remonter à ChatGPT plutôt que l'inventer.
+8. Les migrations SQL actives sont uniquement dans `supabase/migrations/` à la racine. `apps/crm/supabase/functions/` conserve les sources de fonctions Edge ; les anciens historiques Drizzle/Supabase sous `apps/crm/archive/` sont des archives en lecture seule, jamais une cible de déploiement.
+9. Ne pas utiliser Lovable comme outil de développement de référence pour ce projet. GitHub/Codex est le flux de développement retenu.
+10. Préserver l'historique Git déjà publié : pas de force push, rebase ou réécriture de commits publiés.
+11. Lorsqu'une décision métier manque et peut changer le comportement attendu, la faire remonter à ChatGPT plutôt que l'inventer.
 
 ## Validation
 
