@@ -63,6 +63,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Enforce one active migration history
+        run: |
+          test -d supabase/migrations
+          test ! -d apps/crm/drizzle/migrations
+          test ! -d apps/crm/supabase/migrations
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v3
         with:
