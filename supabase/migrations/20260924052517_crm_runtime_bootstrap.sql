@@ -130,6 +130,10 @@ CREATE TABLE IF NOT EXISTS public.prospects (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
+ALTER TABLE public.quote_requests
+  ADD COLUMN IF NOT EXISTS source_system text,
+  ADD COLUMN IF NOT EXISTS source_external_id uuid;
+
 ALTER TABLE public.prospects
   ADD COLUMN IF NOT EXISTS opportunity_type public.opportunity_type,
   ADD COLUMN IF NOT EXISTS loss_reason text,
