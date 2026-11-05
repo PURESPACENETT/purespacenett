@@ -1,0 +1,3 @@
+-- Historical Supabase ledger version retained for reproducibility.
+-- The canonical Meta baseline immediately before this version already creates
+-- the current tables, RLS policies, indexes, and restricted trigger function.

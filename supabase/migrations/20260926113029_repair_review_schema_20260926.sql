@@ -68,3 +68,20 @@ $$;
 
 revoke all on function public.get_published_reviews() from public;
 grant execute on function public.get_published_reviews() to anon, authenticated, service_role;
+
+-- Reconstruct the Vault-backed configuration RPC in the canonical migration
+-- history. Its execution remains restricted to service_role.
+create or replace function public.get_google_review_config()
+returns jsonb
+language sql
+security definer
+set search_path = public, vault
+as $$
+  select decrypted_secret::jsonb
+  from vault.decrypted_secrets
+  where name = 'google_business_profile_credentials'
+  limit 1
+$$;
+
+revoke all on function public.get_google_review_config() from public, anon, authenticated;
+grant execute on function public.get_google_review_config() to service_role;
