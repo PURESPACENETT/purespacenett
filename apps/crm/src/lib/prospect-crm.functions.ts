@@ -13,57 +13,109 @@ const priorityEnum = z.enum(["basse", "normale", "haute", "urgente"]);
 export const listProspectCrm = createServerFn({ method: "GET" })
   .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
-    const [{ data: prospects, error: prospectsError }, { data: tasks, error: tasksError }, { data: activities, error: activitiesError }] =
-      await Promise.all([
-        context.supabase
-          .from("prospects")
-          .select("id,company_name,city,postal_code,email,phone,score,status,opportunity_type,loss_reason,do_not_contact,do_not_contact_reason,website,outreach_sent_at,created_at,updated_at")
-          .order("score", { ascending: false })
-          .order("created_at", { ascending: false })
-          .limit(400),
-        context.supabase
-          .from("prospect_tasks")
-          .select("id,prospect_id,title,task_type,due_at,priority,completed_at,created_at,updated_at")
-          .order("completed_at", { ascending: true, nullsFirst: true })
-          .order("due_at", { ascending: true, nullsFirst: false })
-          .limit(500),
-        context.supabase
-          .from("prospect_activities")
-          .select("id,prospect_id,activity_type,title,body,occurred_at,created_by,metadata,created_at")
-          .order("occurred_at", { ascending: false })
-          .limit(500),
-      ]);
+    const PAGE_SIZE = 1000;
 
-    if (prospectsError) throw new Error(prospectsError.message);
-    if (tasksError) throw new Error(tasksError.message);
-    if (activitiesError) throw new Error(activitiesError.message);
+    const allProspects = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await context.supabase
+        .from("prospects")
+        .select("id,company_name,city,postal_code,email,phone,score,status,opportunity_type,loss_reason,do_not_contact,do_not_contact_reason,website,outreach_sent_at,created_at,updated_at")
+        .order("score", { ascending: false })
+        .order("created_at", { ascending: false })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw new Error(error.message);
+      allProspects.push(...(data ?? []));
+      if (!data || data.length < PAGE_SIZE) break;
+    }
+
+    const allTasks = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await context.supabase
+        .from("prospect_tasks")
+        .select("id,prospect_id,title,task_type,due_at,priority,completed_at,created_at,updated_at")
+        .order("completed_at", { ascending: true, nullsFirst: true })
+        .order("due_at", { ascending: true, nullsFirst: false })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw new Error(error.message);
+      allTasks.push(...(data ?? []));
+      if (!data || data.length < PAGE_SIZE) break;
+    }
+
+    const allActivities = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await context.supabase
+        .from("prospect_activities")
+        .select("id,prospect_id,activity_type,title,body,occurred_at,created_by,metadata,created_at")
+        .order("occurred_at", { ascending: false })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw new Error(error.message);
+      allActivities.push(...(data ?? []));
+      if (!data || data.length < PAGE_SIZE) break;
+    }
 
     return {
-      prospects: prospects ?? [],
-      tasks: tasks ?? [],
-      activities: activities ?? [],
-      kpis: buildKpis(prospects ?? []),
+      prospects: allProspects,
+      tasks: allTasks,
+      activities: allActivities,
+      kpis: buildKpis(allProspects),
     };
   });
 
 export const listTodayProspectTasks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1);
+    const parisParts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Paris",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
+    const year = Number(parisParts.find((part) => part.type === "year")?.value);
+    const month = Number(parisParts.find((part) => part.type === "month")?.value);
+    const day = Number(parisParts.find((part) => part.type === "day")?.value);
+    const offset = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Paris",
+      timeZoneName: "longOffset",
+      hour: "2-digit",
+    })
+      .formatToParts(new Date())
+      .find((part) => part.type === "timeZoneName")?.value
+      ?.replace("GMT", "") || "+01:00";
+    const start = new Date(
+      `${year.toString().padStart(4, "0")}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}T00:00:00${offset}`,
+    );
+    const nextParisDay = new Date(Date.UTC(year, month - 1, day + 1));
+    const nextYear = nextParisDay.getUTCFullYear();
+    const nextMonth = nextParisDay.getUTCMonth() + 1;
+    const nextDay = nextParisDay.getUTCDate();
+    const endOffset = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Paris",
+      timeZoneName: "longOffset",
+      hour: "numeric",
+    })
+      .formatToParts(new Date(nextParisDay.getTime() + 12 * 60 * 60 * 1000))
+      .find((part) => part.type === "timeZoneName")?.value
+      ?.replace("GMT", "") || offset;
+    const end = new Date(
+      `${nextYear.toString().padStart(4, "0")}-${nextMonth.toString().padStart(2, "0")}-${nextDay.toString().padStart(2, "0")}T00:00:00${endOffset}`,
+    );
 
-    const { data: tasks, error: taskError } = await context.supabase
-      .from("prospect_tasks")
-      .select("id,prospect_id,title,task_type,due_at,priority,completed_at")
-      .lt("due_at", end.toISOString())
-      .order("completed_at", { ascending: true, nullsFirst: true })
-      .order("due_at", { ascending: true, nullsFirst: false })
-      .limit(200);
-    if (taskError) throw new Error(taskError.message);
+    const PAGE_SIZE = 1000;
+    const tasks = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await context.supabase
+        .from("prospect_tasks")
+        .select("id,prospect_id,title,task_type,due_at,priority,completed_at")
+        .is("completed_at", null)
+        .lt("due_at", end.toISOString())
+        .order("due_at", { ascending: true, nullsFirst: false })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw new Error(error.message);
+      tasks.push(...(data ?? []));
+      if (!data || data.length < PAGE_SIZE) break;
+    }
 
-    const prospectIds = [...new Set((tasks ?? []).map((task) => task.prospect_id))];
+    const prospectIds = [...new Set(tasks.map((task) => task.prospect_id))];
     const { data: prospects, error: prospectError } = prospectIds.length
       ? await context.supabase
           .from("prospects")
@@ -73,7 +125,7 @@ export const listTodayProspectTasks = createServerFn({ method: "GET" })
     if (prospectError) throw new Error(prospectError.message);
 
     const byId = new Map((prospects ?? []).map((prospect) => [prospect.id, prospect]));
-    return (tasks ?? []).map((task) => ({
+    return tasks.map((task) => ({
       ...task,
       prospect: byId.get(task.prospect_id) ?? null,
     }));

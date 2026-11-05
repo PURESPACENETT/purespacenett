@@ -97,9 +97,13 @@ function isOverdue(value: string | null, completedAt: string | null) {
 
 function isToday(value: string | null) {
   if (!value) return false;
-  const date = new Date(value);
-  const now = new Date();
-  return date.toDateString() === now.toDateString();
+  const parisDate = new Intl.DateTimeFormat("fr-FR", {
+    timeZone: "Europe/Paris",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return parisDate.format(new Date(value)) === parisDate.format(new Date());
 }
 
 export function ProspectCrm() {
@@ -344,7 +348,6 @@ export function ProspectCrm() {
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <span>Réponses : <strong className="text-foreground">{kpis?.reponses ?? 0}</strong></span>
-        <span>·</span>
         <span>·</span>
         <span>Devis : <strong className="text-foreground">{kpis?.devis ?? 0}</strong></span>
         <span>Gagnés : <strong className="text-foreground">{kpis?.gagnes ?? 0}</strong></span>
