@@ -30,7 +30,7 @@ function toPricing(row: Record<string, unknown> | null | undefined): PricingSett
 
 /** Public: submit a quote request from the website form. */
 export const submitQuoteRequest = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => quoteRequestSchema.parse(input))
+  .validator((input: unknown) => quoteRequestSchema.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -122,7 +122,7 @@ export const submitQuoteRequest = createServerFn({ method: "POST" })
 /** Private: (re)generate the AI qualification of a request. */
 export const qualifyRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("quote_requests")
@@ -168,7 +168,7 @@ export const qualifyRequest = createServerFn({ method: "POST" })
 
 /** Public: live estimate preview while filling the form. */
 export const previewEstimate = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         propertyType: z.string(),
@@ -203,7 +203,7 @@ export const listRequests = createServerFn({ method: "GET" })
 
 export const getRequest = createServerFn({ method: "GET" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: request, error } = await context.supabase
       .from("quote_requests")
@@ -239,7 +239,7 @@ export const getRequest = createServerFn({ method: "GET" })
 
 export const updateRequestStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -265,7 +265,7 @@ export const updateRequestStatus = createServerFn({ method: "POST" })
 /** Private: record actual signed/billed revenue and synchronize the Meta conversion event. */
 export const updateRequestRevenue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({
       id: z.string().uuid(),
       actualRevenue: z.number().finite().min(0).max(9999999999.99).nullable(),
@@ -318,7 +318,7 @@ export const updateRequestRevenue = createServerFn({ method: "POST" })
 
 export const addNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({ requestId: z.string().uuid(), body: z.string().trim().min(1).max(2000) })
       .parse(input),
@@ -335,7 +335,7 @@ export const addNote = createServerFn({ method: "POST" })
 
 export const deleteRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("quote_requests").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -360,7 +360,7 @@ export const getPricing = createServerFn({ method: "GET" })
 
 export const updatePricing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseStaff])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         min_price: z.coerce.number().min(0).max(100000),

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { BarChart3 } from "lucide-react";
 
+import { MetaAdsOptimizer } from "@/components/meta-ads-optimizer";
 import { listMetaAdsPerformance } from "@/lib/meta-ads.functions";
 
 export const Route = createFileRoute("/_authenticated/app/meta-ads")({
@@ -126,6 +127,8 @@ function MetaAdsPage() {
           </section>
         </>
       ) : null}
+
+      <MetaAdsOptimizer />
     </div>
   );
 }

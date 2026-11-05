@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { LocalSeoPage, localBusinessJsonLd, type LocalPageProps } from "@/components/local-seo-page";
+import { LocalSeoPage } from "@/components/local-seo-page";
+import { localBusinessJsonLd, type LocalPageProps } from "@/components/local-seo-shared";
 
 const PAGE: LocalPageProps = {
   title: "Nettoyage de bureaux en Île-de-France",
