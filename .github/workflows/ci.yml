@@ -54,3 +54,22 @@ jobs:
 
       - name: Check Meta Leads function
         run: deno check --config supabase/functions/meta-leads-webhook/deno.json supabase/functions/meta-leads-webhook/index.ts
+
+  migration-replay:
+    name: Replay canonical Supabase migrations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+
+      - name: Start local Supabase
+        run: supabase db start
+
+      - name: Replay the complete canonical migration history
+        run: supabase db reset --local --no-seed

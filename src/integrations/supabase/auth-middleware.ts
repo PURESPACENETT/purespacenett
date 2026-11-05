@@ -2,6 +2,7 @@
 import { createMiddleware } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
+import { buildAuthClaims } from './auth-claims'
 import type { Database } from './types'
 
 const OWNER_EMAIL = 'contact@purespacenett.com'
@@ -115,12 +116,7 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
         supabase,
         userId: data.user.id,
         user: data.user,
-        claims: {
-          ...data.user.app_metadata,
-          ...data.user.user_metadata,
-          sub: data.user.id,
-          email: data.user.email,
-        },
+        claims: buildAuthClaims(data.user),
       },
     });
   },
