@@ -17,18 +17,20 @@ BEGIN
     WHERE lower(email) = 'contact@purespacenett.com'
       AND email_confirmed_at IS NOT NULL;
 
-  IF owner_count <> 1 THEN
-    RAISE EXCEPTION 'Expected exactly one confirmed proprietor account; found %', owner_count;
+  IF owner_count > 1 THEN
+    RAISE EXCEPTION 'Expected at most one confirmed proprietor account; found %', owner_count;
   END IF;
 
-  SELECT id INTO owner_id
-    FROM auth.users
-    WHERE lower(email) = 'contact@purespacenett.com'
-      AND email_confirmed_at IS NOT NULL;
+  IF owner_count = 1 THEN
+    SELECT id INTO owner_id
+      FROM auth.users
+      WHERE lower(email) = 'contact@purespacenett.com'
+        AND email_confirmed_at IS NOT NULL;
 
-  INSERT INTO public.user_roles (user_id, role)
-  VALUES (owner_id, 'admin'::public.app_role)
-  ON CONFLICT (user_id, role) DO NOTHING;
+    INSERT INTO public.user_roles (user_id, role)
+    VALUES (owner_id, 'admin'::public.app_role)
+    ON CONFLICT (user_id, role) DO NOTHING;
+  END IF;
 
   FOR policy_row IN
     SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check

@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "test": "bun test tests/meta-lead-reliability.test.ts",
     "format": "prettier --write ."
   },
   "overrides": {
