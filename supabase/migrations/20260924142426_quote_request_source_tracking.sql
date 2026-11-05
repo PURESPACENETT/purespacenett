@@ -18,6 +18,7 @@ create unique index if not exists quote_requests_source_external_id_uidx
 
 alter table public.quote_requests
   add column if not exists gclid text,
+  add column if not exists fbclid text,
   add column if not exists gbraid text,
   add column if not exists wbraid text,
   add column if not exists utm_source text,

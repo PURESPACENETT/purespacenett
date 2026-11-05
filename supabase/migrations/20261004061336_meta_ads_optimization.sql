@@ -1,5 +1,5 @@
 -- Reproducible baseline for the Meta CRM tables used by the sync functions
--- and CRM. Keep this before 20261004220000_meta_crm_actual_revenue.sql.
+-- and CRM. Keep this before 20261005182451_meta_crm_actual_revenue.sql.
 -- The production project already has these tables; IF NOT EXISTS makes this
 -- migration safe to apply there while allowing a fresh database to build them.
 
