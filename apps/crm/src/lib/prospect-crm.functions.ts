@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { nextParisMidnight } from "@/lib/timezone";
 import { z } from "zod";
 
 import { requireSupabaseStaff } from "@/integrations/supabase/staff-middleware";
@@ -64,41 +65,7 @@ export const listProspectCrm = createServerFn({ method: "GET" })
 export const listTodayProspectTasks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseStaff])
   .handler(async ({ context }) => {
-    const parisParts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Europe/Paris",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).formatToParts(new Date());
-    const year = Number(parisParts.find((part) => part.type === "year")?.value);
-    const month = Number(parisParts.find((part) => part.type === "month")?.value);
-    const day = Number(parisParts.find((part) => part.type === "day")?.value);
-    const offset = new Intl.DateTimeFormat("en-US", {
-      timeZone: "Europe/Paris",
-      timeZoneName: "longOffset",
-      hour: "2-digit",
-    })
-      .formatToParts(new Date())
-      .find((part) => part.type === "timeZoneName")?.value
-      ?.replace("GMT", "") || "+01:00";
-    const start = new Date(
-      `${year.toString().padStart(4, "0")}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}T00:00:00${offset}`,
-    );
-    const nextParisDay = new Date(Date.UTC(year, month - 1, day + 1));
-    const nextYear = nextParisDay.getUTCFullYear();
-    const nextMonth = nextParisDay.getUTCMonth() + 1;
-    const nextDay = nextParisDay.getUTCDate();
-    const endOffset = new Intl.DateTimeFormat("en-US", {
-      timeZone: "Europe/Paris",
-      timeZoneName: "longOffset",
-      hour: "numeric",
-    })
-      .formatToParts(new Date(nextParisDay.getTime() + 12 * 60 * 60 * 1000))
-      .find((part) => part.type === "timeZoneName")?.value
-      ?.replace("GMT", "") || offset;
-    const end = new Date(
-      `${nextYear.toString().padStart(4, "0")}-${nextMonth.toString().padStart(2, "0")}-${nextDay.toString().padStart(2, "0")}T00:00:00${endOffset}`,
-    );
+    const end = nextParisMidnight(new Date());
 
     const PAGE_SIZE = 1000;
     const tasks = [];
