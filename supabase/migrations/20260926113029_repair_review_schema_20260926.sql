@@ -31,6 +31,13 @@ create unique index if not exists review_submissions_google_review_id_uidx
 create index if not exists review_submissions_source_status_created_idx
   on public.review_submissions (source, status, created_at desc);
 
+-- Restore the public read policy before the later owner-only migration narrows
+-- it and the following migration restores the published-only condition.
+drop policy if exists "Public can view published reviews" on public.review_submissions;
+create policy "Public can view published reviews"
+  on public.review_submissions for select to anon, authenticated
+  using (status = 'publié');
+
 drop function if exists public.get_published_reviews();
 
 create function public.get_published_reviews()
